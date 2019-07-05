@@ -38,7 +38,16 @@ one arg	- filename. By default, RVM try to read the file like it has RBC in ther
 
 
 ### How it works:<br>
-You start the RVM with the given args and it starts scanning the file. First, the RVM scans the whole file and makes tokens out of them. Second, the recognizer part goes. The recognizer tries to recognize tokens and give them a type. Then, the parsing part goes. In that part, the parser decides what to do using the first token. Decisions are made by using the template (decision tree). The decision tree is just a linked list. If the parser finds a pointer to NULL, it throws an error. While the parser breaking the tree up, it makes instruction in a binary representation. There are 3 types of instruction: opcode, opcode + opDef + operand + operand, opcode + loc. opcode = 1 byte, opDef = 1 byte, operand = 2 bytes, loc = 4 bytes. To make the jump instruction, the parser just repeats looking at opcode of the next instruction and skipping right amount of bytes. The parser always tracks the line number. When instruction has been parsed, the parser give the control to the running part of the VM. The RVM throw an error if a program ends without the halt instruction.
+You start the RVM with the given args. Basically, it scans the first line, tokenizes it, make an instruction out of that (parsing part), and save the instruction in the array. In the parsing part, the parser decides what to do using the first token. Decisions are made by using the template (decision tree). The decision tree is just a linked list. If the parser finds a pointer to NULL, it throws an error. While the parser breaking the tree up, it makes instruction in a binary representation. There are 3 types of instruction: opcode, opcode + opDef + operand + operand, opcode + loc. opcode = 1 byte, opDef = 1 byte, operand = 2 bytes, loc = 4 bytes. To make the jump instruction, the parser just repeats looking at opcode of the next instruction and skipping right amount of bytes. The parser always tracks the line number. When instruction has been parsed, the parser give the control to the running part of the VM. The RVM throw an error if a program ends without the halt instruction.
+
+
+### How it works (briefly):<br>
+1. scan a line<br>
+2. tokenize the line<br>
+3. parse the line (it makes an instruction in bin. representation)<br>
+4. save the instruction in the instruction array<br>
+5. go to the first stage if the next line exists<br>
+6. execute the instructions from the instruction array (the parsing part is likely the same)<br>
 
 
 ### Errors:<br>
@@ -51,3 +60,4 @@ Parser:<br>
 	Not Instruction - the instruction is not correct.<br>
 Executor:<br>
 	Bad Instruction - the binary representation of the instruction is not correct. The parser has made a mistake.<br>
+    End Without HALT - there're no instructions left and the last instruction isn't HALT.
