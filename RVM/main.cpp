@@ -1,6 +1,11 @@
 #include <iostream>
+#include <stdexcept>
+
+#include "exceptions.hpp"
+
 
 int main(int argc, char* argv[])
 {
-	return (0);
+	system("pause");
+	return 0;
 }
