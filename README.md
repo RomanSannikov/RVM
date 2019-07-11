@@ -12,7 +12,7 @@ div    <br>
 ld    var<br>
 sv    var<br>
 eq<br>
-jmp    loc 
+jmp    loc <br>
 jne    loc    <br>
 je    loc    <br>
 gr<br>
