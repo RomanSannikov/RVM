@@ -22,7 +22,8 @@ or    <br>
 nan<br>
 xor    <br> 
 not<br>
-call    loc<br>    
+call    loc<br>   
+ret <br>
 push    val    <br>
 pop    val    <br>
 new    len, name<br>
