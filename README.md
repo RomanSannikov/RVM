@@ -12,7 +12,7 @@ div    <br>
 ld    var<br>
 sv    var<br>
 eq<br>
-jmp    loc<br>    
+jmp    loc 
 jne    loc    <br>
 je    loc    <br>
 gr<br>
@@ -20,7 +20,8 @@ ls<br>
 and    <br>    
 or    <br>
 nan<br>
-xor    <br>    
+xor    <br> 
+not<br>
 call    loc<br>    
 push    val    <br>
 pop    val    <br>
