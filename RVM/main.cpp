@@ -3,7 +3,7 @@
 
 #include "exceptions.hpp"
 #include "scanner.hpp"
-#include "main.h"
+#include "tokenizer.hpp"
 
 std::string filename = "example.txt"; // TEMPORARY VALUE
 std::string lineFromScanner;
@@ -11,18 +11,18 @@ std::string lineFromScanner;
 int main(int argc, char* argv[])
 {
 	Scanner scanner(filename);	
-	Tokenizer tokenizer();
+	//Tokenizer tokenizer();
 
-	try
+	while (true)
 	{
-		while (true)
+		try { lineFromScanner = scanner.scan(); }
+		catch (std::exception& e) { std::cout << e.what() << std::endl; break; }
+
+		if (lineFromScanner.empty())
 		{
-			lineFromScanner = scanner.scan();
+			std::cout << "Scanner returned an empty line" << std::endl;
+			break;
 		}
-	}
-	catch (std::exception& e)
-	{
-		std::cout << e.what() << std::endl;
 	}
 
 	system("pause");

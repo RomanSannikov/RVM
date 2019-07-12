@@ -15,9 +15,10 @@ public:
 	Scanner(const std::string& filename) : file(filename) {}
 	Scanner(const char* const filename) : file(filename) {}
 	
-	inline void open(const std::string& filename);
-	inline void open(const char* const filename);
+	inline void open(const std::string&);
+	inline void open(const char* const);
 	
+	inline bool isEOF();
 	inline bool isOpen();
 
 	std::string scan();

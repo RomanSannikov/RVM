@@ -6,13 +6,16 @@
 
 class Tokenizer
 {
-private:
+public:
 	std::vector<Token> tokens;
 
 public:
-	Tokenizer();
+	Tokenizer() {}
 	
 
-	void tokenize();
+	void tokenize(std::string&);
+
+private:
+	Token& match(std::string);
 };
 
