@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <algorithm>
+#include <iostream>
 
 #include "instruction.hpp"
 
@@ -16,6 +18,6 @@ public:
 	void tokenize(std::string&);
 
 private:
-	Token& match(std::string);
+	Token& recognize(std::string);
 };
 

@@ -11,7 +11,7 @@ std::string lineFromScanner;
 int main(int argc, char* argv[])
 {
 	Scanner scanner(filename);	
-	//Tokenizer tokenizer();
+	Tokenizer tokenizer;
 
 	while (true)
 	{
@@ -23,6 +23,8 @@ int main(int argc, char* argv[])
 			std::cout << "Scanner returned an empty line" << std::endl;
 			break;
 		}
+		std::cout << lineFromScanner << std::endl;
+		tokenizer.tokenize(lineFromScanner);
 	}
 
 	system("pause");
