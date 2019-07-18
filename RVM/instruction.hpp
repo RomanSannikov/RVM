@@ -40,13 +40,16 @@ enum class TokenState : int
 	label,
 
 	word,
-	number
+	number,
+	space,
+	comma,
+	slash
 };
 
 struct Token
 {
 	TokenState tokenState;
-	std::string firstValue;
+	std::string stringValue;
 };
 
 /*

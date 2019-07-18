@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 			std::cout << "Scanner returned an empty line" << std::endl;
 			break;
 		}
-		std::cout << lineFromScanner << std::endl;
+		//std::cout << lineFromScanner << std::endl;
 		tokenizer.tokenize(lineFromScanner);
 	}
 
