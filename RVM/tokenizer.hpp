@@ -2,7 +2,7 @@
 
 #include <array>
 #include <algorithm>
-#include <iostream>
+#include <iostream> // FIX: temp
 #include <cstring>
 
 #include "instruction.hpp"
@@ -32,7 +32,7 @@ public:
 	void tokenize(std::string&);
 
 private:
-	Token& recognize(const std::string&);
+	Token recognize(const std::string&);
 
 	StringSlice& is_(const std::string&, const int&);
 };

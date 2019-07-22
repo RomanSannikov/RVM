@@ -2,7 +2,7 @@
 
 void Tokenizer::tokenize(std::string& lineFromScanner)
 {
-	bool keepTokenizing = true;
+	bool keepTokenizing = true; // FIX: get rid of this
 	unsigned currentPoint = 0;
 	std::string stringSlice;
 	StringSlice slice;
@@ -28,7 +28,7 @@ void Tokenizer::tokenize(std::string& lineFromScanner)
 }
 
 
-Token& Tokenizer::recognize(const std::string& str)
+Token Tokenizer::recognize(const std::string& str)
 {
 	Token newToken = {TokenState::op_add, str};
 	return newToken;
@@ -37,7 +37,7 @@ Token& Tokenizer::recognize(const std::string& str)
 
 Tokenizer::StringSlice& Tokenizer::is_(const std::string& line, const int& startPoint)
 {
-	StringSlice slice = {0};
+	StringSlice slice = {0, 0};
 
 	if (isalpha(line[startPoint]))
 		slice.mode = c_WORD;
@@ -45,8 +45,8 @@ Tokenizer::StringSlice& Tokenizer::is_(const std::string& line, const int& start
 		slice.mode = c_NUMBER;
 	else
 	{
-		for(auto i : c_punctuationSymbols) if (i == line[startPoint]) return (slice = {c_PUNCTUATIONSYMBOL, 1});
-		return (slice = {c_PUNCTUATIONSYMBOL, 0});
+		for(auto i : c_punctuationSymbols) if (i == line[startPoint]) return (slice = {1, c_PUNCTUATIONSYMBOL });
+		return (slice = {0, c_PUNCTUATIONSYMBOL});
 	}
 
 	++slice.length;
