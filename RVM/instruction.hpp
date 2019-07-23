@@ -46,6 +46,17 @@ enum class TokenState : int
 	slash
 };
 
+
+const std::array<std::string, 24> c_stringTokenState =
+{
+	"add", "sub", "mul", "div",
+	"ld", "sv",
+	"eq", "jmp", "op_jne", "op_je", "op_gr", "op_ls",
+	"op_and", "op_or", "op_nand", "op_xor", "op_not",
+	"op_call", "op_ret", "op_push", "op_pop", "op_new", "op_del", "op_hlt"
+};
+
+
 struct Token
 {
 	TokenState tokenState;

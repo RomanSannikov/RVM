@@ -29,11 +29,11 @@ public:
 	Tokenizer() : c_punctuationSymbols{{' ', ',', '"'}}, c_WORD(0), c_NUMBER(1), c_PUNCTUATIONSYMBOL(2) {}
 	
 
-	void tokenize(std::string&);
+	void tokenize(const std::string&);
 
 private:
-	Token recognize(const std::string&);
+	void recognize(Token&, const uint8_t&);
 
-	StringSlice& is_(const std::string&, const int&);
+	StringSlice& is_(const std::string&, const int&); // FIX: rename this bullshit
 };
 
