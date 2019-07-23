@@ -51,9 +51,9 @@ const std::array<std::string, 24> c_stringTokenState =
 {
 	"add", "sub", "mul", "div",
 	"ld", "sv",
-	"eq", "jmp", "op_jne", "op_je", "op_gr", "op_ls",
-	"op_and", "op_or", "op_nand", "op_xor", "op_not",
-	"op_call", "op_ret", "op_push", "op_pop", "op_new", "op_del", "op_hlt"
+	"eq", "jmp", "op_jne", "je", "gr", "ls",
+	"and", "or", "nand", "xor", "not",
+	"call", "ret", "push", "pop", "new", "del", "hlt"
 };
 
 
@@ -77,5 +77,5 @@ const int8_t c_instructionValues[24] =
 				0b00110000, NONE, 
 				0b11110000, NONE,
 				0b11000011, 0b00110000,
-				NONE};
+				NONE };
 #undef NONE

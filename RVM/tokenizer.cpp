@@ -1,24 +1,24 @@
 #include "tokenizer.hpp"
 
+
 void Tokenizer::tokenize(const std::string& lineFromScanner)
 {
-	bool keepTokenizing = true; // FIX: get rid of this
 	unsigned currentPoint = 0;
 	std::string stringSlice;
 	StringSlice slice;
 	Token newToken;
 
-	while (keepTokenizing) // OPTIMIZE: replace with true
+	while (true)
 	{
 		slice = is_(lineFromScanner, currentPoint);
 
 		if (slice.length == 0 || currentPoint >= lineFromScanner.size())
-			break; //keepTokenizing = false;
+			break;
 
 		stringSlice = lineFromScanner.substr(currentPoint, slice.length);
 		newToken.stringValue = stringSlice;
 
-		std::cout << stringSlice << std::endl; // temp
+		std::cout << stringSlice << std::endl; // TEMP
 		
 		recognize(newToken, slice.mode);
 
@@ -37,7 +37,7 @@ void Tokenizer::recognize(Token& token, const uint8_t& c_mode)
 {
 	if (c_mode == c_WORD)
 	{
-		for (int i = 0; i < c_stringTokenState.size(); ++i)
+		for (unsigned i = 0; i < c_stringTokenState.size(); ++i)
 		{
 			if (token.stringValue == c_stringTokenState[i])
 			{
@@ -51,7 +51,7 @@ void Tokenizer::recognize(Token& token, const uint8_t& c_mode)
 	}
 	else if (c_mode == c_PUNCTUATIONSYMBOL)
 	{
-		for (int i = 0; i < c_punctuationSymbols.size(); ++i)
+		for (unsigned i = 0; i < c_punctuationSymbols.size(); ++i)
 			if (token.stringValue == c_stringTokenState[i])
 				token.tokenState = static_cast<TokenState>(static_cast<int>(TokenState::space) + i);
 	}

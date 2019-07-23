@@ -2,7 +2,7 @@
 
 #include <array>
 #include <algorithm>
-#include <iostream> // FIX: temp
+#include <iostream> // TEMP
 #include <cstring>
 
 #include "instruction.hpp"
