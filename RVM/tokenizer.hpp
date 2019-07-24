@@ -13,7 +13,7 @@ public:
 	std::vector<Token> tokens;
 
 private:
-	const std::array<char, 3> c_punctuationSymbols;
+	const std::vector<std::string> c_punctuationSymbols;
 
 	const uint8_t c_WORD;
 	const uint8_t c_NUMBER;
@@ -26,13 +26,14 @@ private:
 	};
 
 public:
-	Tokenizer() : c_punctuationSymbols{{' ', ',', '"'}}, c_WORD(0), c_NUMBER(1), c_PUNCTUATIONSYMBOL(2) {}
+	Tokenizer() : c_punctuationSymbols{{" ", ",", "\""}}, c_WORD(0), c_NUMBER(1), c_PUNCTUATIONSYMBOL(2) {}
 	
 
 	void tokenize(const std::string&);
 
 private:
 	void recognize(Token&, const uint8_t&);
+	void recognizeToken(Token&, const std::vector<std::string>&, const TokenState);
 
 	StringSlice& is_(const std::string&, const int&); // FIX: rename this bullshit
 };

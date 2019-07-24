@@ -1,5 +1,10 @@
 #include "tokenizer.hpp"
 
+void test(const Token& token)
+{
+	std::cout << "token.stringValue: " << token.stringValue << std::endl;
+	std::cout << "token.tokenState: " << static_cast<int>(token.tokenState) << std::endl << std::endl;
+}
 
 void Tokenizer::tokenize(const std::string& lineFromScanner)
 {
@@ -18,8 +23,6 @@ void Tokenizer::tokenize(const std::string& lineFromScanner)
 		stringSlice = lineFromScanner.substr(currentPoint, slice.length);
 		newToken.stringValue = stringSlice;
 
-		std::cout << stringSlice << std::endl; // TEMP
-		
 		recognize(newToken, slice.mode);
 
 		if (newToken.stringValue.empty())
@@ -27,6 +30,8 @@ void Tokenizer::tokenize(const std::string& lineFromScanner)
 			std::cout << "not recognized" << std::endl;
 			break;
 		}
+
+		test(newToken); // TEST
 
 		currentPoint += slice.length;
 	}
@@ -37,28 +42,30 @@ void Tokenizer::recognize(Token& token, const uint8_t& c_mode)
 {
 	if (c_mode == c_WORD)
 	{
-		for (unsigned i = 0; i < c_stringTokenState.size(); ++i)
-		{
-			if (token.stringValue == c_stringTokenState[i])
-			{
-				token.tokenState = static_cast<TokenState>(static_cast<int>(TokenState::op_add) + i);
-				break;
-			}
-		}
-
 		if (token.stringValue[token.stringValue.size() - 1] == ':')
 			token.tokenState = TokenState::label;
+
+		recognizeToken(token, c_stringInstructions, TokenState::op_add);
 	}
 	else if (c_mode == c_PUNCTUATIONSYMBOL)
-	{
-		for (unsigned i = 0; i < c_punctuationSymbols.size(); ++i)
-			if (token.stringValue == c_stringTokenState[i])
-				token.tokenState = static_cast<TokenState>(static_cast<int>(TokenState::space) + i);
-	}
+		recognizeToken(token, c_punctuationSymbols, TokenState::space);
 	else if (c_mode == c_NUMBER)
 		token.tokenState = TokenState::number;
-	else
-		token.stringValue.clear();
+}
+
+
+void Tokenizer::recognizeToken(Token& token, const std::vector<std::string>& array, const TokenState tokenState)
+{
+	for (unsigned i = 0; i < array.size(); ++i)
+	{
+		if (token.stringValue == array[i])
+		{
+			token.tokenState = static_cast<TokenState>(static_cast<int>(tokenState) + i);
+			return;
+		}
+	}
+
+	token.stringValue.clear();
 }
 
 
@@ -72,7 +79,7 @@ Tokenizer::StringSlice& Tokenizer::is_(const std::string& c_line, const int& c_s
 		slice.mode = c_NUMBER;
 	else
 	{
-		for(auto i : c_punctuationSymbols) if (i == c_line[c_startPoint]) return (slice = {1, c_PUNCTUATIONSYMBOL });
+		for(auto i : c_punctuationSymbols) if (i[0] == c_line[c_startPoint]) return (slice = {1, c_PUNCTUATIONSYMBOL });
 		return (slice = {0, c_PUNCTUATIONSYMBOL});
 	}
 

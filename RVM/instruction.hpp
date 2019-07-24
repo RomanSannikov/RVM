@@ -47,7 +47,7 @@ enum class TokenState : int
 };
 
 
-const std::array<std::string, 24> c_stringTokenState =
+const std::vector<std::string> c_stringInstructions =
 {
 	"add", "sub", "mul", "div",
 	"ld", "sv",
