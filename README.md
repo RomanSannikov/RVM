@@ -17,8 +17,8 @@ jne    loc    <br>
 je    loc    <br>
 gr<br>
 ls<br>
-and    <br>    
-or    <br>
+and    
+or
 nan<br>
 xor    <br> 
 not<br>
@@ -66,6 +66,9 @@ The Label Location Tabel stores label names and their location (a label points t
     <li>when the scanning part is done, go throw The ST and fill up jmp values using The LLT</li>
 </ol>
 
+### Logging System:<br>
+The RVM uses a logging system that helps to handle exceptions. The LS works in a different thread. In an unusual situation, a function throws an exception, that the LS handles. The LS has two states of handling. The first one is the yellow state. In that state, the LS just writes info in the console. The second one is the red state. In that state, the LS writes info in the console and terminates the program.
+
 ### Errors:<br>
 Scanner:<br>
 Bad File - cannot open the given file.<br>
@@ -76,4 +79,4 @@ Parser:<br>
     Not Instruction - the instruction is not correct.<br>
 Executor:<br>
     Bad Instruction - the binary representation of the instruction is not correct. The parser has made a mistake.<br>
-    End Without HALT - there're no instructions left and the last instruction isn't HALT.
+    End Without HALT - there are no instructions left and the last instruction isn't HALT.
