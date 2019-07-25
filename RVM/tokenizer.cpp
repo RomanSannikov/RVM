@@ -28,12 +28,12 @@ void Tokenizer::tokenize(const std::string& lineFromScanner)
 		if (newToken.stringValue.empty())
 		{
 			std::cout << "not recognized" << std::endl;
-			break;
+			break; // FIX: make up an exception or whatever
 		}
 
-		test(newToken); // TEST
-
 		currentPoint += slice.length;
+
+		tokens.push_back(newToken);
 	}
 }
 
