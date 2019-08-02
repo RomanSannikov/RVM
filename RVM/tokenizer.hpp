@@ -2,10 +2,11 @@
 
 #include <array>
 #include <algorithm>
-#include <iostream> // TEMP
+#include <iostream> // Fix: temporary
 #include <cstring>
 
 #include "instruction.hpp"
+#include "error.hpp"
 
 class Tokenizer
 {

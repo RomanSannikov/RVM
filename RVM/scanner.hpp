@@ -3,7 +3,7 @@
 #include <string>
 #include <fstream>
 
-#include "exceptions.hpp"
+#include "error.hpp"
 
 class Scanner
 {

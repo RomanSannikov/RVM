@@ -15,6 +15,8 @@ void Tokenizer::tokenize(const std::string& lineFromScanner)
 	StringSlice slice;
 	Token newToken;
 
+	tokens.clear();
+
 	while (true)
 	{
 		slice = getSlice(lineFromScanner, currentPoint);
@@ -28,10 +30,7 @@ void Tokenizer::tokenize(const std::string& lineFromScanner)
 		recognize(newToken, slice.mode);
 
 		if (newToken.stringValue.empty())
-		{
-			std::cout << "not recognized" << std::endl;
-			break; // FIX: make up an exception or whatever
-		}
+			error(c_lexerError + "not recognized");
 
 		currentPoint += slice.length;
 

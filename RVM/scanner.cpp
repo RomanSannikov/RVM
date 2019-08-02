@@ -1,4 +1,5 @@
 #include "scanner.hpp"
+#include "error.hpp"
 
 
 inline void Scanner::open(const std::string& filename) { file.open(filename); }
@@ -16,7 +17,7 @@ inline bool Scanner::isOpen() { return file.is_open(); }
 std::string Scanner::getLine()
 {
 	if (!file.is_open())
-		throw std::exception("Exception from scanner");
+		error(c_scannerError + "Cannot open the file!");
 
 	char* scannedLine = (char*)malloc(c_lineSize);
 	file.getline(scannedLine, c_lineSize);

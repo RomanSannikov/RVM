@@ -38,6 +38,12 @@
     <ClInclude Include="instruction.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="error.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="example.txt" />

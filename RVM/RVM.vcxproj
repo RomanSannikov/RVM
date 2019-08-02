@@ -24,8 +24,10 @@
     <ClCompile Include="tokenizer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="error.hpp" />
     <ClInclude Include="exceptions.hpp" />
     <ClInclude Include="instruction.hpp" />
+    <ClInclude Include="parser.hpp" />
     <ClInclude Include="scanner.hpp" />
     <ClInclude Include="tokenizer.hpp" />
   </ItemGroup>
