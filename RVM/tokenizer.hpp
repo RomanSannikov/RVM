@@ -35,6 +35,6 @@ private:
 	void recognize(Token&, const uint8_t&);
 	void recognizeToken(Token&, const std::vector<std::string>&, const TokenState);
 
-	StringSlice& is_(const std::string&, const int&); // FIX: rename this bullshit
+	StringSlice& getSlice(const std::string&, const int&);
 };
 

@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="loggingSystem.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="scanner.cpp" />
     <ClCompile Include="tokenizer.cpp" />
@@ -27,7 +26,6 @@
   <ItemGroup>
     <ClInclude Include="exceptions.hpp" />
     <ClInclude Include="instruction.hpp" />
-    <ClInclude Include="loggingSystem.hpp" />
     <ClInclude Include="scanner.hpp" />
     <ClInclude Include="tokenizer.hpp" />
   </ItemGroup>

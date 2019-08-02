@@ -24,9 +24,6 @@
     <ClCompile Include="tokenizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="loggingSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="exceptions.hpp">
@@ -39,9 +36,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="instruction.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="loggingSystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

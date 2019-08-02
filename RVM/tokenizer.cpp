@@ -1,10 +1,12 @@
 #include "tokenizer.hpp"
 
+
 void test(const Token& token)
 {
 	std::cout << "token.stringValue: " << token.stringValue << std::endl;
 	std::cout << "token.tokenState: " << static_cast<int>(token.tokenState) << std::endl << std::endl;
 }
+
 
 void Tokenizer::tokenize(const std::string& lineFromScanner)
 {
@@ -15,7 +17,7 @@ void Tokenizer::tokenize(const std::string& lineFromScanner)
 
 	while (true)
 	{
-		slice = is_(lineFromScanner, currentPoint);
+		slice = getSlice(lineFromScanner, currentPoint);
 
 		if (slice.length == 0 || currentPoint >= lineFromScanner.size())
 			break;
@@ -69,7 +71,7 @@ void Tokenizer::recognizeToken(Token& token, const std::vector<std::string>& arr
 }
 
 
-Tokenizer::StringSlice& Tokenizer::is_(const std::string& c_line, const int& c_startPoint)
+Tokenizer::StringSlice& Tokenizer::getSlice(const std::string& c_line, const int& c_startPoint)
 {
 	StringSlice slice = {0, 0};
 

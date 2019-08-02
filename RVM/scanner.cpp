@@ -13,7 +13,7 @@ inline bool Scanner::isEOF() { return file.eof(); }
 inline bool Scanner::isOpen() { return file.is_open(); }
 
 
-std::string Scanner::scan()
+std::string Scanner::getLine()
 {
 	if (!file.is_open())
 		throw std::exception("Exception from scanner");

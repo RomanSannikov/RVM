@@ -21,5 +21,5 @@ public:
 	inline bool isEOF();
 	inline bool isOpen();
 
-	std::string scan();
+	std::string getLine();
 };
