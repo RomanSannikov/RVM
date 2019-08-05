@@ -8,12 +8,14 @@
 class Scanner
 {
 private:
-	const unsigned int c_lineSize = 128;
+	const unsigned c_lineSize = 128;
 	std::ifstream file;
 
 public:
-	Scanner(const std::string& filename) : file(filename) {}
-	Scanner(const char* const filename) : file(filename) {}
+	Scanner(const std::string& c_filename) : file(c_filename) {}
+	Scanner(const char* const c_filename) : file(c_filename) {}
+
+	~Scanner() { file.close(); }
 	
 	inline void open(const std::string&);
 	inline void open(const char* const);
@@ -21,5 +23,5 @@ public:
 	inline bool isEOF();
 	inline bool isOpen();
 
-	std::string getLine();
+	std::string getLine(std::string&);
 };

@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-enum class TokenState : int
+enum class TokenState : unsigned
 {
 	op_add = 0,
 	op_sub,

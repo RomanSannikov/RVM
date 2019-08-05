@@ -22,20 +22,24 @@ private:
 
 	struct StringSlice
 	{
-		int length;
+		unsigned length;
 		uint8_t mode;
 	};
 
 public:
 	Tokenizer() : c_punctuationSymbols{{" ", ",", "\""}}, c_WORD(0), c_NUMBER(1), c_PUNCTUATIONSYMBOL(2) {}
 	
-
 	void tokenize(const std::string&);
+	void testTokens()
+	{
+		for (auto i : tokens)
+			std::cout << i.stringValue << std::endl;
+	}
 
 private:
 	void recognize(Token&, const uint8_t&);
 	void recognizeToken(Token&, const std::vector<std::string>&, const TokenState);
 
-	StringSlice& getSlice(const std::string&, const int&);
+	StringSlice& getSlice(const std::string&, const unsigned&, StringSlice&);
 };
 

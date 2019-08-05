@@ -1,39 +1,34 @@
 #include "tokenizer.hpp"
 
 
-void test(const Token& token)
-{
-	std::cout << "token.stringValue: " << token.stringValue << std::endl;
-	std::cout << "token.tokenState: " << static_cast<int>(token.tokenState) << std::endl << std::endl;
-}
-
-
-void Tokenizer::tokenize(const std::string& lineFromScanner)
+void Tokenizer::tokenize(const std::string& c_lineFromScanner)
 {
 	unsigned currentPoint = 0;
 	std::string stringSlice;
 	StringSlice slice;
-	Token newToken;
+	Token newToken = { TokenState::op_add };
 
 	tokens.clear();
 
 	while (true)
 	{
-		slice = getSlice(lineFromScanner, currentPoint);
+		slice.length = 0;
 
-		if (slice.length == 0 || currentPoint >= lineFromScanner.size())
+		slice = getSlice(c_lineFromScanner, currentPoint, slice);
+
+		if (slice.length == 0 || currentPoint >= c_lineFromScanner.size())
 			break;
 
-		stringSlice = lineFromScanner.substr(currentPoint, slice.length);
+		stringSlice = c_lineFromScanner.substr(currentPoint, slice.length);
 		newToken.stringValue = stringSlice;
 
 		recognize(newToken, slice.mode);
 
 		if (newToken.stringValue.empty())
-			error(c_lexerError + "not recognized");
+			printErrorAndExit(c_lexerError + "not recognized");
 
 		currentPoint += slice.length;
-
+	
 		tokens.push_back(newToken);
 	}
 }
@@ -70,10 +65,8 @@ void Tokenizer::recognizeToken(Token& token, const std::vector<std::string>& arr
 }
 
 
-Tokenizer::StringSlice& Tokenizer::getSlice(const std::string& c_line, const int& c_startPoint)
+Tokenizer::StringSlice& Tokenizer::getSlice(const std::string& c_line, const unsigned& c_startPoint, StringSlice& slice)
 {
-	StringSlice slice = {0, 0};
-
 	if (isalpha(c_line[c_startPoint]))
 		slice.mode = c_WORD;
 	else if (isdigit(c_line[c_startPoint]))

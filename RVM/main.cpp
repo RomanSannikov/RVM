@@ -3,25 +3,30 @@
 #include "scanner.hpp"
 #include "tokenizer.hpp"
 
-std::string filename = "example.txt"; // Fix: temporary value
-std::string lineFromScanner;
-
 
 void startVirtualMachine()
 {
-	Scanner scanner(filename);
+	const std::string c_filename = "example.txt"; // Fix: temporary value
+	
+	Scanner scanner(c_filename);
 	Tokenizer tokenizer;
+	
+	std::string lineFromScanner;
 
 	while (true)
 	{
-		lineFromScanner = scanner.getLine();
+		scanner.getLine(lineFromScanner);
 
-		if (lineFromScanner.empty())
+		if (scanner.isEOF())
+			break;
+		else if (lineFromScanner.empty())
 			continue;
 
 		std::cout << lineFromScanner << std::endl;
 		
 		tokenizer.tokenize(lineFromScanner);
+	
+		tokenizer.testTokens();
 	}
 }
 

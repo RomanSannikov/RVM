@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_map>
 
+#include "instruction.hpp"
 #include "error.hpp"
 
 class Parser
@@ -16,12 +17,13 @@ private:
 	std::unordered_map<std::string, jumpTableNode> jumpTable;
 	std::vector<uint8_t> instructions;
 
-	int currentLocation;
+	unsigned currentLocation;
+
 public: 
-	Parser() {}
+	Parser() : currentLocation(0) {}
 
 public:
-	void parse();
+	void parse(std::vector<Token>&);
 
 private:
 };
