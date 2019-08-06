@@ -7,16 +7,13 @@ inline void Scanner::open(const std::string& c_filename) { file.open(c_filename)
 inline void Scanner::open(const char* const c_filename) { file.open(c_filename); }
 
 
-inline bool Scanner::isEOF() { return file.eof(); }
-
-
-inline bool Scanner::isOpen() { return file.is_open(); }
+bool Scanner::isEOF() { return file.eof(); }
 
 
 std::string Scanner::getLine(std::string& scannedLine)
 {
 	if (!file.is_open())
-		printErrorAndExit(c_scannerError + "Cannot open the file!");
+		printErrorAndExit(c_scannerError + "The file is not open!");
 
 	std::getline(file, scannedLine);
 

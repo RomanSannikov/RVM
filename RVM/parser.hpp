@@ -13,7 +13,7 @@ private:
 	struct jumpTableNode 
 	{ void* location; int8_t value; };
 
-	std::unordered_map<std::string, uint8_t> symbolTable; // Fix: type
+	std::unordered_map<std::string, uint8_t> symbolTable; // Fix: Think of type
 	std::unordered_map<std::string, jumpTableNode> jumpTable;
 	std::vector<uint8_t> instructions;
 

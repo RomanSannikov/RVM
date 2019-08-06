@@ -20,8 +20,7 @@ public:
 	inline void open(const std::string&);
 	inline void open(const char* const);
 	
-	inline bool isEOF();
-	inline bool isOpen();
+	bool isEOF();
 
 	std::string getLine(std::string&);
 };

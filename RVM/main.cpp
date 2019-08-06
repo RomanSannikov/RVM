@@ -13,20 +13,16 @@ void startVirtualMachine()
 	
 	std::string lineFromScanner;
 
-	while (true)
+	while (!scanner.isEOF())
 	{
 		scanner.getLine(lineFromScanner);
 
-		if (scanner.isEOF())
-			break;
-		else if (lineFromScanner.empty())
+		if (lineFromScanner.empty())
 			continue;
 
 		std::cout << lineFromScanner << std::endl;
 		
 		tokenizer.tokenize(lineFromScanner);
-	
-		tokenizer.testTokens();
 	}
 }
 

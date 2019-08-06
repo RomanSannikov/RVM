@@ -30,11 +30,6 @@ public:
 	Tokenizer() : c_punctuationSymbols{{" ", ",", "\""}}, c_WORD(0), c_NUMBER(1), c_PUNCTUATIONSYMBOL(2) {}
 	
 	void tokenize(const std::string&);
-	void testTokens()
-	{
-		for (auto i : tokens)
-			std::cout << i.stringValue << std::endl;
-	}
 
 private:
 	void recognize(Token&, const uint8_t&);
