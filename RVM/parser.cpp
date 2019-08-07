@@ -1,7 +1,7 @@
 #include "parser.hpp"
 
 
-void Parser::parse(std::vector<Token>& tokens)
+void Parser::parse()
 {
 	int8_t insturctionValue;
 	uint8_t instruction;
@@ -19,32 +19,48 @@ void Parser::parse(std::vector<Token>& tokens)
 
 			insturctionValue = c_instructionValues[instruction];
 
-			// Todo: jump instruction branch
+			// Fix: finish this branch up
+			if (i.tokenState >= TokenState::op_jmp && i.tokenState <= TokenState::op_je)
+			{
+				addLocationOfJump(i.stringValue, reinterpret_cast<intptr_t>(instructions.data() + instructions.size() - 1));
+				instructions.push_back((uint8_t)0);
+			}
 
 			thenValuesGo = true;
 		}
 		else if (i.tokenState == TokenState::label)
 		{
-			const auto& it_jumpTableNode = jumpTable.find(i.stringValue);
-			jumpTableNode jumpTableNode;
-			uintptr_t locationOfLabel;
+			addLocationOfLabel(i.stringValue, reinterpret_cast<intptr_t>(instructions.data() + instructions.size() - 1));
 
-			// the location of the last instruction
-			locationOfLabel = reinterpret_cast<uintptr_t>(instructions.data() + instructions.size() - 1);
-			
-			if(it_jumpTableNode != jumpTable.end() && it_jumpTableNode->second.locationOfLabel != 0)
-				printErrorAndExit(c_parserError + "The label " + it_jumpTableNode->first + " was defined several times!");
-			else if (it_jumpTableNode == jumpTable.end())
-			{
-				jumpTableNode.locationOfJump = 0;
-				jumpTableNode.locationOfLabel = locationOfLabel;
-
-				jumpTable.insert(std::make_pair(i.stringValue, jumpTableNode));
-			}
-			else
-				it_jumpTableNode->second.locationOfLabel = locationOfLabel;
-				
 			thenValuesGo = true;
 		}
 	}
+}
+
+
+void Parser::addLocationOfLabel(std::string& labelName, intptr_t&& location)
+{
+	const auto& it_jumpTableNode = jumpTable.find(labelName);
+	jumpTableNode jumpTableNode;
+
+	if (it_jumpTableNode != jumpTable.end() && it_jumpTableNode->second.locationOfLabel >= 0)
+		printErrorAndExit(c_parserError + "The label " + it_jumpTableNode->first + " was defined several times!");
+	else if (it_jumpTableNode == jumpTable.end())
+	{
+		// jumpTableNode.locationOfJump = 0;
+		jumpTableNode.locationOfLabel = location;
+
+		jumpTable.insert(std::make_pair(labelName, jumpTableNode));
+	}
+	else
+		it_jumpTableNode->second.locationOfLabel = location;
+}
+
+
+void Parser::addLocationOfJump(std::string& labelName, intptr_t&& location)
+{
+	const auto& it_jumpTableNode = jumpTable.find(labelName);
+	jumpTableNode jumpTableNode;
+
+	// Todo: do something with locationOfJump (note that's a vector)
 }
