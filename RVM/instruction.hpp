@@ -80,21 +80,4 @@ const std::array<int8_t, 24> c_instructionValues
 				0b11000011, 0b00110000,
 				NONE };
 
-//const std::array<TokenState*> c_pattern = // Fix: think of the name
-//				{
-//
-//				};
-//
-//struct patternNode
-//{
-//	TokenState tokenState;
-//	patternNode* another;
-//	patternNode* next;
-//};
-//
-//const std::array<patternNode> c_pattern = 
-//{
-//	patternNode {TokenState::op_add, }
-//};
-
 #undef NONE

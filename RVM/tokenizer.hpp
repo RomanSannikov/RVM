@@ -2,7 +2,6 @@
 
 #include <array>
 #include <algorithm>
-#include <iostream> // Fix: temporary
 #include <cstring>
 
 #include "instruction.hpp"
