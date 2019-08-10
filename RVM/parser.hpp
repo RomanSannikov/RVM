@@ -32,11 +32,14 @@ public:
 	// Todo: add a function that will complete the jumpTable after all parsing
 
 private:
+	// Todo: don't use intptr_t
 	void addLocationOfLabel(const std::string&, const intptr_t&&);
 
+	// Todo: don't use intptr_t
 	// Todo: add this description to the documentation
 	// Desc: the last argument of addLocationOfJump is the location of the jump instruction,
 	// therefore when the location of label is added after the instruction (the space is added already)
 	void addLocationOfJump(const std::string&, const intptr_t&&);
 
+	auto findLocationOfJump(const std::string&, const unsigned&&);
 };

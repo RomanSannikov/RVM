@@ -47,6 +47,7 @@ void Parser::addLocationOfLabel(const std::string& c_labelName, const intptr_t&&
 		printErrorAndExit(c_parserError + "The label " + c_it_jumpTableNode->first + " was defined several times!");
 	else if (c_it_jumpTableNode == jumpTable.end())
 	{
+		// Todo: put in findLocationOfJump() here
 		// jumpTableNode.locationOfJump = 0;
 		jumpTableNode.locationOfLabel = c_location;
 
@@ -63,4 +64,17 @@ void Parser::addLocationOfJump(const std::string& c_labelName, const intptr_t&& 
 	jumpTableNode jumpTableNode;
 
 	// Todo: do something with locationOfJump (note that's a vector)
+}
+
+
+auto Parser::findLocationOfJump(const std::string& c_labelName, const unsigned&& c_locationToFind)
+{
+	const auto c_it_jumpTableNode = jumpTable.find(c_labelName);
+
+	if (c_it_jumpTableNode != jumpTable.end())
+		for (auto i = c_it_jumpTableNode->second.locationOfJump.begin(); i != c_it_jumpTableNode->second.locationOfJump.end(); ++i)
+			if (*i == c_locationToFind)
+				return i;
+
+	return c_it_jumpTableNode->second.locationOfJump.end();
 }
