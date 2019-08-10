@@ -57,9 +57,9 @@ void Parser::addLocationOfLabel(const std::string& c_labelName, const intptr_t&&
 }
 
 
-void Parser::addLocationOfJump(std::string& labelName, intptr_t&& location)
+void Parser::addLocationOfJump(const std::string& c_labelName, const intptr_t&& c_location)
 {
-	const auto& c_it_jumpTableNode = jumpTable.find(labelName);
+	const auto& c_it_jumpTableNode = jumpTable.find(c_labelName);
 	jumpTableNode jumpTableNode;
 
 	// Todo: do something with locationOfJump (note that's a vector)
