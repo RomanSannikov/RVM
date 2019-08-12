@@ -1,44 +1,47 @@
 #include "parser.hpp"
 
-
-void Parser::parse(std::vector<Token>& tokens)
+void Parser::parse(const std::vector<Token>& tokens)
 {
 	int8_t insturctionValue;
 	uint8_t instruction;
 
-	bool thenValuesGo = false;
+	// Fix: I think it could be removed
+	bool needValues = false;
 
 	for (auto& i : tokens)
 	{
 		if (i.tokenState <= TokenState::op_hlt)
 		{
-			assert(thenValuesGo == false);
+			assert(needValues == false);
 
 			instruction = static_cast<uint8_t>(i.tokenState);
 			instructions.push_back(instruction);
 
-			insturctionValue = c_instructionValues[instruction];
+			needValues = insturctionValue = c_instructionValues[instruction];
 
-			// Fix: finish this branch up
 			if (i.tokenState >= TokenState::op_jmp && i.tokenState <= TokenState::op_je)
 			{
-				addLocationOfJump(i.stringValue, reinterpret_cast<intptr_t>(instructions.data() + instructions.size() - 1));
+				addLocationOfJump(i.stringValue, (instructions.size() - 1));
 				instructions.push_back((uint8_t)0);
 			}
-
-			thenValuesGo = true;
 		}
 		else if (i.tokenState == TokenState::label)
 		{
-			addLocationOfLabel(i.stringValue, reinterpret_cast<intptr_t>(instructions.data() + instructions.size() - 1));
-
-			thenValuesGo = true;
+			addLocationOfLabel(i.stringValue, (instructions.size() - 1));
 		}
+		else if (i.tokenState == TokenState::number)
+		{
+			// Fix: strings are also values!
+			try { instructions.push_back(std::stoi(i.stringValue)); }
+			catch (const std::invalid_argument&) { printErrorAndExit(c_parserError + "the value is invalid"); }
+		}
+		else // Fix: get rid of exceptions. Write stable code!
+			printErrorAndExit(c_parserError + "invalid instruction");
 	}
 }
 
 
-void Parser::addLocationOfLabel(const std::string& c_labelName, const intptr_t&& c_location)
+void Parser::addLocationOfLabel(const std::string& c_labelName, const unsigned&& c_locationLabel)
 {
 	const auto& c_it_jumpTableNode = jumpTable.find(c_labelName);
 	jumpTableNode jumpTableNode;
@@ -47,34 +50,39 @@ void Parser::addLocationOfLabel(const std::string& c_labelName, const intptr_t&&
 		printErrorAndExit(c_parserError + "The label " + c_it_jumpTableNode->first + " was defined several times!");
 	else if (c_it_jumpTableNode == jumpTable.end())
 	{
-		// Todo: put in findLocationOfJump() here
-		// jumpTableNode.locationOfJump = 0;
-		jumpTableNode.locationOfLabel = c_location;
-
+		jumpTableNode.locationOfLabel = c_locationLabel;
 		jumpTable.insert(std::make_pair(c_labelName, jumpTableNode));
 	}
 	else
-		c_it_jumpTableNode->second.locationOfLabel = c_location;
+		c_it_jumpTableNode->second.locationOfLabel = c_locationLabel;
 }
 
 
-void Parser::addLocationOfJump(const std::string& c_labelName, const intptr_t&& c_location)
+void Parser::addLocationOfJump(const std::string& c_labelName, const unsigned&& c_locationOfJump)
 {
 	const auto& c_it_jumpTableNode = jumpTable.find(c_labelName);
 	jumpTableNode jumpTableNode;
 
-	// Todo: do something with locationOfJump (note that's a vector)
+	if (findLocationOfJump(c_it_jumpTableNode, c_locationOfJump) != jumpTableNode.locationOfJump.end())
+		printErrorAndExit(c_parserError + "jump instruction is already exits");
+	else if (c_it_jumpTableNode == jumpTable.end())
+	{
+		jumpTableNode.locationOfLabel = 0;
+		jumpTableNode.locationOfJump.push_back(c_locationOfJump);
+		jumpTable.insert(std::make_pair(c_labelName, jumpTableNode));
+	}
+	else
+		jumpTableNode.locationOfJump.push_back(c_locationOfJump);
+
 }
 
 
-auto Parser::findLocationOfJump(const std::string& c_labelName, const unsigned&& c_locationToFind)
+auto Parser::findLocationOfJump(const jumpTableList& c_labelIterator, const unsigned& c_locationToFind)
 {
-	const auto c_it_jumpTableNode = jumpTable.find(c_labelName);
-
-	if (c_it_jumpTableNode != jumpTable.end())
-		for (auto i = c_it_jumpTableNode->second.locationOfJump.begin(); i != c_it_jumpTableNode->second.locationOfJump.end(); ++i)
+	if (c_labelIterator != jumpTable.end())
+		for (auto i = c_labelIterator->second.locationOfJump.begin(); i != c_labelIterator->second.locationOfJump.end(); ++i)
 			if (*i == c_locationToFind)
 				return i;
 
-	return c_it_jumpTableNode->second.locationOfJump.end();
+	return c_labelIterator->second.locationOfJump.end();
 }
