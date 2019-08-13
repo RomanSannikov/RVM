@@ -1,5 +1,8 @@
 push 1
+
 push 2
+l1:
 add
-pop
+
+jmp l1
 hlt

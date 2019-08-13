@@ -2,6 +2,7 @@
 
 #include "scanner.hpp"
 #include "tokenizer.hpp"
+#include "parser.hpp"
 
 
 void startVirtualMachine()
@@ -10,6 +11,7 @@ void startVirtualMachine()
 	
 	Scanner scanner(c_filename);
 	Tokenizer tokenizer;
+	Parser parser;
 	
 	std::string lineFromScanner;
 
@@ -23,7 +25,11 @@ void startVirtualMachine()
 		std::cout << lineFromScanner << std::endl;
 		
 		tokenizer.tokenize(lineFromScanner);
+
+		parser.parse(tokenizer.tokens);
 	}
+
+	parser.printInstructions();
 }
 
 

@@ -70,7 +70,7 @@ NUM STR NUM STR
 1value  2value
 */
 #define NONE 0b00000000
-const std::array<int8_t, 24> c_instructionValues
+const std::array<uint8_t, 24> c_instructionValues
 				{ NONE, NONE, NONE, NONE, 
 				0b00110000, 0b00110000, 
 				NONE, 0b00110000, 0b00110000, 0b00110000, NONE, NONE,

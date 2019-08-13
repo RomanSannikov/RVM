@@ -2,42 +2,35 @@
 
 void Parser::parse(const std::vector<Token>& tokens)
 {
-	int8_t insturctionValue;
-	uint8_t instruction;
+	uint8_t instructionValuePattern = 0b11110000;
+	uint8_t instructionValue = c_instructionValues[static_cast<uint8_t>(tokens[0].tokenState)];
+	auto it_currentToken = tokens.begin();
 
-	// Fix: I think it could be removed
-	bool needValues = false;
+	for (; it_currentToken != tokens.end(); ++it_currentToken)
+	{ if (it_currentToken->tokenState < TokenState::space) break; }
 
-	for (auto& i : tokens)
+	if (it_currentToken->tokenState == TokenState::label)
+		addLocationOfLabel(it_currentToken->stringValue, (instructions.size() - 1));
+	else if (it_currentToken->tokenState <= TokenState::op_hlt)
+		makeInstruction(*it_currentToken);
+	else	
+		printErrorAndExit(c_parserError + "cannot make an instruction");
+
+
+	for (; it_currentToken != tokens.end(); ++it_currentToken)
 	{
-		if (i.tokenState <= TokenState::op_hlt)
+		if (it_currentToken->tokenState == TokenState::word || it_currentToken->tokenState == TokenState::number)
 		{
-			assert(needValues == false);
+			if (instructionValue & instructionValuePattern)
+				makeValue(*it_currentToken);
+			else
+				printErrorAndExit(c_parserError + "too many arguments");
 
-			instruction = static_cast<uint8_t>(i.tokenState);
-			instructions.push_back(instruction);
-
-			needValues = insturctionValue = c_instructionValues[instruction];
-
-			if (i.tokenState >= TokenState::op_jmp && i.tokenState <= TokenState::op_je)
-			{
-				addLocationOfJump(i.stringValue, (instructions.size() - 1));
-				instructions.push_back((uint8_t)0);
-			}
+			instructionValuePattern >>= 4;
 		}
-		else if (i.tokenState == TokenState::label)
-		{
-			addLocationOfLabel(i.stringValue, (instructions.size() - 1));
-		}
-		else if (i.tokenState == TokenState::number)
-		{
-			// Fix: strings are also values!
-			try { instructions.push_back(std::stoi(i.stringValue)); }
-			catch (const std::invalid_argument&) { printErrorAndExit(c_parserError + "the value is invalid"); }
-		}
-		else // Fix: get rid of exceptions. Write stable code!
-			printErrorAndExit(c_parserError + "invalid instruction");
 	}
+
+	// Todo: test for instruction completeness
 }
 
 
@@ -55,6 +48,17 @@ void Parser::addLocationOfLabel(const std::string& c_labelName, const unsigned&&
 	}
 	else
 		c_it_jumpTableNode->second.locationOfLabel = c_locationLabel;
+}
+
+
+auto Parser::findLocationOfJump(const jumpTableList& c_labelIterator, const unsigned& c_locationToFind)
+{
+	if (c_labelIterator != jumpTable.end())
+		for (auto i = c_labelIterator->second.locationOfJump.begin(); i != c_labelIterator->second.locationOfJump.end(); ++i)
+			if (*i == c_locationToFind)
+				return i;
+
+	return c_labelIterator->second.locationOfJump.end();
 }
 
 
@@ -77,12 +81,21 @@ void Parser::addLocationOfJump(const std::string& c_labelName, const unsigned&& 
 }
 
 
-auto Parser::findLocationOfJump(const jumpTableList& c_labelIterator, const unsigned& c_locationToFind)
+void Parser::makeInstruction(const Token& token)
 {
-	if (c_labelIterator != jumpTable.end())
-		for (auto i = c_labelIterator->second.locationOfJump.begin(); i != c_labelIterator->second.locationOfJump.end(); ++i)
-			if (*i == c_locationToFind)
-				return i;
+	instructions.push_back(static_cast<uint8_t>(token.tokenState));
 
-	return c_labelIterator->second.locationOfJump.end();
+	if (token.tokenState >= TokenState::op_jmp && token.tokenState <= TokenState::op_je)
+	{
+		addLocationOfJump(token.stringValue, (instructions.size() - 1));
+		instructions.push_back((uint8_t)0);
+	}
+}
+
+
+void Parser::makeValue(const Token& token)
+{
+	if (token.tokenState == TokenState::number)
+		instructions.push_back(std::stoi(token.stringValue));
+	// Todo: add string support
 }

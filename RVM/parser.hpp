@@ -3,11 +3,13 @@
 #include <iostream> // Fix: temporary
 #include <vector>
 #include <unordered_map>
-#include <cassert> // Test
+#include <cassert> // Fix: just for tests
 #include <string>
 
 #include "instruction.hpp"
 #include "error.hpp"
+
+#include <bitset> // Fix: just for tests
 
 class Parser
 {
@@ -31,9 +33,17 @@ public:
 
 public:
 	void parse(const std::vector<Token>&);
+	
+	void printInstructions() 
+	{
+		for (auto i : instructions) std::cout << std::bitset<8>(i) << std::endl;
+	}
+	
 	// Todo: add a function that will complete the jumpTable after all parsing
 
 private:
+	// Todo: add a function that will compete the jump instruction when a row of jumpTable is filled up
+
 	void addLocationOfLabel(const std::string&, const unsigned&&);
 
 	// Todo: add this description to the documentation
@@ -42,4 +52,7 @@ private:
 	void addLocationOfJump(const std::string&, const unsigned&&);
 
 	auto findLocationOfJump(const jumpTableList&, const unsigned&);
+
+	void makeInstruction(const Token&);
+	void makeValue(const Token&);
 };
