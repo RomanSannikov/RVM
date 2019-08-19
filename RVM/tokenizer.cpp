@@ -24,9 +24,6 @@ void Tokenizer::tokenize(const std::string& c_lineFromScanner)
 
 		recognize(newToken, slice.mode);
 
-		if (newToken.stringValue.empty())
-			printErrorAndExit(c_lexerError + "not recognized");
-
 		currentPoint += slice.length;
 	
 		tokens.push_back(newToken);
@@ -39,9 +36,9 @@ void Tokenizer::recognize(Token& token, const uint8_t& c_mode)
 	if (c_mode == c_WORD)
 	{
 		if (token.stringValue[token.stringValue.size() - 1] == ':')
-			token.tokenState = TokenState::label;
-
-		recognizeToken(token, c_stringInstructions, TokenState::op_add);
+			token.tokenState = TokenState::word;
+		else
+			recognizeToken(token, c_stringInstructions, TokenState::op_add);
 	}
 	else if (c_mode == c_PUNCTUATIONSYMBOL)
 		recognizeToken(token, c_punctuationSymbols, TokenState::space);
@@ -61,7 +58,7 @@ void Tokenizer::recognizeToken(Token& token, const std::vector<std::string>& arr
 		}
 	}
 
-	token.stringValue.clear();
+	token.tokenState = TokenState::word;
 }
 
 
@@ -81,7 +78,7 @@ Tokenizer::StringSlice& Tokenizer::getSlice(const std::string& c_line, const uns
 
 	for (unsigned i = c_startPoint + 1; i < c_line.size(); ++i)
 	{
-		if (slice.mode == c_WORD && isalpha(c_line[i])) ++slice.length;
+		if ((slice.mode == c_WORD) && (isalpha(c_line[i]) || isdigit(c_line[i]) || c_line[i] == ':')) ++slice.length;
 		else if (slice.mode == c_NUMBER && isdigit(c_line[i])) ++slice.length;
 		else break;
 	}

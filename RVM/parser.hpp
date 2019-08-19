@@ -21,7 +21,7 @@ public:
 	{ unsigned locationOfLabel; std::vector<unsigned> locationOfJump; };
 
 	using jumpTableList = std::list<std::pair<const std::string, Parser::jumpTableNode>, std::allocator< std::pair<const std::string, Parser::jumpTableNode>>>::iterator;
-
+	
 private:
 	// Desc:		   name		    type
 	std::unordered_map<std::string, uint8_t> symbolTable;
@@ -52,6 +52,9 @@ private:
 	void addLocationOfJump(const std::string&, const unsigned&&);
 
 	auto findLocationOfJump(const jumpTableList&, const unsigned&);
+
+	void checkArguments(std::vector<Token>::const_iterator&,
+		std::vector<Token>::const_iterator&, const uint8_t&, std::vector<Token>::const_iterator);
 
 	void makeInstruction(const Token&);
 	void makeValue(const Token&);

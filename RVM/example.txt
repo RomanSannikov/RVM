@@ -1,8 +1,31 @@
-push 1
-
-push 2
-l1:
 add
+sub
+mul
+div
 
+ld a
+sv a
+
+eq
 jmp l1
+jne l1
+je l1
+gr
+ls
+
+and
+or
+nand
+xor
+not
+
+call func
+ret
+
+push 1
+pop
+
+new a 2
+del a
+
 hlt

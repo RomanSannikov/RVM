@@ -1,36 +1,33 @@
 #include "parser.hpp"
 
+
 void Parser::parse(const std::vector<Token>& tokens)
 {
-	uint8_t instructionValuePattern = 0b11110000;
-	uint8_t instructionValue = c_instructionValues[static_cast<uint8_t>(tokens[0].tokenState)];
+	uint8_t instructionValue;
 	auto it_currentToken = tokens.begin();
-
-	for (; it_currentToken != tokens.end(); ++it_currentToken)
+	decltype(it_currentToken) it_lastToken;
+	
+	for (; it_currentToken != tokens.end(); 
+		 it_lastToken = it_currentToken, ++it_currentToken)
 	{ if (it_currentToken->tokenState < TokenState::space) break; }
 
-	if (it_currentToken->tokenState == TokenState::label)
+	if (it_currentToken->tokenState == TokenState::word)
 		addLocationOfLabel(it_currentToken->stringValue, (instructions.size() - 1));
 	else if (it_currentToken->tokenState <= TokenState::op_hlt)
+	{
+		instructionValue = c_instructionValues[static_cast<uint8_t>(tokens[0].tokenState)];
 		makeInstruction(*it_currentToken);
-	else	
+	}
+	else
 		printErrorAndExit(c_parserError + "cannot make an instruction");
 
+	++it_currentToken;
 
-	for (; it_currentToken != tokens.end(); ++it_currentToken)
-	{
-		if (it_currentToken->tokenState == TokenState::word || it_currentToken->tokenState == TokenState::number)
-		{
-			if (instructionValue & instructionValuePattern)
-				makeValue(*it_currentToken);
-			else
-				printErrorAndExit(c_parserError + "too many arguments");
+	if (instructionValue)
+		checkArguments(it_currentToken, it_lastToken, instructionValue, tokens.end());
 
-			instructionValuePattern >>= 4;
-		}
-	}
-
-	// Todo: test for instruction completeness
+	if (it_currentToken != tokens.end())
+		printErrorAndExit(c_parserError + "too many arguments");
 }
 
 
@@ -93,9 +90,37 @@ void Parser::makeInstruction(const Token& token)
 }
 
 
+void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken, 
+		std::vector<Token>::const_iterator& it_lastToken, const uint8_t& instructionValue, std::vector<Token>::const_iterator tokenEnd)
+{
+	uint8_t instructionValuePattern = 0b11110000;
+
+	for (int i = 0; i < 2; ++i, instructionValuePattern >>= 4)
+	{
+		if (++it_currentToken == tokenEnd)
+			printErrorAndExit(c_parserError + "too few arguments");
+		it_lastToken = it_currentToken;
+
+		if (instructionValue & instructionValuePattern)
+		{
+			if (it_lastToken->tokenState >= TokenState::op_jmp &&
+				it_lastToken->tokenState <= TokenState::op_je)
+				addLocationOfJump(it_currentToken->stringValue, instructions.size() - 1);
+			else
+				makeValue(*it_currentToken);
+		}
+	}
+}
+
+
 void Parser::makeValue(const Token& token)
 {
 	if (token.tokenState == TokenState::number)
 		instructions.push_back(std::stoi(token.stringValue));
-	// Todo: add string support
+	else if (token.tokenState == TokenState::word)
+	{
+		// Todo: add string support
+	}
+	else
+		printErrorAndExit(c_parserError + "not an argument");
 }
