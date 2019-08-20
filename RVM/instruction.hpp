@@ -41,10 +41,10 @@ enum class TokenState : unsigned
 	label, // Fix: do i need the label token?
 
 	word,
-	number,
-	space,
+	number
+	/*space,
 	comma,
-	slash
+	slash*/
 };
 
 

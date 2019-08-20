@@ -15,10 +15,9 @@ public:
 private:
 	const std::vector<std::string> c_punctuationSymbols;
 
-	const uint8_t c_WORD;
-	const uint8_t c_NUMBER;
-	const uint8_t c_PUNCTUATIONSYMBOL;
-
+	enum : uint8_t
+	{ c_WORD = 0, c_NUMBER,	c_PUNCTUATIONSYMBOL };
+	
 	struct StringSlice
 	{
 		unsigned length;
@@ -26,7 +25,7 @@ private:
 	};
 
 public:
-	Tokenizer() : c_punctuationSymbols{{" ", ",", "\""}}, c_WORD(0), c_NUMBER(1), c_PUNCTUATIONSYMBOL(2) {}
+	Tokenizer() : c_punctuationSymbols{{" ", ",", "\""}} {}
 	
 	void tokenize(const std::string&);
 

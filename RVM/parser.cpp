@@ -7,10 +7,6 @@ void Parser::parse(const std::vector<Token>& tokens)
 	auto it_currentToken = tokens.begin();
 	decltype(it_currentToken) it_lastToken;
 	
-	for (; it_currentToken != tokens.end(); 
-		 it_lastToken = it_currentToken, ++it_currentToken)
-	{ if (it_currentToken->tokenState < TokenState::space) break; }
-
 	if (it_currentToken->tokenState == TokenState::word)
 		addLocationOfLabel(it_currentToken->stringValue, (instructions.size() - 1));
 	else if (it_currentToken->tokenState <= TokenState::op_hlt)

@@ -18,6 +18,13 @@ void Tokenizer::tokenize(const std::string& c_lineFromScanner)
 
 		if (slice.length == 0 || currentPoint >= c_lineFromScanner.size())
 			break;
+		// Todo: add the description to the documentation
+		// Desc: the tokenizer ignores punctuation symbols
+		else if (slice.mode == c_PUNCTUATIONSYMBOL)
+		{
+			currentPoint += slice.length;
+			continue;
+		}
 
 		stringSlice = c_lineFromScanner.substr(currentPoint, slice.length);
 		newToken.stringValue = stringSlice;
@@ -40,8 +47,6 @@ void Tokenizer::recognize(Token& token, const uint8_t& c_mode)
 		else
 			recognizeToken(token, c_stringInstructions, TokenState::op_add);
 	}
-	else if (c_mode == c_PUNCTUATIONSYMBOL)
-		recognizeToken(token, c_punctuationSymbols, TokenState::space);
 	else if (c_mode == c_NUMBER)
 		token.tokenState = TokenState::number;
 }
