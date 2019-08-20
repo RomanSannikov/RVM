@@ -52,13 +52,13 @@ void Tokenizer::recognize(Token& token, const uint8_t& c_mode)
 }
 
 
-void Tokenizer::recognizeToken(Token& token, const std::vector<std::string>& array, const TokenState tokenState)
+void Tokenizer::recognizeToken(Token& token, const std::vector<std::string>& c_array, const TokenState c_tokenState)
 {
-	for (unsigned i = 0; i < array.size(); ++i)
+	for (unsigned i = 0; i < c_array.size(); ++i)
 	{
-		if (token.stringValue == array[i])
+		if (token.stringValue == c_array[i])
 		{
-			token.tokenState = static_cast<TokenState>(static_cast<int>(tokenState) + i);
+			token.tokenState = static_cast<TokenState>(static_cast<int>(c_tokenState) + i);
 			return;
 		}
 	}

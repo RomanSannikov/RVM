@@ -52,7 +52,7 @@ const std::vector<std::string> c_stringInstructions =
 {
 	"add", "sub", "mul", "div",
 	"ld", "sv",
-	"eq", "jmp", "op_jne", "je", "gr", "ls",
+	"eq", "jmp", "jne", "je", "gr", "ls",
 	"and", "or", "nand", "xor", "not",
 	"call", "ret", "push", "pop", "new", "del", "hlt"
 };

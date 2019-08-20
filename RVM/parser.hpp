@@ -56,6 +56,5 @@ private:
 	void checkArguments(std::vector<Token>::const_iterator&,
 		std::vector<Token>::const_iterator&, const uint8_t&, std::vector<Token>::const_iterator);
 
-	void makeInstruction(const Token&);
 	void makeValue(const Token&);
 };

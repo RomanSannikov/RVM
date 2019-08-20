@@ -1,28 +1,29 @@
 #include "parser.hpp"
 
 
-void Parser::parse(const std::vector<Token>& tokens)
+void Parser::parse(const std::vector<Token>& c_tokens)
 {
-	uint8_t instructionValue;
-	auto it_currentToken = tokens.begin();
+	uint8_t instructionValue = 0;
+	auto it_currentToken = c_tokens.begin();
 	decltype(it_currentToken) it_lastToken;
 	
 	if (it_currentToken->tokenState == TokenState::word)
 		addLocationOfLabel(it_currentToken->stringValue, (instructions.size() - 1));
 	else if (it_currentToken->tokenState <= TokenState::op_hlt)
 	{
-		instructionValue = c_instructionValues[static_cast<uint8_t>(tokens[0].tokenState)];
-		makeInstruction(*it_currentToken);
+		instructionValue = c_instructionValues[static_cast<uint8_t>(c_tokens[0].tokenState)];
+		instructions.push_back(static_cast<uint8_t>(it_currentToken->tokenState));
 	}
 	else
 		printErrorAndExit(c_parserError + "cannot make an instruction");
 
+	it_lastToken = it_currentToken;
 	++it_currentToken;
 
 	if (instructionValue)
-		checkArguments(it_currentToken, it_lastToken, instructionValue, tokens.end());
+		checkArguments(it_currentToken, it_lastToken, instructionValue, c_tokens.end());
 
-	if (it_currentToken != tokens.end())
+	if (it_currentToken != c_tokens.end())
 		printErrorAndExit(c_parserError + "too many arguments");
 }
 
@@ -60,60 +61,56 @@ void Parser::addLocationOfJump(const std::string& c_labelName, const unsigned&& 
 	const auto& c_it_jumpTableNode = jumpTable.find(c_labelName);
 	jumpTableNode jumpTableNode;
 
-	if (findLocationOfJump(c_it_jumpTableNode, c_locationOfJump) != jumpTableNode.locationOfJump.end())
-		printErrorAndExit(c_parserError + "jump instruction is already exits");
-	else if (c_it_jumpTableNode == jumpTable.end())
+	if (c_it_jumpTableNode == jumpTable.end())
 	{
 		jumpTableNode.locationOfLabel = 0;
 		jumpTableNode.locationOfJump.push_back(c_locationOfJump);
 		jumpTable.insert(std::make_pair(c_labelName, jumpTableNode));
 	}
+	else if (findLocationOfJump(c_it_jumpTableNode, c_locationOfJump) != c_it_jumpTableNode->second.locationOfJump.end())
+		printErrorAndExit(c_parserError + "jump instruction is already exits");
 	else
 		jumpTableNode.locationOfJump.push_back(c_locationOfJump);
 
 }
 
 
-void Parser::makeInstruction(const Token& token)
-{
-	instructions.push_back(static_cast<uint8_t>(token.tokenState));
-
-	if (token.tokenState >= TokenState::op_jmp && token.tokenState <= TokenState::op_je)
-	{
-		addLocationOfJump(token.stringValue, (instructions.size() - 1));
-		instructions.push_back((uint8_t)0);
-	}
-}
-
-
 void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken, 
-		std::vector<Token>::const_iterator& it_lastToken, const uint8_t& instructionValue, std::vector<Token>::const_iterator tokenEnd)
+		std::vector<Token>::const_iterator& it_lastToken, const uint8_t& c_instructionValue, const std::vector<Token>::const_iterator c_it_tokenEnd)
 {
 	uint8_t instructionValuePattern = 0b11110000;
+	uint8_t numberOfIteration = 0;
 
-	for (int i = 0; i < 2; ++i, instructionValuePattern >>= 4)
+	for (uint8_t i = 0b11110000; i != 0; i >>= 4)
+		if (c_instructionValue & i)
+			++numberOfIteration;
+	
+	for (; numberOfIteration > 0; --numberOfIteration, instructionValuePattern >>= 4, ++it_currentToken)
 	{
-		if (++it_currentToken == tokenEnd)
+		if (it_currentToken == c_it_tokenEnd)
 			printErrorAndExit(c_parserError + "too few arguments");
-		it_lastToken = it_currentToken;
 
-		if (instructionValue & instructionValuePattern)
+		if (c_instructionValue & instructionValuePattern)
 		{
 			if (it_lastToken->tokenState >= TokenState::op_jmp &&
 				it_lastToken->tokenState <= TokenState::op_je)
-				addLocationOfJump(it_currentToken->stringValue, instructions.size() - 1);
+				// Fix: addlocationoflabel should be here
+				addLocationOfJump(it_currentToken->stringValue, instructions.size() - 1 );
 			else
 				makeValue(*it_currentToken);
+			// Todo: the makeValue function doesn't work for loading and saving
 		}
+
+		it_lastToken = it_currentToken;
 	}
 }
 
 
-void Parser::makeValue(const Token& token)
+void Parser::makeValue(const Token& c_token)
 {
-	if (token.tokenState == TokenState::number)
-		instructions.push_back(std::stoi(token.stringValue));
-	else if (token.tokenState == TokenState::word)
+	if (c_token.tokenState == TokenState::number)
+		instructions.push_back(std::stoi(c_token.stringValue));
+	else if (c_token.tokenState == TokenState::word)
 	{
 		// Todo: add string support
 	}
