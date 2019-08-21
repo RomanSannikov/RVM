@@ -62,6 +62,7 @@ struct Token
 {
 	TokenState tokenState;
 	std::string stringValue;
+	unsigned lineNumber;
 };
 
 /*

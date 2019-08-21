@@ -16,6 +16,10 @@ std::string Scanner::getLine(std::string& scannedLine)
 		printErrorAndExit(c_scannerError + "The file is not open!");
 
 	std::getline(file, scannedLine);
+	++lineNumber;
 
 	return scannedLine;
 }
+
+
+unsigned Scanner::getLineNumber() { return lineNumber; }

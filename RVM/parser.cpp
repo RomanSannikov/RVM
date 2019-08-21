@@ -15,7 +15,7 @@ void Parser::parse(const std::vector<Token>& c_tokens)
 		instructions.push_back(static_cast<uint8_t>(it_currentToken->tokenState));
 	}
 	else
-		printErrorAndExit(c_parserError + "cannot make an instruction");
+		printErrorAndExit(c_parserError + "cannot make an instruction", it_currentToken->lineNumber);
 
 	it_lastToken = it_currentToken;
 	++it_currentToken;
@@ -24,7 +24,7 @@ void Parser::parse(const std::vector<Token>& c_tokens)
 		checkArguments(it_currentToken, it_lastToken, instructionValue, c_tokens.end());
 
 	if (it_currentToken != c_tokens.end())
-		printErrorAndExit(c_parserError + "too many arguments");
+		printErrorAndExit(c_parserError + "too many arguments", it_currentToken->lineNumber);
 }
 
 
@@ -88,13 +88,13 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 	for (; numberOfIteration > 0; --numberOfIteration, instructionValuePattern >>= 4, ++it_currentToken)
 	{
 		if (it_currentToken == c_it_tokenEnd)
-			printErrorAndExit(c_parserError + "too few arguments");
+			printErrorAndExit(c_parserError + "too few arguments", it_currentToken->lineNumber);
 
 		if (c_instructionValue & instructionValuePattern)
 		{
 			if (it_lastToken->tokenState >= TokenState::op_jmp &&
 				it_lastToken->tokenState <= TokenState::op_je)
-				// Fix: addlocationoflabel should be here
+				// Fix: addlocationoflabel should be here?
 				addLocationOfJump(it_currentToken->stringValue, instructions.size() - 1 );
 			else
 				makeValue(*it_currentToken);
@@ -115,5 +115,5 @@ void Parser::makeValue(const Token& c_token)
 		// Todo: add string support
 	}
 	else
-		printErrorAndExit(c_parserError + "not an argument");
+		printErrorAndExit(c_parserError + "not an argument", c_token.lineNumber);
 }

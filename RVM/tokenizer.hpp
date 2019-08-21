@@ -27,7 +27,7 @@ private:
 public:
 	Tokenizer() : c_punctuationSymbols{{" ", ",", "\""}} {}
 	
-	void tokenize(const std::string&);
+	void tokenize(const std::string&, const unsigned&);
 
 private:
 	void recognize(Token&, const uint8_t&);

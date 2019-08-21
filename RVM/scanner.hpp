@@ -10,6 +10,7 @@ class Scanner
 private:
 	const unsigned c_lineSize = 128;
 	std::ifstream file;
+	unsigned lineNumber;
 
 public:
 	Scanner(const std::string& c_filename) : file(c_filename) {}
@@ -23,4 +24,5 @@ public:
 	bool isEOF();
 
 	std::string getLine(std::string&);
+	unsigned getLineNumber();
 };

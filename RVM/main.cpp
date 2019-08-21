@@ -24,7 +24,7 @@ void startVirtualMachine()
 
 		std::cout << lineFromScanner << std::endl;
 		
-		tokenizer.tokenize(lineFromScanner);
+		tokenizer.tokenize(lineFromScanner, scanner.getLineNumber());
 
 		parser.parse(tokenizer.tokens);
 	}
