@@ -30,8 +30,10 @@ enum class TokenState : unsigned
 	op_call,
 	op_ret,
 
-	op_push,
-	op_pop,
+	op_pushn,
+	op_pushs,
+	op_popn,
+	op_pops,
 
 	op_new,
 	op_del,
@@ -42,9 +44,6 @@ enum class TokenState : unsigned
 
 	word,
 	number
-	/*space,
-	comma,
-	slash*/
 };
 
 
@@ -54,7 +53,7 @@ const std::vector<std::string> c_stringInstructions =
 	"ld", "sv",
 	"eq", "jmp", "jne", "je", "gr", "ls",
 	"and", "or", "nand", "xor", "not",
-	"call", "ret", "push", "pop", "new", "del", "hlt"
+	"call", "ret", "pushn", "pushs", "popn", "pops", "new", "del", "hlt"
 };
 
 
@@ -71,13 +70,13 @@ NUM STR NUM STR
 1value  2value
 */
 #define NONE 0b00000000
-const std::array<uint8_t, 24> c_instructionValues
+const std::array<uint8_t, 26> c_instructionValues
 				{ NONE, NONE, NONE, NONE, 
 				0b00110000, 0b00110000, 
 				NONE, 0b00110000, 0b00110000, 0b00110000, NONE, NONE,
 				NONE, NONE, NONE, NONE, NONE,
 				0b00110000, NONE, 
-				0b11110000, NONE,
+				0b11000000, 0b00110000, NONE, NONE,
 				0b11000011, 0b00110000,
 				NONE };
 

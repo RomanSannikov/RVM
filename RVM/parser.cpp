@@ -95,7 +95,6 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 			if (it_lastToken->tokenState >= TokenState::op_jmp &&
 				it_lastToken->tokenState <= TokenState::op_je)
 			{
-				// Fix: addlocationoflabel should be here?
 				addLocationOfJump(it_currentToken->stringValue, instructions.size() - 1);
 				instructions.push_back(0);
 			}
