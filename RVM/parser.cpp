@@ -94,8 +94,11 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 		{
 			if (it_lastToken->tokenState >= TokenState::op_jmp &&
 				it_lastToken->tokenState <= TokenState::op_je)
+			{
 				// Fix: addlocationoflabel should be here?
-				addLocationOfJump(it_currentToken->stringValue, instructions.size() - 1 );
+				addLocationOfJump(it_currentToken->stringValue, instructions.size() - 1);
+				instructions.push_back(0);
+			}
 			else
 				makeValue(*it_currentToken);
 			// Todo: the makeValue function doesn't work for loading and saving
@@ -112,7 +115,9 @@ void Parser::makeValue(const Token& c_token)
 		instructions.push_back(std::stoi(c_token.stringValue));
 	else if (c_token.tokenState == TokenState::word)
 	{
-		// Todo: add string support
+		for (auto& i : c_token.stringValue)
+			instructions.push_back(i);
+		instructions.push_back(0);
 	}
 	else
 		printErrorAndExit(c_parserError + "not an argument", c_token.lineNumber);
