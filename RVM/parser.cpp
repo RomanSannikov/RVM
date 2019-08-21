@@ -79,16 +79,30 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 		std::vector<Token>::const_iterator& it_lastToken, const uint8_t& c_instructionValue, const std::vector<Token>::const_iterator c_it_tokenEnd)
 {
 	uint8_t instructionValuePattern = 0b11110000;
-	uint8_t numberOfIteration = 0;
+	uint8_t numberOfIterations = 0;
+	std::array<TokenState, 2> valueTypes;
 
 	for (uint8_t i = 0b11110000; i != 0; i >>= 4)
 		if (c_instructionValue & i)
-			++numberOfIteration;
+			++numberOfIterations;
 	
-	for (; numberOfIteration > 0; --numberOfIteration, instructionValuePattern >>= 4, ++it_currentToken)
+	// Desc: Fiding out what value types are
+	for (uint8_t i = 0b11000000, index = 0, counter = 4; i != 0; i >>= 2, --counter)
+	{
+		if (c_instructionValue & i)
+		{
+			valueTypes[index] = static_cast<TokenState>(static_cast<uint8_t>(TokenState::number) - (counter % 2));
+			++index;
+		}
+	}
+
+	for (int i = 0; numberOfIterations > 0;
+		--numberOfIterations, instructionValuePattern >>= 4, ++it_currentToken, ++i)
 	{
 		if (it_currentToken == c_it_tokenEnd)
 			printErrorAndExit(c_parserError + "too few arguments", it_currentToken->lineNumber);
+		else if (valueTypes[i] != it_currentToken->tokenState)
+			printErrorAndExit(c_parserError + "the value isn't the correct type", it_currentToken->lineNumber);
 
 		if (c_instructionValue & instructionValuePattern)
 		{
@@ -100,7 +114,6 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 			}
 			else
 				makeValue(*it_currentToken);
-			// Todo: the makeValue function doesn't work for loading and saving
 		}
 
 		it_lastToken = it_currentToken;
@@ -111,7 +124,10 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 void Parser::makeValue(const Token& c_token)
 {
 	if (c_token.tokenState == TokenState::number)
-		instructions.push_back(std::stoi(c_token.stringValue));
+	{
+		try { instructions.push_back(std::stoi(c_token.stringValue)); }
+		catch (std::invalid_argument& invalidArgument) { printErrorAndExit(c_parserError + "the value must be a number", c_token.lineNumber); }
+	}
 	else if (c_token.tokenState == TokenState::word)
 	{
 		for (auto& i : c_token.stringValue)

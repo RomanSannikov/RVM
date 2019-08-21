@@ -22,10 +22,12 @@ not
 call func
 ret
 
-push 1
-pop
+pushn 1
+pushs abc
+popn
+pops
 
-new a 2
+new 2 a
 del a
 
 hlt
