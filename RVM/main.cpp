@@ -29,6 +29,8 @@ void startVirtualMachine()
 		parser.parse(tokenizer.tokens);
 	}
 
+	parser.completeJumpInstructions();
+
 	parser.printInstructions();
 }
 

@@ -8,7 +8,7 @@ void Parser::parse(const std::vector<Token>& c_tokens)
 	decltype(it_currentToken) it_lastToken;
 	
 	if (it_currentToken->tokenState == TokenState::word)
-		addLocationOfLabel(it_currentToken->stringValue, (instructions.size() - 1));
+		addLocationOfLabel(it_currentToken->stringValue, instructions.size());
 	else if (it_currentToken->tokenState <= TokenState::op_hlt)
 	{
 		instructionValue = c_instructionValues[static_cast<uint8_t>(c_tokens[0].tokenState)];
@@ -28,31 +28,54 @@ void Parser::parse(const std::vector<Token>& c_tokens)
 }
 
 
+void Parser::completeJumpInstructions()
+{
+	for (const auto& i : labelNames)
+	{
+		const auto&& c_it_jumpTableNode = jumpTable.find(i);
+		
+		if (c_it_jumpTableNode != jumpTable.end() || c_it_jumpTableNode->second.locationsOfJumps.size() != 0)
+		{
+			for (const auto& c_locationOfJump : c_it_jumpTableNode->second.locationsOfJumps)
+			{
+				uint8_t* pointerToInstructions = instructions.data();
+				pointerToInstructions[c_locationOfJump + 1] = c_it_jumpTableNode->second.locationOfLabel >> 8;
+				pointerToInstructions[c_locationOfJump + 2] = c_it_jumpTableNode->second.locationOfLabel;
+			}
+		}
+		else 
+			printErrorAndExit(c_parserError + "label " + i + " hasn't been found");
+	}
+}
+
+
 void Parser::addLocationOfLabel(const std::string& c_labelName, const unsigned&& c_locationLabel)
 {
 	const auto& c_it_jumpTableNode = jumpTable.find(c_labelName);
 	jumpTableNode jumpTableNode;
 
-	if (c_it_jumpTableNode != jumpTable.end() && c_it_jumpTableNode->second.locationOfLabel >= 0)
+	if (c_it_jumpTableNode != jumpTable.end() && c_it_jumpTableNode->second.locationsOfJumps.size() == 0)
 		printErrorAndExit(c_parserError + "The label " + c_it_jumpTableNode->first + " was defined several times!");
 	else if (c_it_jumpTableNode == jumpTable.end())
 	{
 		jumpTableNode.locationOfLabel = c_locationLabel;
 		jumpTable.insert(std::make_pair(c_labelName, jumpTableNode));
+		labelNames.push_back(c_labelName);
 	}
 	else
 		c_it_jumpTableNode->second.locationOfLabel = c_locationLabel;
+
 }
 
 
 auto Parser::findLocationOfJump(const jumpTableList& c_labelIterator, const unsigned& c_locationToFind)
 {
 	if (c_labelIterator != jumpTable.end())
-		for (auto i = c_labelIterator->second.locationOfJump.begin(); i != c_labelIterator->second.locationOfJump.end(); ++i)
+		for (auto i = c_labelIterator->second.locationsOfJumps.begin(); i != c_labelIterator->second.locationsOfJumps.end(); ++i)
 			if (*i == c_locationToFind)
 				return i;
 
-	return c_labelIterator->second.locationOfJump.end();
+	return c_labelIterator->second.locationsOfJumps.end();
 }
 
 
@@ -63,14 +86,14 @@ void Parser::addLocationOfJump(const std::string& c_labelName, const unsigned&& 
 
 	if (c_it_jumpTableNode == jumpTable.end())
 	{
-		jumpTableNode.locationOfLabel = 0;
-		jumpTableNode.locationOfJump.push_back(c_locationOfJump);
+		jumpTableNode.locationsOfJumps.push_back(c_locationOfJump);
 		jumpTable.insert(std::make_pair(c_labelName, jumpTableNode));
+		labelNames.push_back(c_labelName);
 	}
-	else if (findLocationOfJump(c_it_jumpTableNode, c_locationOfJump) != c_it_jumpTableNode->second.locationOfJump.end())
+	else if (findLocationOfJump(c_it_jumpTableNode, c_locationOfJump) != c_it_jumpTableNode->second.locationsOfJumps.end())
 		printErrorAndExit(c_parserError + "jump instruction is already exits");
 	else
-		jumpTableNode.locationOfJump.push_back(c_locationOfJump);
+		c_it_jumpTableNode->second.locationsOfJumps.push_back(c_locationOfJump);
 
 }
 
@@ -110,7 +133,8 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 				it_lastToken->tokenState <= TokenState::op_je)
 			{
 				addLocationOfJump(it_currentToken->stringValue, instructions.size() - 1);
-				instructions.push_back(0);
+				// Desc: locationOfLabel is 2 byte long
+				instructions.push_back(0); instructions.push_back(0);
 			}
 			else
 				makeValue(*it_currentToken);
@@ -126,7 +150,7 @@ void Parser::makeValue(const Token& c_token)
 	if (c_token.tokenState == TokenState::number)
 	{
 		try { instructions.push_back(std::stoi(c_token.stringValue)); }
-		catch (std::invalid_argument& invalidArgument) { printErrorAndExit(c_parserError + "the value must be a number", c_token.lineNumber); }
+		catch (std::invalid_argument invalidArgument) { printErrorAndExit(c_parserError + "the value must be a number", c_token.lineNumber); }
 	}
 	else if (c_token.tokenState == TokenState::word)
 	{

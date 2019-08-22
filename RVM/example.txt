@@ -31,3 +31,5 @@ new 2 a
 del a
 
 hlt
+
+l1:

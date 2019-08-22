@@ -44,7 +44,10 @@ void Tokenizer::recognize(Token& token, const uint8_t& c_mode)
 	if (c_mode == c_WORD)
 	{
 		if (token.stringValue[token.stringValue.size() - 1] == ':')
+		{
 			token.tokenState = TokenState::word;
+			token.stringValue.pop_back();
+		}
 		else
 			recognizeToken(token, c_stringInstructions, TokenState::op_add);
 	}

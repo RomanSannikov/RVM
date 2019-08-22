@@ -18,7 +18,7 @@ public:
 	// Decs: the locations are integers. This means to find 
 	// the place in instructions use instructions[locationOf...]
 	struct jumpTableNode 
-	{ unsigned locationOfLabel; std::vector<unsigned> locationOfJump; };
+	{ uint16_t locationOfLabel; std::vector<uint16_t> locationsOfJumps; };
 
 	using jumpTableList = std::list<std::pair<const std::string, Parser::jumpTableNode>, std::allocator< std::pair<const std::string, Parser::jumpTableNode>>>::iterator;
 	
@@ -26,6 +26,7 @@ private:
 	// Desc:		   name		    type
 	std::unordered_map<std::string, uint8_t> symbolTable;
 	std::unordered_map<std::string, jumpTableNode> jumpTable;
+	std::vector<std::string> labelNames;
 	std::vector<uint8_t> instructions;
 
 public: 
@@ -39,11 +40,10 @@ public:
 		for (auto i : instructions) std::cout << std::bitset<8>(i) << std::endl;
 	}
 	
-	// Todo: add a function that will complete the jumpTable after all parsing
+	// Todo: think of the name
+	void completeJumpInstructions();
 
 private:
-	// Todo: add a function that will compete the jump instruction when a row of jumpTable is filled up
-
 	void addLocationOfLabel(const std::string&, const unsigned&&);
 
 	// Todo: add this description to the documentation
