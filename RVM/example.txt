@@ -3,6 +3,8 @@ sub
 mul
 div
 
+new 2 a
+
 ld a
 sv a
 
@@ -27,7 +29,6 @@ pushs abc
 popn
 pops
 
-new 2 a
 del a
 
 hlt

@@ -28,6 +28,13 @@ void Parser::parse(const std::vector<Token>& c_tokens)
 }
 
 
+void Parser::completeParsing()
+{
+	completeJumpInstructions();
+	checkSymbolTabel();
+}
+
+
 void Parser::completeJumpInstructions()
 {
 	for (const auto& i : labelNames)
@@ -46,6 +53,13 @@ void Parser::completeJumpInstructions()
 		else 
 			printErrorAndExit(c_parserError + "label " + i + " hasn't been found");
 	}
+}
+
+
+void Parser::checkSymbolTabel()
+{
+	if (symbolTable.size() != 0)
+		printErrorAndExit(c_parserError + "not all variables were deleted");
 }
 
 
@@ -99,11 +113,13 @@ void Parser::addLocationOfJump(const std::string& c_labelName, const unsigned&& 
 
 
 void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken, 
-		std::vector<Token>::const_iterator& it_lastToken, const uint8_t& c_instructionValue, const std::vector<Token>::const_iterator c_it_tokenEnd)
+		std::vector<Token>::const_iterator& it_currentInstruction, const uint8_t& c_instructionValue, const std::vector<Token>::const_iterator c_it_tokenEnd)
 {
 	uint8_t instructionValuePattern = 0b11110000;
 	uint8_t numberOfIterations = 0;
 	std::array<TokenState, 2> valueTypes;
+
+	uint8_t variableSize;
 
 	for (uint8_t i = 0b11110000; i != 0; i >>= 4)
 		if (c_instructionValue & i)
@@ -129,18 +145,36 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 
 		if (c_instructionValue & instructionValuePattern)
 		{
-			if (it_lastToken->tokenState >= TokenState::op_jmp &&
-				it_lastToken->tokenState <= TokenState::op_je)
+			if (it_currentInstruction->tokenState >= TokenState::op_jmp &&
+				it_currentInstruction->tokenState <= TokenState::op_je)
 			{
 				addLocationOfJump(it_currentToken->stringValue, instructions.size() - 1);
 				// Desc: locationOfLabel is 2 byte long
 				instructions.push_back(0); instructions.push_back(0);
 			}
+			else if (it_currentInstruction->tokenState == TokenState::op_new)
+			{
+				if (valueTypes[i] == TokenState::number)
+				{
+					try { instructions.push_back(std::stoi(it_currentToken->stringValue)); }
+					catch (std::invalid_argument invalidArgument) { printErrorAndExit(c_parserError + "the value must be a number", it_currentToken->lineNumber); }
+				}
+				else if (symbolTable.find(it_currentToken->stringValue) == symbolTable.end())
+					symbolTable.insert(std::make_pair(it_currentToken->stringValue, variableSize));
+				else
+					printErrorAndExit(c_parserError + "the variable " + it_currentToken->stringValue + " has been already defined", it_currentToken->lineNumber);
+			}
+			else if (it_currentInstruction->tokenState == TokenState::op_del)
+			{
+				if (symbolTable.erase(it_currentToken->stringValue) == 0)
+					printErrorAndExit(c_parserError + "the variable " + it_currentToken->stringValue + " hasn't been defined", it_currentToken->lineNumber);
+			}
+			else if ((it_currentInstruction->tokenState == TokenState::op_ld || it_currentInstruction->tokenState == TokenState::op_sv) 
+																	&& symbolTable.find(it_currentToken->stringValue) == symbolTable.end())
+					printErrorAndExit(c_parserError + "the value " + it_currentToken->stringValue + " hasn't been defined", it_currentToken->lineNumber);
 			else
 				makeValue(*it_currentToken);
 		}
-
-		it_lastToken = it_currentToken;
 	}
 }
 

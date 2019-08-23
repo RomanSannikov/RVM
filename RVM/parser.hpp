@@ -14,16 +14,12 @@
 class Parser
 {
 public:
-	// Todo: add this description to the documentation
-	// Decs: the locations are integers. This means to find 
-	// the place in instructions use instructions[locationOf...]
 	struct jumpTableNode 
 	{ uint16_t locationOfLabel; std::vector<uint16_t> locationsOfJumps; };
 
 	using jumpTableList = std::list<std::pair<const std::string, Parser::jumpTableNode>, std::allocator< std::pair<const std::string, Parser::jumpTableNode>>>::iterator;
 	
 private:
-	// Desc:		   name		    type
 	std::unordered_map<std::string, uint8_t> symbolTable;
 	std::unordered_map<std::string, jumpTableNode> jumpTable;
 	std::vector<std::string> labelNames;
@@ -36,14 +32,14 @@ public:
 	void parse(const std::vector<Token>&);
 	
 	void printInstructions() 
-	{
-		for (auto i : instructions) std::cout << std::bitset<8>(i) << std::endl;
-	}
+	{ for (auto i : instructions) std::cout << std::bitset<8>(i) << std::endl; }
 	
-	// Todo: think of the name
-	void completeJumpInstructions();
+	void completeParsing();
 
 private:
+	void completeJumpInstructions();
+	void checkSymbolTabel();
+
 	void addLocationOfLabel(const std::string&, const unsigned&&);
 
 	// Todo: add this description to the documentation
