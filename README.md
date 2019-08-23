@@ -49,12 +49,12 @@ You start the RVM with the given args. Basically, it scans the first line, token
  
 ### How it works (briefly):<br>
 <ol>
-    <li>scan a line</li><br>
-    <li>tokenize the line</li><br>
-    <li>parse the line (it makes an instruction in bin. representation)</li><br>
-    <li>save the instruction in the instruction array</li><br>
-    <li>if the next line exists, go to the first stage </li><br>
-    <li>execute the instructions from the instruction array</li><br>
+    <li>scan a line</li>
+    <li>tokenize the line</li>
+    <li>parse the line (it makes an instruction in bin. representation)</li>
+    <li>save the instruction in the instruction array</li>
+    <li>if the next line exists, go to the first stage </li>
+    <li>execute the instructions from the instruction array</li>
 </ol>
  
  
@@ -63,4 +63,4 @@ The RVM has the Jump Tabel. The JT stores label names, their locations, and jump
 
 
 ### Tokenizer
-Note, the tokenizer ignores punctuation symbols.
+Note, the tokenizer ignores punctuation symbols
