@@ -57,7 +57,7 @@ You start the RVM with the given args. Basically, it scans the first line, token
 </ol>
  
  
-### How the jump instructions work:<br>
+### How the jump instructions work: <br>
 The RVM has the Jump Tabel. The JT stores label names, their locations, and jump instruction locations. If a label appears, its name and location are written. If a jump appears, its location and the label name are written.<br>
 
 
