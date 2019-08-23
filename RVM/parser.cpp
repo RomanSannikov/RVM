@@ -8,7 +8,7 @@ void Parser::parse(const std::vector<Token>& c_tokens)
 	decltype(it_currentToken) it_lastToken;
 	
 	if (it_currentToken->tokenState == TokenState::word)
-		addLocationOfLabel(it_currentToken->stringValue, instructions.size());
+		addLocationOfLabel(it_currentToken->stringValue, (uint16_t)instructions.size());
 	else if (it_currentToken->tokenState <= TokenState::op_hlt)
 	{
 		instructionValue = c_instructionValues[static_cast<uint8_t>(c_tokens[0].tokenState)];
@@ -47,7 +47,7 @@ void Parser::completeJumpInstructions()
 			{
 				uint8_t* pointerToInstructions = instructions.data();
 				pointerToInstructions[c_locationOfJump + 1] = c_it_jumpTableNode->second.locationOfLabel >> 8;
-				pointerToInstructions[c_locationOfJump + 2] = c_it_jumpTableNode->second.locationOfLabel;
+				pointerToInstructions[c_locationOfJump + 2] = (uint8_t)c_it_jumpTableNode->second.locationOfLabel;
 			}
 		}
 		else 
@@ -63,7 +63,7 @@ void Parser::checkSymbolTabel()
 }
 
 
-void Parser::addLocationOfLabel(const std::string& c_labelName, const unsigned&& c_locationLabel)
+void Parser::addLocationOfLabel(const std::string& c_labelName, const uint16_t&& c_locationLabel)
 {
 	const auto& c_it_jumpTableNode = jumpTable.find(c_labelName);
 	jumpTableNode jumpTableNode;
@@ -93,7 +93,7 @@ auto Parser::findLocationOfJump(const jumpTableList& c_labelIterator, const unsi
 }
 
 
-void Parser::addLocationOfJump(const std::string& c_labelName, const unsigned&& c_locationOfJump)
+void Parser::addLocationOfJump(const std::string& c_labelName, const uint16_t && c_locationOfJump)
 {
 	const auto& c_it_jumpTableNode = jumpTable.find(c_labelName);
 	jumpTableNode jumpTableNode;
@@ -148,7 +148,7 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 			if (it_currentInstruction->tokenState >= TokenState::op_jmp &&
 				it_currentInstruction->tokenState <= TokenState::op_je)
 			{
-				addLocationOfJump(it_currentToken->stringValue, instructions.size() - 1);
+				addLocationOfJump(it_currentToken->stringValue, (uint16_t)(instructions.size() - 1));
 				// Desc: locationOfLabel is 2 byte long
 				instructions.push_back(0); instructions.push_back(0);
 			}

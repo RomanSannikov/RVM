@@ -3,7 +3,6 @@
 #include <iostream> // Fix: temporary
 #include <vector>
 #include <unordered_map>
-#include <cassert> // Fix: just for tests
 #include <string>
 
 #include "instruction.hpp"
@@ -40,12 +39,9 @@ private:
 	void completeJumpInstructions();
 	void checkSymbolTabel();
 
-	void addLocationOfLabel(const std::string&, const unsigned&&);
+	void addLocationOfLabel(const std::string&, const uint16_t&& c_locationLabel);
 
-	// Todo: add this description to the documentation
-	// Desc: the last argument of addLocationOfJump is the location of the jump instruction,
-	// therefore when the location of label is added after the instruction (the space is added already)
-	void addLocationOfJump(const std::string&, const unsigned&&);
+	void addLocationOfJump(const std::string&, const uint16_t && c_locationOfJump);
 
 	auto findLocationOfJump(const jumpTableList&, const unsigned&);
 
