@@ -19,10 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="instructions.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="scanner.cpp" />
     <ClCompile Include="tokenizer.cpp" />
+    <ClCompile Include="VM.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="error.hpp" />
@@ -31,6 +33,7 @@
     <ClInclude Include="parser.hpp" />
     <ClInclude Include="scanner.hpp" />
     <ClInclude Include="tokenizer.hpp" />
+    <ClInclude Include="VM.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="example.txt" />

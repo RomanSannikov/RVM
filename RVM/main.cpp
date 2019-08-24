@@ -14,7 +14,8 @@ void startVirtualMachine()
 	Parser parser;
 	
 	std::string lineFromScanner;
-
+	
+	// Fix: !scanner.isEOF() && compile == true
 	while (!scanner.isEOF())
 	{
 		scanner.getLine(lineFromScanner);
@@ -30,8 +31,7 @@ void startVirtualMachine()
 	}
 
 	parser.completeParsing();
-
-	parser.printInstructions();
+	parser.printInstructions(); // Fix: it's temporary
 }
 
 
