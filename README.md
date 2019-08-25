@@ -12,10 +12,10 @@ mul    <br>
 div    <br>
 ld    word<br>
 sv    word<br>
-eq<br>
 jmp    word<br>
 jne    word<br>
 je     word<br>
+eq<br>
 gr<br>
 ls<br>
 and<br>
