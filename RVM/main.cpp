@@ -3,15 +3,17 @@
 #include "scanner.hpp"
 #include "tokenizer.hpp"
 #include "parser.hpp"
+#include "VM.hpp"
 
 
 void startVirtualMachine()
 {
-	const std::string c_filename = "example.txt"; // Fix: temporary value
+	const std::string c_filename = "simpleTest.txt"; // Fix: temporary value
 	
 	Scanner scanner(c_filename);
 	Tokenizer tokenizer;
 	Parser parser;
+	VM vm;
 	
 	std::string lineFromScanner;
 	
@@ -32,6 +34,9 @@ void startVirtualMachine()
 
 	parser.completeParsing();
 	parser.printInstructions(); // Fix: it's temporary
+
+	vm.run(parser.getInstructions());
+	vm.printStack();
 }
 
 

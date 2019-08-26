@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="example.txt" />
+    <Text Include="simpleTest.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -4,11 +4,11 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include <bitset> // Fix: just for tests
 
 #include "instruction.hpp"
 #include "error.hpp"
 
-#include <bitset> // Fix: just for tests
 
 class Parser
 {
@@ -34,6 +34,8 @@ public:
 	{ for (auto i : instructions) std::cout << std::bitset<8>(i) << std::endl; }
 	
 	void completeParsing();
+
+	std::vector<uint8_t>& getInstructions() { return instructions; }
 
 private:
 	void completeJumpInstructions();
