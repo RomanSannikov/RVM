@@ -27,9 +27,6 @@ public:
 	VM() : c_SIZE_OF_STACK(15), stackPointer(0), programPointer(0)
 	{
 		stack.reserve(c_SIZE_OF_STACK);
-		// Fix: for testing
-		stack.push_back(3);
-		stack.push_back(1);
 	}
 
 public:

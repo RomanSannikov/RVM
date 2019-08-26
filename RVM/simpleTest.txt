@@ -1,3 +1,5 @@
+pushn 1
+pushn 5
 add
 
 hlt

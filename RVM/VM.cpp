@@ -28,21 +28,27 @@ uint8_t op_nand(const uint8_t& a, const uint8_t& b) { return ~(b and a); }
 uint8_t op_xor(const uint8_t& a, const uint8_t& b) { return b xor a; }
 uint8_t op_not(const uint8_t& a) { return ~a; }
 
-/*
-void pushn(std::vector& stack, const uint8_t& a) { stack.push_back(); }
+void pushn(std::vector<uint8_t>& stack, const uint8_t& a) { stack.push_back(a); }
 
-void pushs(std::vector& stack, const const std::string& str)
+void pushs(std::vector<uint8_t>& stack, const const std::string& str)
 { for (const auto& i : str) stack.push_back(i); }
 
-void popn(std::vector& stack) { stack.pop_back(); }
+void popn(std::vector<uint8_t>& stack) { stack.pop_back(); }
 
-void pops(std::vector& stack)
-{ for (const auto& i = stack.end(); *i != 0; --i) stack.push_back(i); }
-*/
+unsigned pops(std::vector<uint8_t>& stack)
+{
+	uint8_t numberOfPops = 0;
+	for (auto&& i = stack.cend(); *i != 0; --i, ++numberOfPops) stack.pop_back(); 
+	stack.pop_back();
+	return ++numberOfPops;
+}
 
 // Todo: allocations
-void allocate(const uint8_t&, const std::string&);
-void del(const std::string&);
+void allocate(std::unordered_map<std::string, uint8_t>& symbolTable, const uint8_t& variableSize, const std::string& variableName)
+{ symbolTable.insert(std::make_pair(variableName, variableSize)); }
+
+void del(std::unordered_map<std::string, uint8_t>& symbolTable, const std::string& variableName)
+{ symbolTable.erase(variableName); }
 
 
 std::array < std::function<uint8_t(const uint8_t&, const uint8_t&)>, 4> arithmeticFunctions =
@@ -72,28 +78,24 @@ void VM::run(const std::vector<uint8_t>& instructions)
 {
 	this->instructions = std::move(instructions);
 
-	// Fix: change the name
-	for (const auto& instruction : instructions)
+	for (; programPointer < instructions.size(); ++programPointer)
 	{
-		if (static_cast<TokenState>(instruction) == TokenState::op_hlt)
+		uint8_t currentInstruction = instructions[programPointer];
+		if (static_cast<TokenState>(currentInstruction) == TokenState::op_hlt)
 			break;
 
-		doInstruction(static_cast<TokenState>(instruction));
+		doInstruction(static_cast<TokenState>(currentInstruction));
 	}
 }
 
 
 void VM::doInstruction(const TokenState& opcode)
 {
-	uint8_t a = stack.back(), b = stack[stack.size() - 2];
+	uint8_t a, b;
 	int index;
 
-	try
-	{
-		a = stack.back();
-		b = stack[stack.size() - 2];
-	}
-	catch (const std::exception&) {}
+	if (stack.size() > 0) a = stack.back();
+	if (stack.size() > 1) b = stack[stack.size() - 2];
 
 	auto popTwoTimes = [&]() { stack.pop_back(); stack.pop_back(); };
 	auto lambda = [&](const TokenState&& tokenState) 
@@ -102,6 +104,8 @@ void VM::doInstruction(const TokenState& opcode)
 		index = static_cast<int>(opcode) - static_cast<int>(tokenState);
 		--stackPointer;
 	};
+
+	++programPointer;
 
 	if (opcode >= TokenState::op_add && opcode <= TokenState::op_div)
 	{
@@ -140,7 +144,24 @@ void VM::doInstruction(const TokenState& opcode)
 		stack.pop_back();
 		stack.push_back(op_not(a));
 	}
-	// Todo: continue with pushn
+	else if (opcode == TokenState::op_pushn)
+	{
+		pushn(stack, instructions[programPointer]);
+		++stackPointer;
+	}
+	else if (opcode == TokenState::op_pushs)
+	{
+		pushs(stack, decodeString());
+		++stackPointer;
+	}
+	else if (opcode == TokenState::op_popn)
+	{
+		popn(stack);
+		--stackPointer;
+	}
+	else if (opcode == TokenState::op_pops)
+		stackPointer -= pops(stack);
+	// Todo: continue from new
 }
 
 
