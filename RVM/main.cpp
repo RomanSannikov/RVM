@@ -36,7 +36,6 @@ void startVirtualMachine()
 	parser.printInstructions(); // Fix: it's temporary
 
 	vm.run(parser.getInstructions());
-	vm.printStack();
 }
 
 

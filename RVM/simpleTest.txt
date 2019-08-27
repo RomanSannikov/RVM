@@ -1,5 +1,15 @@
+new 1 a
+new 1 b
 pushn 1
-pushn 5
+pushn 1
+sv a
+sv b
+ld a
+ld b
 add
+popn
+popn
 
+del a
+del b
 hlt

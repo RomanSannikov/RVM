@@ -2,76 +2,59 @@
 
 
 // Todo: const
-uint8_t add(const uint8_t& a, const uint8_t& b) { return b + a; }
-uint8_t sub(const uint8_t& a, const uint8_t& b) { return b - a; }
-uint8_t mul(const uint8_t& a, const uint8_t& b) { return b * a; }
-uint8_t divide(const uint8_t& a, const uint8_t& b) { return b / a; }
+uint8_t VM::add(const uint8_t& a, const uint8_t& b) { --stackPointer; return b + a;}
+uint8_t VM::sub(const uint8_t& a, const uint8_t& b) { --stackPointer; return b - a; }
+uint8_t VM::mul(const uint8_t& a, const uint8_t& b) { --stackPointer; return b * a; }
+uint8_t VM::divide(const uint8_t& a, const uint8_t& b) { --stackPointer; return b / a; }
 
 // Todo: loading and saving
-uint8_t ld(const std::string&);
-void sv(const std::string&);
+const std::vector<uint8_t>& VM::ld(const std::string& variableName)
+{ 
+	const auto& foundResult = symbolTable.find(variableName)->second;
+	stackPointer += (uint8_t)foundResult.size();
+	return foundResult; 
+}
 
-// Todo: jumps
-/*
-void jmp(const uint8_t&, uint8_t&);
-void jne(const uint8_t&, uint8_t&);
-void je(const uint8_t&, uint8_t&);
-*/
-
-uint8_t eq(const uint8_t& a, const uint8_t& b) { return a == b; }
-uint8_t gr(const uint8_t& a, const uint8_t& b) { return b > a; }
-uint8_t ls(const uint8_t& a, const uint8_t& b) { return b < a; }
-
-uint8_t op_and(const uint8_t& a, const uint8_t& b) { return b and a; }
-uint8_t op_or(const uint8_t& a, const uint8_t& b) { return b or a; }
-uint8_t op_nand(const uint8_t& a, const uint8_t& b) { return ~(b and a); }
-uint8_t op_xor(const uint8_t& a, const uint8_t& b) { return b xor a; }
-uint8_t op_not(const uint8_t& a) { return ~a; }
-
-void pushn(std::vector<uint8_t>& stack, const uint8_t& a) { stack.push_back(a); }
-
-void pushs(std::vector<uint8_t>& stack, const const std::string& str)
-{ for (const auto& i : str) stack.push_back(i); }
-
-void popn(std::vector<uint8_t>& stack) { stack.pop_back(); }
-
-unsigned pops(std::vector<uint8_t>& stack)
+void VM::sv(const std::string& variableName)
 {
-	uint8_t numberOfPops = 0;
-	for (auto&& i = stack.cend(); *i != 0; --i, ++numberOfPops) stack.pop_back(); 
+	auto& foundResult = symbolTable.find(variableName)->second;
+	for (auto& i : foundResult) { i = stack.back(); stack.pop_back(); }
+	stackPointer -= (uint8_t)foundResult.size();
+}
+
+uint8_t VM::eq(const uint8_t& a, const uint8_t& b) { --stackPointer; return a == b; }
+uint8_t VM::gr(const uint8_t& a, const uint8_t& b) { --stackPointer; return b > a; }
+uint8_t VM::ls(const uint8_t& a, const uint8_t& b) { --stackPointer; return b < a; }
+
+uint8_t VM::op_and(const uint8_t& a, const uint8_t& b) { --stackPointer; return b and a; }
+uint8_t VM::op_or(const uint8_t& a, const uint8_t& b) { --stackPointer; return b or a; }
+uint8_t VM::op_nand(const uint8_t& a, const uint8_t& b) { --stackPointer; return ~(b and a); }
+uint8_t VM::op_xor(const uint8_t& a, const uint8_t& b) { --stackPointer; return b xor a; }
+uint8_t VM::op_not(const uint8_t& a) { return ~a; }
+
+void VM::pushn(const uint8_t& a) { ++stackPointer; stack.push_back(a); }
+void VM::pushs(const std::string& data)
+{ 
+	for (const auto& i : data) stack.push_back(i); 
+	stack.push_back(0);
+	stackPointer += (uint8_t)data.size() + 1;
+}
+
+void VM::popn() { stack.pop_back(); --stackPointer; }
+
+void VM::pops()
+{
+	for (auto&& i = stack.cend(); *i != 0; --i, --stackPointer) stack.pop_back(); 
 	stack.pop_back();
-	return ++numberOfPops;
+	--stackPointer;
 }
 
 // Todo: allocations
-void allocate(std::unordered_map<std::string, uint8_t>& symbolTable, const uint8_t& variableSize, const std::string& variableName)
-{ symbolTable.insert(std::make_pair(variableName, variableSize)); }
+void VM::allocate(const std::string& variableName, const uint8_t& variableSize)
+{ symbolTable.insert(std::make_pair(variableName, std::vector<uint8_t>((size_t)variableSize))); }
 
-void del(std::unordered_map<std::string, uint8_t>& symbolTable, const std::string& variableName)
+void VM::del(const std::string& variableName)
 { symbolTable.erase(variableName); }
-
-
-std::array < std::function<uint8_t(const uint8_t&, const uint8_t&)>, 4> arithmeticFunctions =
-{ add, sub,
-  mul, divide };
-
-
-/*
-std::array < std::function<void(const uint8_t&, uint8_t&)>, 3> jumpFunctions =
-{ jmp, jne,
-  je };
-*/
-
-
-std::array < std::function<uint8_t(const uint8_t&, const uint8_t&)>, 3> comparisonFunctions =
-{ eq, gr,
-  ls };
-
-
-std::array < std::function<uint8_t(const uint8_t&, const uint8_t&)>, 4> binaryArithmeticFunctions =
-{ op_and, op_or,
-  op_nand, op_xor };
-
 
 
 void VM::run(const std::vector<uint8_t>& instructions)
@@ -93,7 +76,7 @@ void VM::doInstruction(const TokenState& opcode)
 {
 	uint8_t a, b;
 	int index;
-
+	
 	if (stack.size() > 0) a = stack.back();
 	if (stack.size() > 1) b = stack[stack.size() - 2];
 
@@ -102,7 +85,6 @@ void VM::doInstruction(const TokenState& opcode)
 	{
 		popTwoTimes();
 		index = static_cast<int>(opcode) - static_cast<int>(tokenState);
-		--stackPointer;
 	};
 
 	++programPointer;
@@ -112,17 +94,14 @@ void VM::doInstruction(const TokenState& opcode)
 		lambda(TokenState::op_add);
 		stack.push_back(arithmeticFunctions[index](a, b));
 	}
-	/*
 	else if (opcode == TokenState::op_ld)
 	{
-		stack.push_back(ld(decodeString()));
-		++stackPointer;
+		const auto& variableData = ld(decodeString());
+		for (const auto& i : variableData)
+			stack.push_back(i);
 	}
 	else if (opcode == TokenState::op_sv)
-	{
 		sv(decodeString());
-	}
-	*/
 	else if (opcode >= TokenState::op_jmp && opcode <= TokenState::op_je)
 	{
 		// Todo: jump stack
@@ -145,37 +124,33 @@ void VM::doInstruction(const TokenState& opcode)
 		stack.push_back(op_not(a));
 	}
 	else if (opcode == TokenState::op_pushn)
-	{
-		pushn(stack, instructions[programPointer]);
-		++stackPointer;
-	}
+		pushn(instructions[programPointer]);
 	else if (opcode == TokenState::op_pushs)
-	{
-		pushs(stack, decodeString());
-		++stackPointer;
-	}
+		pushs(decodeString());
 	else if (opcode == TokenState::op_popn)
-	{
-		popn(stack);
-		--stackPointer;
-	}
+		popn();
 	else if (opcode == TokenState::op_pops)
-		stackPointer -= pops(stack);
-	// Todo: continue from new
+		pops();
+	else if (opcode == TokenState::op_new)
+	{
+		const uint8_t data = instructions[programPointer];
+		++programPointer;
+		allocate(decodeString(), data);
+	}
+	else if (opcode == TokenState::op_del)
+		del(decodeString());
 }
 
 
 std::string VM::decodeString()
 {
-	++programPointer;
-
 	uint8_t character = instructions[programPointer];
 	std::string result;
 
-	while (character != 0);
+	while (character != 0)
 	{
 		result.push_back(character);
-		character = instructions[programPointer];
+		character = instructions[++programPointer];
 	}
 
 	return result;

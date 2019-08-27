@@ -160,7 +160,10 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 					catch (std::invalid_argument invalidArgument) { printErrorAndExit(c_parserError + "the value must be a number", it_currentToken->lineNumber); }
 				}
 				else if (symbolTable.find(it_currentToken->stringValue) == symbolTable.end())
+				{ 
 					symbolTable.insert(std::make_pair(it_currentToken->stringValue, variableSize));
+					makeValue(*it_currentToken);
+				}
 				else
 					printErrorAndExit(c_parserError + "the variable " + it_currentToken->stringValue + " has been already defined", it_currentToken->lineNumber);
 			}
@@ -168,6 +171,7 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 			{
 				if (symbolTable.erase(it_currentToken->stringValue) == 0)
 					printErrorAndExit(c_parserError + "the variable " + it_currentToken->stringValue + " hasn't been defined", it_currentToken->lineNumber);
+				makeValue(*it_currentToken);
 			}
 			else if ((it_currentInstruction->tokenState == TokenState::op_ld || it_currentInstruction->tokenState == TokenState::op_sv) 
 																	&& symbolTable.find(it_currentToken->stringValue) == symbolTable.end())
