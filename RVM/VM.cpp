@@ -18,7 +18,7 @@ const std::vector<int8_t>& VM::ld(const std::string& variableName)
 void VM::sv(const std::string& variableName)
 {
 	auto& foundResult = symbolTable.find(variableName)->second;
-	for (auto& i : foundResult) { i = stack.back(); stack.pop_back(); }
+	for (auto& i : foundResult) { i = stack.back(); popFromStack(); }
 	stackPointer -= (int8_t)foundResult.size();
 }
 
@@ -49,20 +49,20 @@ int8_t VM::op_nand(const int8_t& a, const int8_t& b) { --stackPointer; return ~(
 int8_t VM::op_xor(const int8_t& a, const int8_t& b) { --stackPointer; return b xor a; }
 int8_t VM::op_not(const int8_t& a) { return ~a; }
 
-void VM::pushn(const int8_t& a) { ++stackPointer; stack.push_back(a); }
+void VM::pushn(const int8_t& a) { ++stackPointer; pushToStack(a); }
 void VM::pushs(const std::string& data)
 { 
-	for (const auto& i : data) stack.push_back(i); 
-	stack.push_back(0);
+	for (const auto& i : data) pushToStack(i); 
+	pushToStack(0);
 	stackPointer += (int8_t)data.size() + 1;
 }
 
-void VM::popn() { stack.pop_back(); --stackPointer; }
+void VM::popn() { popFromStack(); --stackPointer; }
 
 void VM::pops()
 {
-	for (auto&& i = stack.cend(); *i != 0; --i, --stackPointer) stack.pop_back(); 
-	stack.pop_back();
+	for (auto&& i = stack.cend(); *i != 0; --i, --stackPointer) popFromStack; 
+	popFromStack();
 	--stackPointer;
 }
 
@@ -99,7 +99,7 @@ void VM::doInstruction(const TokenState& opcode)
 	if (stack.size() > 0) a = stack.back();
 	if (stack.size() > 1) b = stack[stack.size() - 2];
 
-	auto popTwoTimes = [&]() { stack.pop_back(); stack.pop_back(); };
+	auto popTwoTimes = [&]() { popFromStack(); popFromStack(); };
 	auto lambda = [&](const TokenState&& tokenState) 
 	{
 		popTwoTimes();
@@ -112,13 +112,13 @@ void VM::doInstruction(const TokenState& opcode)
 	if (opcode >= TokenState::op_add && opcode <= TokenState::op_div)
 	{
 		lambda(TokenState::op_add);
-		stack.push_back(arithmeticFunctions[index](a, b));
+		pushToStack(arithmeticFunctions[index](a, b));
 	}
 	else if (opcode == TokenState::op_ld)
 	{
 		const auto& variableData = ld(decodeString());
 		for (const auto& i : variableData)
-			stack.push_back(i);
+			pushToStack(i);
 	}
 	else if (opcode == TokenState::op_sv)
 		sv(decodeString());
@@ -131,17 +131,17 @@ void VM::doInstruction(const TokenState& opcode)
 	else if (opcode >= TokenState::op_eq && opcode <= TokenState::op_ls)
 	{
 		lambda(TokenState::op_eq);
-		stack.push_back(comparisonFunctions[index](a, b));
+		pushToStack(comparisonFunctions[index](a, b));
 	}
 	else if (opcode >= TokenState::op_and && opcode <= TokenState::op_xor)
 	{
 		lambda(TokenState::op_add);
-		stack.push_back(binaryArithmeticFunctions[index](a, b));
+		pushToStack(binaryArithmeticFunctions[index](a, b));
 	}
 	else if (opcode == TokenState::op_not)
 	{
-		stack.pop_back();
-		stack.push_back(op_not(a));
+		popFromStack();
+		pushToStack(op_not(a));
 	}
 	else if (opcode == TokenState::op_pushn)
 		pushn(instructions[programPointer]);
@@ -174,4 +174,30 @@ std::string VM::decodeString()
 	}
 
 	return result;
+}
+
+
+void VM::pushToStack(const int8_t&& value)
+{
+	if (stack.size() + 1 > stack.capacity())
+		stack.resize(stack.size() + c_SIZE_OF_STACK);
+	
+	pushToStack(value);
+}
+
+void VM::pushToStack(const int8_t& value)
+{
+	if (stack.size() + 1 > stack.capacity())
+		stack.resize(stack.size() + c_SIZE_OF_STACK);
+	
+	stack.push_back(value);
+}
+
+
+void VM::popFromStack()
+{
+	if (stack.capacity() / (stack.size() + 1))
+		stack.resize(stack.size() - c_SIZE_OF_STACK);
+
+	stack.pop_back();
 }

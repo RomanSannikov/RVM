@@ -40,7 +40,7 @@ private:
 
 public:
 	
-	VM() : c_SIZE_OF_STACK(15), stackPointer(0), programPointer(0)
+	VM() : c_SIZE_OF_STACK(8), stackPointer(0), programPointer(0)
 	{
 		stack.reserve(c_SIZE_OF_STACK);
 	}
@@ -58,10 +58,9 @@ private:
 	
 	std::string decodeString();
 	
-	/*
-	void increaseStack();
-	void decreaseStack();
-	*/
+	void pushToStack(const int8_t&&);
+	void pushToStack(const int8_t&);
+	void popFromStack();
 
 	// Todo: const
 	int8_t add(const int8_t&, const int8_t&);
