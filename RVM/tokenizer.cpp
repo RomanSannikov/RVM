@@ -4,7 +4,6 @@
 void Tokenizer::tokenize(const std::string& c_lineFromScanner, const unsigned& c_lineNumber)
 {
 	unsigned currentPoint = 0;
-	std::string stringSlice;
 	StringSlice slice;
 	Token newToken = { TokenState::op_add };
 
@@ -24,8 +23,7 @@ void Tokenizer::tokenize(const std::string& c_lineFromScanner, const unsigned& c
 			continue;
 		}
 
-		stringSlice = c_lineFromScanner.substr(currentPoint, slice.length);
-		newToken.stringValue = stringSlice;
+		newToken.stringValue = c_lineFromScanner.substr(currentPoint, slice.length);
 		newToken.lineNumber = c_lineNumber;
 
 		recognize(newToken, slice.mode);
