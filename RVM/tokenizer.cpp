@@ -30,6 +30,9 @@ void Tokenizer::tokenize(const std::string& c_lineFromScanner, const unsigned& c
 
 		recognize(newToken, slice.mode);
 
+		if (newToken.tokenState == TokenState::word && tokens.size() == 0)
+			printErrorAndExit(c_lexerError + "cannot recognize the instruction " + newToken.stringValue, newToken.lineNumber);
+
 		currentPoint += slice.length;
 	
 		tokens.push_back(newToken);
@@ -43,7 +46,7 @@ void Tokenizer::recognize(Token& token, const uint8_t& c_mode)
 	{
 		if (token.stringValue[token.stringValue.size() - 1] == ':')
 		{
-			token.tokenState = TokenState::word;
+			token.tokenState = TokenState::label;
 			token.stringValue.pop_back();
 		}
 		else

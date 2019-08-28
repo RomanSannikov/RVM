@@ -9,6 +9,6 @@ label:
 popn
 popn
 pushn 15
-popn
+pop
 
 hlt

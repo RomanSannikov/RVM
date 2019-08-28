@@ -42,7 +42,7 @@ enum class TokenState : unsigned
 
 	op_hlt,
 
-	label, // Fix: do i need the label token?
+	label,
 
 	word,
 	number
