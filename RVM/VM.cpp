@@ -61,7 +61,7 @@ void VM::popn() { popFromStack(); --stackPointer; }
 
 void VM::pops()
 {
-	for (auto&& i = stack.cend(); *i != 0; --i, --stackPointer) popFromStack; 
+	for (auto&& i = stack.cend(); *i != 0; --i, --stackPointer) popFromStack(); 
 	popFromStack();
 	--stackPointer;
 }
@@ -196,8 +196,8 @@ void VM::pushToStack(const int8_t& value)
 
 void VM::popFromStack()
 {
-	if (stack.capacity() / (stack.size() + 1))
-		stack.resize(stack.size() - c_SIZE_OF_STACK);
-
 	stack.pop_back();
+
+	if (stack.capacity() > stack.size() + c_SIZE_OF_STACK + 1)
+		stack.resize(stack.size() - c_SIZE_OF_STACK);
 }

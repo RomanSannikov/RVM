@@ -62,7 +62,6 @@ private:
 	void pushToStack(const int8_t&);
 	void popFromStack();
 
-	// Todo: const
 	int8_t add(const int8_t&, const int8_t&);
 	int8_t sub(const int8_t&, const int8_t&);
 	int8_t mul(const int8_t&, const int8_t&);
