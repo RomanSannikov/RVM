@@ -45,7 +45,7 @@ void Parser::completeJumpInstructions()
 		{
 			for (const auto& c_locationOfJump : c_it_jumpTableNode->second.locationsOfJumps)
 			{
-				uint8_t* pointerToInstructions = instructions.data();
+				int8_t* pointerToInstructions = instructions.data();
 				pointerToInstructions[c_locationOfJump + 1] = c_it_jumpTableNode->second.locationOfLabel >> 8;
 				pointerToInstructions[c_locationOfJump + 2] = (uint8_t)c_it_jumpTableNode->second.locationOfLabel;
 			}

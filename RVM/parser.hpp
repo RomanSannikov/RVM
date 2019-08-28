@@ -22,7 +22,7 @@ private:
 	std::unordered_map<std::string, uint8_t> symbolTable;
 	std::unordered_map<std::string, jumpTableNode> jumpTable;
 	std::vector<std::string> labelNames;
-	std::vector<uint8_t> instructions;
+	std::vector<int8_t> instructions;
 
 public: 
 	Parser() {}
@@ -35,7 +35,7 @@ public:
 	
 	void completeParsing();
 
-	std::vector<uint8_t>& getInstructions() { return instructions; }
+	std::vector<int8_t>& getInstructions() { return instructions; }
 
 private:
 	void completeJumpInstructions();

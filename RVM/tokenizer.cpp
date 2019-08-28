@@ -73,7 +73,7 @@ Tokenizer::StringSlice& Tokenizer::getSlice(const std::string& c_line, const uns
 {
 	if (isalpha(c_line[c_startPoint]))
 		slice.mode = c_WORD;
-	else if (isdigit(c_line[c_startPoint]))
+	else if (isdigit(c_line[c_startPoint]) || c_line[c_startPoint] == '-')
 		slice.mode = c_NUMBER;
 	else
 	{

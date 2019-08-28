@@ -1,7 +1,7 @@
 new 1 a
 new 1 b
-pushn 1
-pushn 1
+pushn -1
+pushn -1
 sv a
 sv b
 ld a

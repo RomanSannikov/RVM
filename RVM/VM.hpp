@@ -15,28 +15,28 @@ class VM
 private:
 	const unsigned c_SIZE_OF_STACK;
 
-	std::vector<uint8_t> stack;
-	std::unordered_map<std::string, std::vector<uint8_t>> symbolTable;
-	std::vector<uint8_t> instructions;
+	std::vector<int8_t> stack;
+	std::unordered_map<std::string, std::vector<int8_t>> symbolTable;
+	std::vector<int8_t> instructions;
 
 	uint16_t programPointer;
-	uint8_t stackPointer;
+	int8_t stackPointer;
 
-	const std::array < std::function<uint8_t(const uint8_t&, const uint8_t&)>, 4> arithmeticFunctions =
+	const std::array < std::function<int8_t(const int8_t&, const int8_t&)>, 4> arithmeticFunctions =
 	{ std::bind(&VM::add, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::sub, this, std::placeholders::_1, std::placeholders::_2),
 	  std::bind(&VM::mul, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::divide, this, std::placeholders::_1, std::placeholders::_2) };
 
 	/*
-	std::array < std::function<void(const uint8_t&, uint8_t&)>, 3> jumpFunctions =
+	std::array < std::function<void(const int8_t&, int8_t&)>, 3> jumpFunctions =
 	{ jmp, jne,
 	  je };
 	*/
 
-	const std::array < std::function<uint8_t(const uint8_t&, const uint8_t&)>, 3> comparisonFunctions =
+	const std::array < std::function<int8_t(const int8_t&, const int8_t&)>, 3> comparisonFunctions =
 	{ std::bind(&VM::eq, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::gr, this, std::placeholders::_1, std::placeholders::_2),
 	  std::bind(&VM::ls, this, std::placeholders::_1, std::placeholders::_2) };
 
-	const std::array < std::function<uint8_t(const uint8_t&, const uint8_t&)>, 4> binaryArithmeticFunctions =
+	const std::array < std::function<int8_t(const int8_t&, const int8_t&)>, 4> binaryArithmeticFunctions =
 	{ std::bind(&VM::op_and, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::op_or, this, std::placeholders::_1, std::placeholders::_2),
 	  std::bind(&VM::op_nand, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::op_xor, this, std::placeholders::_1, std::placeholders::_2) };
 
@@ -48,7 +48,7 @@ public:
 	}
 
 public:
-	void run(const std::vector<uint8_t>&);
+	void run(const std::vector<int8_t>&);
 
 	void printStack() 
 	{
@@ -66,35 +66,35 @@ private:
 	*/
 
 	// Todo: const
-	uint8_t add(const uint8_t&, const uint8_t&);
-	uint8_t sub(const uint8_t&, const uint8_t&);
-	uint8_t mul(const uint8_t&, const uint8_t&);
-	uint8_t divide(const uint8_t&, const uint8_t&);
+	int8_t add(const int8_t&, const int8_t&);
+	int8_t sub(const int8_t&, const int8_t&);
+	int8_t mul(const int8_t&, const int8_t&);
+	int8_t divide(const int8_t&, const int8_t&);
 
 	// Todo: loading and saving
-	const std::vector<uint8_t>& ld(const std::string&);
+	const std::vector<int8_t>& ld(const std::string&);
 	void sv(const std::string&);
 
-	void jmp(const uint8_t&, uint8_t&);
-	void jne(const uint8_t&, uint8_t&);
-	void je(const uint8_t&, uint8_t&);
+	void jmp(const int8_t&, int8_t&);
+	void jne(const int8_t&, int8_t&);
+	void je(const int8_t&, int8_t&);
 
-	uint8_t eq(const uint8_t&, const uint8_t&);
-	uint8_t gr(const uint8_t&, const uint8_t&);
-	uint8_t ls(const uint8_t&, const uint8_t&);
+	int8_t eq(const int8_t&, const int8_t&);
+	int8_t gr(const int8_t&, const int8_t&);
+	int8_t ls(const int8_t&, const int8_t&);
 
-	uint8_t op_and(const uint8_t&, const uint8_t&);
-	uint8_t op_or(const uint8_t&, const uint8_t&);
-	uint8_t op_nand(const uint8_t&, const uint8_t&);
-	uint8_t op_xor(const uint8_t&, const uint8_t&);
-	uint8_t op_not(const uint8_t&);
+	int8_t op_and(const int8_t&, const int8_t&);
+	int8_t op_or(const int8_t&, const int8_t&);
+	int8_t op_nand(const int8_t&, const int8_t&);
+	int8_t op_xor(const int8_t&, const int8_t&);
+	int8_t op_not(const int8_t&);
 
-	void pushn(const uint8_t&);
+	void pushn(const int8_t&);
 	void pushs(const std::string&);
 	void popn();
 	void pops();
 
-	void allocate(const std::string&, const uint8_t&);
+	void allocate(const std::string&, const int8_t&);
 	void del(const std::string&);
 };
 
