@@ -26,11 +26,9 @@ private:
 	{ std::bind(&VM::add, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::sub, this, std::placeholders::_1, std::placeholders::_2),
 	  std::bind(&VM::mul, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::divide, this, std::placeholders::_1, std::placeholders::_2) };
 
-	/*
-	std::array < std::function<void(const int8_t&, int8_t&)>, 3> jumpFunctions =
-	{ jmp, jne,
-	  je };
-	*/
+	const std::array < std::function<void(const int16_t&)>, 3> jumpFunctions =
+	{ std::bind(&VM::jmp, this, std::placeholders::_1), std::bind(&VM::jne, this, std::placeholders::_1),
+	  std::bind(&VM::je, this, std::placeholders::_1) };
 
 	const std::array < std::function<int8_t(const int8_t&, const int8_t&)>, 3> comparisonFunctions =
 	{ std::bind(&VM::eq, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::gr, this, std::placeholders::_1, std::placeholders::_2),
@@ -71,13 +69,12 @@ private:
 	int8_t mul(const int8_t&, const int8_t&);
 	int8_t divide(const int8_t&, const int8_t&);
 
-	// Todo: loading and saving
 	const std::vector<int8_t>& ld(const std::string&);
 	void sv(const std::string&);
 
-	void jmp(const int8_t&, int8_t&);
-	void jne(const int8_t&, int8_t&);
-	void je(const int8_t&, int8_t&);
+	void jmp(const int16_t&);
+	void jne(const int16_t&);
+	void je(const int16_t&);
 
 	int8_t eq(const int8_t&, const int8_t&);
 	int8_t gr(const int8_t&, const int8_t&);

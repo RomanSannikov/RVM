@@ -1,15 +1,14 @@
-new 1 a
-new 1 b
-pushn -1
-pushn -1
-sv a
-sv b
-ld a
-ld b
-add
+pushn 1
+pushn 2
+mul
+pushn 2
+eq
+je label
+hlt
+label:
 popn
+popn
+pushn 15
 popn
 
-del a
-del b
 hlt

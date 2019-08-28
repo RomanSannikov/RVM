@@ -22,6 +22,23 @@ void VM::sv(const std::string& variableName)
 	stackPointer -= (int8_t)foundResult.size();
 }
 
+void VM::jmp(const int16_t& destination)
+{
+	programPointer = destination;
+}
+
+void VM::jne(const int16_t& destination)
+{
+	if (!stack[stackPointer - 1])
+		programPointer = destination;
+}
+
+void VM::je(const int16_t& destination)
+{
+	if (stack[stackPointer - 1])
+		programPointer = destination;
+}
+
 int8_t VM::eq(const int8_t& a, const int8_t& b) { --stackPointer; return a == b; }
 int8_t VM::gr(const int8_t& a, const int8_t& b) { --stackPointer; return b > a; }
 int8_t VM::ls(const int8_t& a, const int8_t& b) { --stackPointer; return b < a; }
@@ -87,6 +104,7 @@ void VM::doInstruction(const TokenState& opcode)
 	{
 		popTwoTimes();
 		index = static_cast<int>(opcode) - static_cast<int>(tokenState);
+		--programPointer;
 	};
 
 	++programPointer;
@@ -106,9 +124,9 @@ void VM::doInstruction(const TokenState& opcode)
 		sv(decodeString());
 	else if (opcode >= TokenState::op_jmp && opcode <= TokenState::op_je)
 	{
-		// Todo: jump stack
-		// index = static_cast<int>(TokenState::op_jmp) - static_cast<int>(opcode);
-		// jumpFunctions[static_cast<int>(opcode)](a, b);
+		int16_t destination = instructions[programPointer] << 8 | instructions[programPointer + 1];
+		index = static_cast<int>(opcode) - static_cast<int>(TokenState::op_jmp);
+		jumpFunctions[index](destination - 1);
 	}
 	else if (opcode >= TokenState::op_eq && opcode <= TokenState::op_ls)
 	{
