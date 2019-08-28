@@ -24,8 +24,10 @@ private:
 	std::vector<std::string> labelNames;
 	std::vector<int8_t> instructions;
 
+	bool wasHlt;
+
 public: 
-	Parser() {}
+	Parser() : wasHlt(false) {}
 
 public:
 	void parse(const std::vector<Token>&);

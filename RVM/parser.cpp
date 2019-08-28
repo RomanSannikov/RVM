@@ -11,6 +11,8 @@ void Parser::parse(const std::vector<Token>& c_tokens)
 		addLocationOfLabel(it_currentToken->stringValue, (uint16_t)instructions.size());
 	else if (it_currentToken->tokenState <= TokenState::op_hlt)
 	{
+		if (it_currentToken->tokenState == TokenState::op_hlt)
+			wasHlt = true;
 		instructionValue = c_instructionValues[static_cast<uint8_t>(c_tokens[0].tokenState)];
 		instructions.push_back(static_cast<uint8_t>(it_currentToken->tokenState));
 	}
@@ -32,6 +34,9 @@ void Parser::completeParsing()
 {
 	completeJumpInstructions();
 	checkSymbolTabel();
+
+	if (!wasHlt)
+		printErrorAndExit(c_parserError + "There is no HLT instruction. It's an undefined behavior without the instructions");
 }
 
 
