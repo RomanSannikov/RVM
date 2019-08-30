@@ -26,9 +26,13 @@ private:
 	{ std::bind(&VM::add, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::sub, this, std::placeholders::_1, std::placeholders::_2),
 	  std::bind(&VM::mul, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::divide, this, std::placeholders::_1, std::placeholders::_2) };
 
-	const std::array < std::function<void(const int16_t&)>, 3> jumpFunctions =
+	const std::array <std::function<void()>, 2> incAndDecFunctions =
+	{ std::bind(&VM::inc, this), std::bind(&VM::dec, this) };
+
+	const std::array < std::function<void(const int16_t&)>, 5> jumpFunctions =
 	{ std::bind(&VM::jmp, this, std::placeholders::_1), std::bind(&VM::jne, this, std::placeholders::_1),
-	  std::bind(&VM::je, this, std::placeholders::_1) };
+	  std::bind(&VM::je, this, std::placeholders::_1), 
+	  std::bind(&VM::jz, this, std::placeholders::_1), std::bind(&VM::jnz, this, std::placeholders::_1) };
 
 	const std::array < std::function<int8_t(const int8_t&, const int8_t&)>, 3> comparisonFunctions =
 	{ std::bind(&VM::eq, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::gr, this, std::placeholders::_1, std::placeholders::_2),
@@ -67,12 +71,17 @@ private:
 	int8_t mul(const int8_t&, const int8_t&);
 	int8_t divide(const int8_t&, const int8_t&);
 
+	void inc();
+	void dec();
+
 	const std::vector<int8_t>& ld(const std::string&);
 	void sv(const std::string&);
 
 	void jmp(const int16_t&);
 	void jne(const int16_t&);
 	void je(const int16_t&);
+	void jz(const int16_t&);
+	void jnz(const int16_t&);
 
 	int8_t eq(const int8_t&, const int8_t&);
 	int8_t gr(const int8_t&, const int8_t&);

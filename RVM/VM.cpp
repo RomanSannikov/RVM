@@ -1,13 +1,21 @@
 #include "VM.hpp"
 
 
-// Todo: const
 int8_t VM::add(const int8_t& a, const int8_t& b) { --stackPointer; return b + a;}
 int8_t VM::sub(const int8_t& a, const int8_t& b) { --stackPointer; return b - a; }
 int8_t VM::mul(const int8_t& a, const int8_t& b) { --stackPointer; return b * a; }
 int8_t VM::divide(const int8_t& a, const int8_t& b) { --stackPointer; return b / a; }
 
-// Todo: loading and saving
+void VM::inc()
+{
+	++stack[stackPointer - 1];
+}
+
+void VM::dec()
+{
+	--stack[stackPointer - 1];
+}
+
 const std::vector<int8_t>& VM::ld(const std::string& variableName)
 { 
 	const auto& foundResult = symbolTable.find(variableName)->second;
@@ -29,19 +37,39 @@ void VM::jmp(const int16_t& destination)
 
 void VM::jne(const int16_t& destination)
 {
-	if (!stack[stackPointer - 1])
+	if (stack[stackPointer - 1] != stack[stackPointer - 2])
 		programPointer = destination;
+	else
+		++programPointer;
 }
 
 void VM::je(const int16_t& destination)
 {
-	if (stack[stackPointer - 1])
+	if (stack[stackPointer - 1] == stack[stackPointer - 2])
 		programPointer = destination;
+	else
+		++programPointer;
 }
 
-int8_t VM::eq(const int8_t& a, const int8_t& b) { --stackPointer; return a == b; }
-int8_t VM::gr(const int8_t& a, const int8_t& b) { --stackPointer; return b > a; }
-int8_t VM::ls(const int8_t& a, const int8_t& b) { --stackPointer; return b < a; }
+void VM::jz(const int16_t& destination)
+{
+	if (stack[stackPointer - 1] == 0)
+		programPointer = destination;
+	else
+		++programPointer;
+}
+
+void VM::jnz(const int16_t& destination)
+{
+	if (stack[stackPointer - 1])
+		programPointer = destination;
+	else
+		++programPointer;
+}
+
+int8_t VM::eq(const int8_t& a, const int8_t& b) { ++stackPointer; return a == b; }
+int8_t VM::gr(const int8_t& a, const int8_t& b) { ++stackPointer; return b > a; }
+int8_t VM::ls(const int8_t& a, const int8_t& b) { ++stackPointer; return b < a; }
 
 int8_t VM::op_and(const int8_t& a, const int8_t& b) { --stackPointer; return b and a; }
 int8_t VM::op_or(const int8_t& a, const int8_t& b) { --stackPointer; return b or a; }
@@ -66,7 +94,6 @@ void VM::pops()
 	--stackPointer;
 }
 
-// Todo: allocations
 void VM::allocate(const std::string& variableName, const int8_t& variableSize)
 { symbolTable.insert(std::make_pair(variableName, std::vector<int8_t>((size_t)variableSize))); }
 
@@ -83,7 +110,7 @@ void VM::run(const std::vector<int8_t>& instructions)
 		int8_t currentInstruction = instructions[programPointer];
 		if (static_cast<TokenState>(currentInstruction) == TokenState::op_hlt)
 			break;
-
+		TokenState opcode = static_cast<TokenState>(currentInstruction);
 		doInstruction(static_cast<TokenState>(currentInstruction));
 
 		printStack();
@@ -114,6 +141,12 @@ void VM::doInstruction(const TokenState& opcode)
 		lambda(TokenState::op_add);
 		pushToStack(arithmeticFunctions[index](a, b));
 	}
+	else if (opcode == TokenState::op_inc || opcode == TokenState::op_dec)
+	{
+		--programPointer;
+		index = static_cast<int>(opcode) - static_cast<int>(TokenState::op_inc);
+		incAndDecFunctions[index]();
+	}
 	else if (opcode == TokenState::op_ld)
 	{
 		const auto& variableData = ld(decodeString());
@@ -130,7 +163,7 @@ void VM::doInstruction(const TokenState& opcode)
 	}
 	else if (opcode >= TokenState::op_eq && opcode <= TokenState::op_ls)
 	{
-		lambda(TokenState::op_eq);
+		index = static_cast<int>(opcode) - static_cast<int>(TokenState::op_eq);
 		pushToStack(comparisonFunctions[index](a, b));
 	}
 	else if (opcode >= TokenState::op_and && opcode <= TokenState::op_xor)
@@ -148,9 +181,15 @@ void VM::doInstruction(const TokenState& opcode)
 	else if (opcode == TokenState::op_pushs)
 		pushs(decodeString());
 	else if (opcode == TokenState::op_popn)
+	{
+		--programPointer;
 		popn();
+	}
 	else if (opcode == TokenState::op_pops)
+	{
+		--programPointer;
 		pops();
+	}
 	else if (opcode == TokenState::op_new)
 	{
 		const int8_t data = instructions[programPointer];

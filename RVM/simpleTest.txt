@@ -1,14 +1,9 @@
-pushn 1
-pushn 2
-mul
-pushn 2
-eq
-je label
-hlt
-label:
+pushn 0
+pushn 5
+loop:
+dec
+jne loop
 popn
-popn
-pushn 15
 popn
 
 hlt

@@ -12,12 +12,17 @@ enum class TokenState : unsigned
 	op_mul,
 	op_div,
 
+	op_inc,
+	op_dec,
+
 	op_ld,
 	op_sv,
 
 	op_jmp,
 	op_jne,
 	op_je,
+	op_jz,
+	op_jnz,
 
 	op_eq,
 	op_gr,
@@ -52,8 +57,9 @@ enum class TokenState : unsigned
 const std::vector<std::string> c_stringInstructions =
 {
 	"add", "sub", "mul", "div",
+	"inc", "dec",
 	"ld", "sv",
-	"jmp", "jne", "je",
+	"jmp", "jne", "je", "jz", "jnz",
 	"eq", "gr", "ls",
 	"and", "or", "nand", "xor", "not",
 	"call", "ret", 
@@ -77,14 +83,16 @@ NUM STR NUM STR
 1value  2value
 */
 #define NONE 0b00000000
-const std::array<uint8_t, 26> c_instructionValues
-				{ NONE, NONE, NONE, NONE, 
-				0b00110000, 0b00110000, 
-				0b00110000, 0b00110000, 0b00110000, NONE, NONE, NONE,
-				NONE, NONE, NONE, NONE, NONE,
-				0b00110000, NONE, 
-				0b11000000, 0b00110000, NONE, NONE,
-				0b11000011, 0b00110000,
-				NONE };
+const std::array<uint8_t, 30> c_instructionValues
+				{ NONE, NONE, NONE, NONE, // add sub mul div
+				NONE, NONE, // inc dec
+				0b00110000, 0b00110000, // ld sv 
+				0b00110000, 0b00110000, 0b00110000, 0b00110000, 0b00110000, // jmp jne je jz jnz
+				NONE, NONE, NONE, // eq gr ls
+				NONE, NONE, NONE, NONE, NONE, // and or nand xor not
+				0b00110000, NONE, // call ret
+				0b11000000, 0b00110000, NONE, NONE, // pushn pushs popn pops
+				0b11000011, 0b00110000, // new del
+				NONE }; // hlt
 
 #undef NONE
