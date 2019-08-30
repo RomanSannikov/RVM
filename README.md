@@ -10,11 +10,15 @@ add<br>
 sub    <br>
 mul    <br>
 div    <br>
+inc<br>
+dec<br>
 ld    word<br>
 sv    word<br>
 jmp    word<br>
 jne    word<br>
 je     word<br>
+jz     word<br>
+jnz     word<br>
 eq<br>
 gr<br>
 ls<br>
@@ -40,7 +44,7 @@ none - error, at least one argument should be written<br>
 one arg - filename. By default, RVM try to read the file like it has RBC in there<br>
 -f - then a filename goes<br>
 -b - run a binary representation of Rolang ByteCode<br>
--c - run Rolang ByteCode<br>
+-o - output Rolang ByteCode<br>
  
  
 ### How it works:<br>
