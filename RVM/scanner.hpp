@@ -21,8 +21,8 @@ public:
 	inline void open(const std::string&);
 	inline void open(const char* const);
 	
-	bool isEOF();
+	bool isEOF() noexcept;
 
-	std::string getLine(std::string&);
+	std::string getLine(std::string&) noexcept;
 	unsigned getLineNumber();
 };

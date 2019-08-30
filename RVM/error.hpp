@@ -6,7 +6,8 @@
 
 #include "exceptions.hpp"
 
-inline void printErrorAndExit(const std::string& c_message)
+
+inline void printErrorAndExit(const std::string& c_message) noexcept
 {
 	std::cout << std::endl << "ERROR APPEARED!" << std::endl 
 		<< "ERROR MESSAGE: " << c_message << std::endl;
@@ -15,7 +16,8 @@ inline void printErrorAndExit(const std::string& c_message)
 	exit(EXIT_FAILURE);
 }
 
-inline void printErrorAndExit(const std::string& c_message, const unsigned c_lineNumber)
+
+inline void printErrorAndExit(const std::string& c_message, const unsigned c_lineNumber) noexcept
 {
 	std::cout << std::endl << "ERROR APPEARED!" << std::endl
 		<< "ERROR MESSAGE: " << c_message << std::endl 

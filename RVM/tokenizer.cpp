@@ -1,7 +1,7 @@
 #include "tokenizer.hpp"
 
 
-void Tokenizer::tokenize(const std::string& c_lineFromScanner, const unsigned& c_lineNumber)
+void Tokenizer::tokenize(const std::string& c_lineFromScanner, const unsigned& c_lineNumber) noexcept
 {
 	unsigned currentPoint = 0;
 	StringSlice slice;
@@ -38,7 +38,7 @@ void Tokenizer::tokenize(const std::string& c_lineFromScanner, const unsigned& c
 }
 
 
-void Tokenizer::recognize(Token& token, const uint8_t& c_mode)
+void Tokenizer::recognize(Token& token, const uint8_t& c_mode) noexcept
 {
 	if (c_mode == c_WORD)
 	{
@@ -55,7 +55,7 @@ void Tokenizer::recognize(Token& token, const uint8_t& c_mode)
 }
 
 
-void Tokenizer::recognizeToken(Token& token, const std::vector<std::string>& c_array, const TokenState c_tokenState)
+void Tokenizer::recognizeToken(Token& token, const std::vector<std::string>& c_array, const TokenState c_tokenState) noexcept
 {
 	for (unsigned i = 0; i < c_array.size(); ++i)
 	{
@@ -70,7 +70,7 @@ void Tokenizer::recognizeToken(Token& token, const std::vector<std::string>& c_a
 }
 
 
-Tokenizer::StringSlice& Tokenizer::getSlice(const std::string& c_line, const unsigned& c_startPoint, StringSlice& slice)
+Tokenizer::StringSlice& Tokenizer::getSlice(const std::string& c_line, const unsigned& c_startPoint, StringSlice& slice) noexcept
 {
 	if (isalpha(c_line[c_startPoint]))
 		slice.mode = c_WORD;

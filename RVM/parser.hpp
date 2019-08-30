@@ -30,27 +30,27 @@ public:
 	Parser() : wasHlt(false) {}
 
 public:
-	void parse(const std::vector<Token>&);
+	void parse(const std::vector<Token>&) noexcept;
 	
-	void printInstructions() 
-	{ for (auto i : instructions) std::cout << std::bitset<8>(i) << std::endl; }
+	void printInstructions() noexcept
+	{ for (const auto& i : instructions) std::cout << std::bitset<8>(i) << std::endl; }
 	
-	void completeParsing();
+	void completeParsing() noexcept;
 
-	std::vector<int8_t>& getInstructions() { return instructions; }
+	constexpr std::vector<int8_t>& getInstructions() noexcept { return instructions; }
 
 private:
-	void completeJumpInstructions();
-	void checkSymbolTabel();
+	void completeJumpInstructions() noexcept;
+	void checkSymbolTabel() noexcept;
 
-	void addLocationOfLabel(const std::string&, const uint16_t&& c_locationLabel);
+	void addLocationOfLabel(const std::string&, const uint16_t&&) noexcept;
 
-	void addLocationOfJump(const std::string&, const uint16_t && c_locationOfJump);
+	void addLocationOfJump(const std::string&, const uint16_t &&) noexcept;
 
-	auto findLocationOfJump(const jumpTableList&, const unsigned&);
+	auto findLocationOfJump(const jumpTableList&, const unsigned&) noexcept;
 
 	void checkArguments(std::vector<Token>::const_iterator&,
-		std::vector<Token>::const_iterator&, const uint8_t&, std::vector<Token>::const_iterator);
+		std::vector<Token>::const_iterator&, const uint8_t&, std::vector<Token>::const_iterator) noexcept;
 
-	void makeValue(const Token&);
+	void makeValue(const Token&) noexcept;
 };

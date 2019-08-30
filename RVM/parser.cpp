@@ -1,7 +1,7 @@
 #include "parser.hpp"
 
 
-void Parser::parse(const std::vector<Token>& c_tokens)
+void Parser::parse(const std::vector<Token>& c_tokens) noexcept
 {
 	uint8_t instructionValue = 0;
 	auto it_currentToken = c_tokens.begin();
@@ -33,7 +33,7 @@ void Parser::parse(const std::vector<Token>& c_tokens)
 }
 
 
-void Parser::completeParsing()
+void Parser::completeParsing() noexcept
 {
 	completeJumpInstructions();
 	checkSymbolTabel();
@@ -43,7 +43,7 @@ void Parser::completeParsing()
 }
 
 
-void Parser::completeJumpInstructions()
+void Parser::completeJumpInstructions() noexcept
 {
 	for (const auto& i : labelNames)
 	{
@@ -64,14 +64,14 @@ void Parser::completeJumpInstructions()
 }
 
 
-void Parser::checkSymbolTabel()
+void Parser::checkSymbolTabel() noexcept
 {
 	if (symbolTable.size() != 0)
 		printErrorAndExit(c_parserError + "not all variables were deleted");
 }
 
 
-void Parser::addLocationOfLabel(const std::string& c_labelName, const uint16_t&& c_locationLabel)
+void Parser::addLocationOfLabel(const std::string& c_labelName, const uint16_t&& c_locationLabel) noexcept
 {
 	const auto& c_it_jumpTableNode = jumpTable.find(c_labelName);
 	jumpTableNode jumpTableNode;
@@ -90,7 +90,7 @@ void Parser::addLocationOfLabel(const std::string& c_labelName, const uint16_t&&
 }
 
 
-auto Parser::findLocationOfJump(const jumpTableList& c_labelIterator, const unsigned& c_locationToFind)
+auto Parser::findLocationOfJump(const jumpTableList& c_labelIterator, const unsigned& c_locationToFind) noexcept
 {
 	if (c_labelIterator != jumpTable.end())
 		for (auto i = c_labelIterator->second.locationsOfJumps.begin(); i != c_labelIterator->second.locationsOfJumps.end(); ++i)
@@ -101,7 +101,7 @@ auto Parser::findLocationOfJump(const jumpTableList& c_labelIterator, const unsi
 }
 
 
-void Parser::addLocationOfJump(const std::string& c_labelName, const uint16_t && c_locationOfJump)
+void Parser::addLocationOfJump(const std::string& c_labelName, const uint16_t && c_locationOfJump) noexcept
 {
 	const auto& c_it_jumpTableNode = jumpTable.find(c_labelName);
 	jumpTableNode jumpTableNode;
@@ -121,7 +121,7 @@ void Parser::addLocationOfJump(const std::string& c_labelName, const uint16_t &&
 
 
 void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken, 
-		std::vector<Token>::const_iterator& it_currentInstruction, const uint8_t& c_instructionValue, const std::vector<Token>::const_iterator c_it_tokenEnd)
+		std::vector<Token>::const_iterator& it_currentInstruction, const uint8_t& c_instructionValue, const std::vector<Token>::const_iterator c_it_tokenEnd) noexcept
 {
 	uint8_t instructionValuePattern = 0b11110000;
 	uint8_t numberOfIterations = 0;
@@ -191,7 +191,7 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 }
 
 
-void Parser::makeValue(const Token& c_token)
+void Parser::makeValue(const Token& c_token) noexcept
 {
 	if (c_token.tokenState == TokenState::number)
 	{

@@ -1,113 +1,113 @@
 #include "VM.hpp"
 
 
-int8_t VM::add(const int8_t& a, const int8_t& b) { --stackPointer; return b + a;}
-int8_t VM::sub(const int8_t& a, const int8_t& b) { --stackPointer; return b - a; }
-int8_t VM::mul(const int8_t& a, const int8_t& b) { --stackPointer; return b * a; }
-int8_t VM::divide(const int8_t& a, const int8_t& b) { --stackPointer; return b / a; }
+int8_t VM::add(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b + a;}
+int8_t VM::sub(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b - a; }
+int8_t VM::mul(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b * a; }
+int8_t VM::divide(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b / a; }
 
-void VM::inc()
+void VM::inc() noexcept
 {
 	++stack[stackPointer - 1];
 }
 
-void VM::dec()
+void VM::dec() noexcept
 {
 	--stack[stackPointer - 1];
 }
 
-const std::vector<int8_t>& VM::ld(const std::string& variableName)
+const std::vector<int8_t>& VM::ld(const std::string& variableName) noexcept
 { 
-	const auto& foundResult = symbolTable.find(variableName)->second;
-	stackPointer += (int8_t)foundResult.size();
-	return foundResult; 
+	const auto& c_it_foundResult = symbolTable.find(variableName)->second;
+	stackPointer += (int8_t)c_it_foundResult.size();
+	return c_it_foundResult; 
 }
 
-void VM::sv(const std::string& variableName)
+void VM::sv(const std::string& c_variableName) noexcept
 {
-	auto& foundResult = symbolTable.find(variableName)->second;
-	for (auto& i : foundResult) { i = stack.back(); popFromStack(); }
-	stackPointer -= (int8_t)foundResult.size();
+	auto& it_foundResult = symbolTable.find(c_variableName)->second;
+	for (auto& i : it_foundResult) { i = stack.back(); popFromStack(); }
+	stackPointer -= (int8_t)it_foundResult.size();
 }
 
-void VM::jmp(const int16_t& destination)
+void VM::jmp(const int16_t& c_destination) noexcept
 {
-	programPointer = destination;
+	programPointer = c_destination;
 }
 
-void VM::jne(const int16_t& destination)
+void VM::jne(const int16_t& c_destination) noexcept
 {
 	if (stack[stackPointer - 1] != stack[stackPointer - 2])
-		programPointer = destination;
+		programPointer = c_destination;
 	else
 		++programPointer;
 }
 
-void VM::je(const int16_t& destination)
+void VM::je(const int16_t& c_destination) noexcept
 {
 	if (stack[stackPointer - 1] == stack[stackPointer - 2])
-		programPointer = destination;
+		programPointer = c_destination;
 	else
 		++programPointer;
 }
 
-void VM::jz(const int16_t& destination)
+void VM::jz(const int16_t& c_destination) noexcept
 {
 	if (stack[stackPointer - 1] == 0)
-		programPointer = destination;
+		programPointer = c_destination;
 	else
 		++programPointer;
 }
 
-void VM::jnz(const int16_t& destination)
+void VM::jnz(const int16_t& c_destination) noexcept
 {
 	if (stack[stackPointer - 1])
-		programPointer = destination;
+		programPointer = c_destination;
 	else
 		++programPointer;
 }
 
-int8_t VM::eq(const int8_t& a, const int8_t& b) { ++stackPointer; return a == b; }
-int8_t VM::gr(const int8_t& a, const int8_t& b) { ++stackPointer; return b > a; }
-int8_t VM::ls(const int8_t& a, const int8_t& b) { ++stackPointer; return b < a; }
+int8_t VM::eq(const int8_t& a, const int8_t& b) noexcept { ++stackPointer; return a == b; }
+int8_t VM::gr(const int8_t& a, const int8_t& b) noexcept { ++stackPointer; return b > a; }
+int8_t VM::ls(const int8_t& a, const int8_t& b) noexcept { ++stackPointer; return b < a; }
 
-int8_t VM::op_and(const int8_t& a, const int8_t& b) { --stackPointer; return b and a; }
-int8_t VM::op_or(const int8_t& a, const int8_t& b) { --stackPointer; return b or a; }
-int8_t VM::op_nand(const int8_t& a, const int8_t& b) { --stackPointer; return ~(b and a); }
-int8_t VM::op_xor(const int8_t& a, const int8_t& b) { --stackPointer; return b xor a; }
-int8_t VM::op_not(const int8_t& a) { return ~a; }
+int8_t VM::op_and(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b ^ a; }
+int8_t VM::op_or(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b | a; }
+int8_t VM::op_nand(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return ~(b & a); }
+int8_t VM::op_xor(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b ^ a; }
+int8_t VM::op_not(const int8_t& a) noexcept { return ~a; }
 
-void VM::pushn(const int8_t& a) { ++stackPointer; pushToStack(a); }
-void VM::pushs(const std::string& data)
+void VM::pushn(const int8_t& a) noexcept { ++stackPointer; pushToStack(a); }
+void VM::pushs(const std::string& c_data) noexcept
 { 
-	for (const auto& i : data) pushToStack(i); 
+	for (const auto& i : c_data) pushToStack(i); 
 	pushToStack(0);
-	stackPointer += (int8_t)data.size() + 1;
+	stackPointer += (int8_t)c_data.size() + 1;
 }
 
-void VM::popn() { popFromStack(); --stackPointer; }
+void VM::popn() noexcept { popFromStack(); --stackPointer; }
 
-void VM::pops()
+void VM::pops() noexcept
 {
 	for (auto&& i = stack.cend(); *i != 0; --i, --stackPointer) popFromStack(); 
 	popFromStack();
 	--stackPointer;
 }
 
-void VM::allocate(const std::string& variableName, const int8_t& variableSize)
-{ symbolTable.insert(std::make_pair(variableName, std::vector<int8_t>((size_t)variableSize))); }
+void VM::allocate(const std::string& c_variableName, const int8_t& c_variableSize) noexcept
+{ symbolTable.insert(std::make_pair(c_variableName, std::vector<int8_t>((size_t)c_variableSize))); }
 
-void VM::del(const std::string& variableName)
-{ symbolTable.erase(variableName); }
+void VM::del(const std::string& c_variableName) noexcept
+{ symbolTable.erase(c_variableName); }
 
 
-void VM::run(const std::vector<int8_t>& instructions)
+void VM::run(const std::vector<int8_t>& c_instructions) noexcept
 {
-	this->instructions = std::move(instructions);
+	this->instructions = std::move(c_instructions);
 
-	for (; programPointer < instructions.size(); ++programPointer)
+	for (; programPointer < c_instructions.size(); ++programPointer)
 	{
-		int8_t currentInstruction = instructions[programPointer];
+		int8_t currentInstruction = c_instructions[programPointer];
 		if (static_cast<TokenState>(currentInstruction) == TokenState::op_hlt)
 			break;
 		TokenState opcode = static_cast<TokenState>(currentInstruction);
@@ -118,7 +118,7 @@ void VM::run(const std::vector<int8_t>& instructions)
 }
 
 
-void VM::doInstruction(const TokenState& opcode)
+void VM::doInstruction(const TokenState& c_opcode) noexcept
 {
 	int8_t a, b;
 	int index;
@@ -127,81 +127,81 @@ void VM::doInstruction(const TokenState& opcode)
 	if (stack.size() > 1) b = stack[stack.size() - 2];
 
 	auto popTwoTimes = [&]() { popFromStack(); popFromStack(); };
-	auto lambda = [&](const TokenState&& tokenState) 
+	auto routine = [&](const TokenState&& c_tokenState) 
 	{
 		popTwoTimes();
-		index = static_cast<int>(opcode) - static_cast<int>(tokenState);
+		index = static_cast<int>(c_opcode) - static_cast<int>(c_tokenState);
 		--programPointer;
 	};
 
 	++programPointer;
 
-	if (opcode >= TokenState::op_add && opcode <= TokenState::op_div)
+	if (c_opcode >= TokenState::op_add && c_opcode <= TokenState::op_div)
 	{
-		lambda(TokenState::op_add);
-		pushToStack(arithmeticFunctions[index](a, b));
+		routine(TokenState::op_add);
+		pushToStack(c_arithmeticFunctions[index](a, b));
 	}
-	else if (opcode == TokenState::op_inc || opcode == TokenState::op_dec)
+	else if (c_opcode == TokenState::op_inc || c_opcode == TokenState::op_dec)
 	{
 		--programPointer;
-		index = static_cast<int>(opcode) - static_cast<int>(TokenState::op_inc);
+		index = static_cast<int>(c_opcode) - static_cast<int>(TokenState::op_inc);
 		incAndDecFunctions[index]();
 	}
-	else if (opcode == TokenState::op_ld)
+	else if (c_opcode == TokenState::op_ld)
 	{
-		const auto& variableData = ld(decodeString());
-		for (const auto& i : variableData)
+		const auto& c_variableData = ld(decodeString());
+		for (const auto& i : c_variableData)
 			pushToStack(i);
 	}
-	else if (opcode == TokenState::op_sv)
+	else if (c_opcode == TokenState::op_sv)
 		sv(decodeString());
-	else if (opcode >= TokenState::op_jmp && opcode <= TokenState::op_je)
+	else if (c_opcode >= TokenState::op_jmp && c_opcode <= TokenState::op_je)
 	{
 		int16_t destination = instructions[programPointer] << 8 | instructions[programPointer + 1];
-		index = static_cast<int>(opcode) - static_cast<int>(TokenState::op_jmp);
-		jumpFunctions[index](destination - 1);
+		index = static_cast<int>(c_opcode) - static_cast<int>(TokenState::op_jmp);
+		c_jumpFunctions[index](destination - 1);
 	}
-	else if (opcode >= TokenState::op_eq && opcode <= TokenState::op_ls)
+	else if (c_opcode >= TokenState::op_eq && c_opcode <= TokenState::op_ls)
 	{
-		index = static_cast<int>(opcode) - static_cast<int>(TokenState::op_eq);
-		pushToStack(comparisonFunctions[index](a, b));
+		index = static_cast<int>(c_opcode) - static_cast<int>(TokenState::op_eq);
+		pushToStack(c_comparisonFunctions[index](a, b));
 	}
-	else if (opcode >= TokenState::op_and && opcode <= TokenState::op_xor)
+	else if (c_opcode >= TokenState::op_and && c_opcode <= TokenState::op_xor)
 	{
-		lambda(TokenState::op_add);
-		pushToStack(binaryArithmeticFunctions[index](a, b));
+		routine(TokenState::op_add);
+		pushToStack(c_binaryArithmeticFunctions[index](a, b));
 	}
-	else if (opcode == TokenState::op_not)
+	else if (c_opcode == TokenState::op_not)
 	{
 		popFromStack();
 		pushToStack(op_not(a));
 	}
-	else if (opcode == TokenState::op_pushn)
+	else if (c_opcode == TokenState::op_pushn)
 		pushn(instructions[programPointer]);
-	else if (opcode == TokenState::op_pushs)
+	else if (c_opcode == TokenState::op_pushs)
 		pushs(decodeString());
-	else if (opcode == TokenState::op_popn)
+	else if (c_opcode == TokenState::op_popn)
 	{
 		--programPointer;
 		popn();
 	}
-	else if (opcode == TokenState::op_pops)
+	else if (c_opcode == TokenState::op_pops)
 	{
 		--programPointer;
 		pops();
 	}
-	else if (opcode == TokenState::op_new)
+	else if (c_opcode == TokenState::op_new)
 	{
-		const int8_t data = instructions[programPointer];
+		const int8_t c_data = instructions[programPointer];
 		++programPointer;
-		allocate(decodeString(), data);
+		allocate(decodeString(), c_data);
 	}
-	else if (opcode == TokenState::op_del)
+	else if (c_opcode == TokenState::op_del)
 		del(decodeString());
 }
 
 
-std::string VM::decodeString()
+std::string VM::decodeString() noexcept
 {
 	int8_t character = instructions[programPointer];
 	std::string result;
@@ -216,24 +216,24 @@ std::string VM::decodeString()
 }
 
 
-void VM::pushToStack(const int8_t&& value)
+void VM::pushToStack(const int8_t&& c_value) noexcept
 {
 	if (stack.size() + 1 > stack.capacity())
 		stack.resize(stack.size() + c_SIZE_OF_STACK);
 	
-	pushToStack(value);
+	pushToStack(c_value);
 }
 
-void VM::pushToStack(const int8_t& value)
+void VM::pushToStack(const int8_t& c_value) noexcept
 {
 	if (stack.size() + 1 > stack.capacity())
 		stack.resize(stack.size() + c_SIZE_OF_STACK);
 	
-	stack.push_back(value);
+	stack.push_back(c_value);
 }
 
 
-void VM::popFromStack()
+void VM::popFromStack() noexcept
 {
 	stack.pop_back();
 
