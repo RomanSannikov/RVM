@@ -10,11 +10,15 @@ add<br>
 sub    <br>
 mul    <br>
 div    <br>
+inc<br>
+dec<br>
 ld    word<br>
 sv    word<br>
 jmp    word<br>
 jne    word<br>
 je     word<br>
+jz     word<br>
+jnz     word<br>
 eq<br>
 gr<br>
 ls<br>
