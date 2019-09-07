@@ -1,6 +1,8 @@
 #include <iostream>
 #include <array>
 
+#include "../include/argh/argh.h"
+
 #include "scanner.hpp"
 #include "tokenizer.hpp"
 #include "parser.hpp"
@@ -14,33 +16,6 @@ enum programMode
 	BINARY_OUTPUT = 0,
 	COMPILE
 };
-
-
-const std::vector<programMode>& parseArguments(const int& c_numberOfArguments, const char* c_arguments[])
-{
-	const std::array<const std::string, 3> c_args = { "-f", "-b", "-o" };
-	std::vector<programMode> programMode;
-
-	for (int i = 1; i < c_numberOfArguments; ++i)
-	{
-		for (const auto& j : c_args)
-		{
-			if (!j.compare(c_arguments[i]))
-			{
-				if (i + 1 < c_numberOfArguments)
-				{
-					if (filename.empty())
-					{ filename = c_arguments[i + 1]; ++i; }
-					else printErrorAndExit(c_argumentParserError + "filename has already been defined");
-
-				}
-				else printErrorAndExit(c_argumentParserError + "there are no filename arter " + j);
-			}
-		}
-	}
-
-	return programMode;
-}
 
 
 void startVirtualMachine(const std::string& c_filename, const std::vector<programMode>& c_programMode)
@@ -76,9 +51,17 @@ void startVirtualMachine(const std::string& c_filename, const std::vector<progra
 
 int main(int argc, char* argv[])
 {
-	//std::vector<programMode>&& programMode = std::move(parseArguments(argc, argv));
+	argh::parser cmdl(argv);
 	std::vector<programMode> programMode;
-	startVirtualMachine("simpleTest.txt", programMode);
+
+	if (cmdl[{"-b", "--binary"}])
+		programMode.emplace_back(programMode::BINARY_OUTPUT);
+	if (cmdl[{"-o", "--output"}] ? "ON" : "OFF")
+		programMode.emplace_back(programMode::COMPILE);
+
+	cmdl({"-f", "--filename"}) >> filename;
+
+	startVirtualMachine(filename, programMode);
 
 	system("pause");
 	return 0;
