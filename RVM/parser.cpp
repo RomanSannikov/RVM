@@ -207,3 +207,17 @@ void Parser::makeValue(const Token& c_token) noexcept
 	else
 		printErrorAndExit(c_parserError + "not an argument", c_token.lineNumber);
 }
+
+void Parser::outputInstructions(std::string filename)
+{
+	for (unsigned i = filename.size() - 1; i >= 0; --i)
+	{
+		if (filename[i] != '.') filename.pop_back();
+		else break;
+	}
+	filename.append("rbc");
+
+	std::ofstream output(filename);
+	for (const auto& i : instructions) output << std::bitset<8>(i);
+	output.close();
+}

@@ -1,10 +1,10 @@
 #include "scanner.hpp"
 
 
-inline void Scanner::open(const std::string& c_filename) { file.open(c_filename); }
+void Scanner::open(const std::string& c_filename) { file.open(c_filename); }
 
 
-inline void Scanner::open(const char* const c_filename) { file.open(c_filename); }
+void Scanner::open(const char* const c_filename) { file.open(c_filename); }
 
 
 bool Scanner::isEOF() noexcept { return file.eof(); }

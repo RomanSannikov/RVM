@@ -13,13 +13,14 @@ private:
 	unsigned lineNumber;
 
 public:
+	Scanner() {}
 	Scanner(const std::string& c_filename) : file(c_filename) {}
 	Scanner(const char* const c_filename) : file(c_filename) {}
 
 	~Scanner() { file.close(); }
 	
-	inline void open(const std::string&);
-	inline void open(const char* const);
+	void open(const std::string&);
+	void open(const char* const);
 	
 	bool isEOF() noexcept;
 

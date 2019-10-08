@@ -1,5 +1,6 @@
 #include <iostream>
 #include <array>
+#include <bitset>
 
 #include "../include/argh/argh.h"
 
@@ -9,41 +10,50 @@
 #include "VM.hpp"
 
 
-std::string filename;
-
 enum programMode
 {
-	BINARY_OUTPUT = 0,
-	COMPILE
+	RUN_BINARY = 0,
+	MAKE_OUTPUT
 };
 
 
-void startVirtualMachine(const std::string& c_filename, const std::vector<programMode>& c_programMode)
+void startVirtualMachine(const std::string& c_filename, const std::bitset<8>& c_mode)
 {	
-	Scanner scanner(c_filename);
+	Scanner scanner;
 	Tokenizer tokenizer;
 	Parser parser;
 	VM vm;
 	
 	std::string lineFromScanner;
 	
-	// Fix: !scanner.isEOF() && compile == true
-	while (!scanner.isEOF())
+	if (!c_mode.test(programMode::RUN_BINARY))
 	{
-		scanner.getLine(lineFromScanner);
+		scanner.open(c_filename);
 
-		if (lineFromScanner.empty())
-			continue;
+		while (!scanner.isEOF())
+		{
+			scanner.getLine(lineFromScanner);
 
-		std::cout << lineFromScanner << std::endl;
-		
-		tokenizer.tokenize(lineFromScanner, scanner.getLineNumber());
+			if (lineFromScanner.empty())
+				continue;
 
-		parser.parse(tokenizer.tokens);
+			std::cout << lineFromScanner << std::endl;
+
+			tokenizer.tokenize(lineFromScanner, scanner.getLineNumber());
+
+			parser.parse(tokenizer.tokens);
+		}
+
+		parser.completeParsing();
+		parser.printInstructions(); // Fix: it's temporary
+	}
+	else
+	{
+		// Todo: read binary code and convert it for the parser
 	}
 
-	parser.completeParsing();
-	parser.printInstructions(); // Fix: it's temporary
+	if (c_mode.test(programMode::MAKE_OUTPUT))
+		parser.outputInstructions(c_filename);
 
 	vm.run(parser.getInstructions());
 }
@@ -52,16 +62,17 @@ void startVirtualMachine(const std::string& c_filename, const std::vector<progra
 int main(int argc, char* argv[])
 {
 	argh::parser cmdl(argv);
-	std::vector<programMode> programMode;
+	std::string filename;
+	std::bitset<8> mode;
 
 	if (cmdl[{"-b", "--binary"}])
-		programMode.emplace_back(programMode::BINARY_OUTPUT);
+		mode.set(programMode::RUN_BINARY);
 	if (cmdl[{"-o", "--output"}] ? "ON" : "OFF")
-		programMode.emplace_back(programMode::COMPILE);
+		mode.set(programMode::MAKE_OUTPUT);
 
 	cmdl({"-f", "--filename"}) >> filename;
 
-	startVirtualMachine(filename, programMode);
+	startVirtualMachine(filename, mode);
 
 	system("pause");
 	return 0;

@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include <fstream>
 #include <bitset> // Fix: just for tests
 
 #include "instruction.hpp"
@@ -35,6 +36,8 @@ public:
 	void printInstructions() noexcept
 	{ for (const auto& i : instructions) std::cout << std::bitset<8>(i) << std::endl; }
 	
+	void outputInstructions(std::string);
+
 	void completeParsing() noexcept;
 
 	constexpr std::vector<int8_t>& getInstructions() noexcept { return instructions; }
