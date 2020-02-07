@@ -49,10 +49,11 @@ void startVirtualMachine(const std::string& c_filename, const std::bitset<8>& c_
 	}
 	else
 	{
-		// Todo: read binary code and convert it for the parser
+		scanner.open(c_filename);
+		parser.loadInstructions(scanner.readBinary());
 	}
 
-	if (c_mode.test(programMode::MAKE_OUTPUT))
+	if (c_mode.test(programMode::MAKE_OUTPUT) && !c_mode.test(programMode::RUN_BINARY))
 		parser.outputInstructions(c_filename);
 
 	vm.run(parser.getInstructions());

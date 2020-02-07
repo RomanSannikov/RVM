@@ -42,6 +42,8 @@ public:
 
 	constexpr std::vector<int8_t>& getInstructions() noexcept { return instructions; }
 
+	inline void loadInstructions(const std::vector<int8_t>& c_givenInstructions) { instructions = std::move(c_givenInstructions); }
+
 private:
 	void completeJumpInstructions() noexcept;
 	void checkSymbolTabel() noexcept;

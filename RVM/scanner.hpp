@@ -2,6 +2,9 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
+#include <bitset>
+#include <cassert>
 
 #include "error.hpp"
 
@@ -26,4 +29,6 @@ public:
 
 	std::string getLine(std::string&) noexcept;
 	unsigned getLineNumber();
+
+	const std::vector<int8_t> readBinary();
 };

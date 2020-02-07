@@ -208,6 +208,7 @@ void Parser::makeValue(const Token& c_token) noexcept
 		printErrorAndExit(c_parserError + "not an argument", c_token.lineNumber);
 }
 
+
 void Parser::outputInstructions(std::string filename)
 {
 	for (unsigned i = filename.size() - 1; i >= 0; --i)

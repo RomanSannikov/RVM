@@ -22,4 +22,23 @@ std::string Scanner::getLine(std::string& scannedLine) noexcept
 }
 
 
+const std::vector<int8_t> Scanner::readBinary()
+{
+	if (!file.is_open())
+		printErrorAndExit(c_scannerError + "The file is not open!");
+
+	std::string scanndedLine;
+	std::vector<int8_t> instructions;
+
+	std::getline(file, scanndedLine);
+
+	assert(scanndedLine.size());
+
+	for (unsigned i = 0; i < scanndedLine.size(); i += 8)
+		instructions.emplace_back((int8_t)std::bitset<8>(scanndedLine.substr(i, 8)).to_ulong());
+
+	return instructions;
+}
+
+
 unsigned Scanner::getLineNumber() { return lineNumber; }
