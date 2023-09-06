@@ -1,13 +1,16 @@
-#include <iostream>
-#include <array>
 #include <bitset>
-
-#include "../include/argh/argh.h"
+#include <span>
+#include <ranges>
+#include <string_view>
 
 #include "scanner.hpp"
 #include "tokenizer.hpp"
 #include "parser.hpp"
 #include "VM.hpp"
+
+
+using bitmode = std::bitset<8>;
+std::string filename;
 
 
 enum programMode
@@ -17,7 +20,34 @@ enum programMode
 };
 
 
-void startVirtualMachine(const std::string& c_filename, const std::bitset<8>& c_mode)
+static void parseArguments(bitmode& mode, const auto c_arguments)
+{
+	auto isArgument = [](auto& argument, std::string_view shortName, std::string_view longName) { return (!shortName.empty() && *argument == shortName) || *argument == longName; };
+	for (auto c_i = c_arguments.begin() + 1; c_i != c_arguments.end(); c_i++)
+	{
+		if (isArgument(c_i, "-b", "--binary"))
+		{
+			mode = programMode::RUN_BINARY;
+		}
+		else if (isArgument(c_i, "-o", "--output"))
+		{
+			c_i++;
+			if (*c_i == "ON") mode = programMode::RUN_BINARY;
+		}
+		else if (isArgument(c_i, "-f", "--filename"))
+		{
+			c_i++;
+			filename = *c_i;
+		}
+		else
+		{
+			printErrorAndExit("cannot recognize command line arguments");
+		}
+	}
+}
+
+
+static void startVirtualMachine(const std::string& c_filename, const bitmode& c_mode)
 {	
 	Scanner scanner;
 	Tokenizer tokenizer;
@@ -62,18 +92,9 @@ void startVirtualMachine(const std::string& c_filename, const std::bitset<8>& c_
 
 int main(int argc, char* argv[])
 {
-	argh::parser cmdl(argv);
-	std::string filename;
-	std::bitset<8> mode;
-
-	if (cmdl[{"-b", "--binary"}])
-		mode.set(programMode::RUN_BINARY);
-	if (cmdl[{"-o", "--output"}] ? "ON" : "OFF")
-		mode.set(programMode::MAKE_OUTPUT);
-
-	cmdl({"-f", "--filename"}) >> filename;
-
+	bitmode mode;
+	const auto args = std::span(argv, argc) | std::views::transform([](const char* str) { return std::string_view{str}; });
+	parseArguments(mode, args);
 	startVirtualMachine(filename, mode);
-
 	return 0;
 }  
