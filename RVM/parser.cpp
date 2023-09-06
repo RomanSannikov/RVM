@@ -90,7 +90,7 @@ void Parser::addLocationOfLabel(const std::string& c_labelName, const uint16_t&&
 }
 
 
-auto Parser::findLocationOfJump(const jumpTableList& c_labelIterator, const unsigned& c_locationToFind) noexcept
+auto Parser::findLocationOfJump(const jumpTableListIter& c_labelIterator, const unsigned& c_locationToFind) noexcept
 {
 	if (c_labelIterator != jumpTable.end())
 		for (auto i = c_labelIterator->second.locationsOfJumps.begin(); i != c_labelIterator->second.locationsOfJumps.end(); ++i)

@@ -6,6 +6,7 @@
 #include <string>
 #include <fstream>
 #include <bitset> // Fix: just for tests
+#include <list>
 
 #include "instruction.hpp"
 #include "error.hpp"
@@ -17,7 +18,7 @@ public:
 	struct jumpTableNode 
 	{ uint16_t locationOfLabel; std::vector<uint16_t> locationsOfJumps; };
 
-	using jumpTableList = std::list<std::pair<const std::string, Parser::jumpTableNode>, std::allocator< std::pair<const std::string, Parser::jumpTableNode>>>::iterator;
+	using jumpTableListIter = std::unordered_map<std::string, jumpTableNode>::iterator;
 	
 private:
 	std::unordered_map<std::string, uint8_t> symbolTable;
@@ -52,7 +53,7 @@ private:
 
 	void addLocationOfJump(const std::string&, const uint16_t &&) noexcept;
 
-	auto findLocationOfJump(const jumpTableList&, const unsigned&) noexcept;
+	auto findLocationOfJump(const jumpTableListIter&, const unsigned&) noexcept;
 
 	void checkArguments(std::vector<Token>::const_iterator&,
 		std::vector<Token>::const_iterator&, const uint8_t&, std::vector<Token>::const_iterator) noexcept;
