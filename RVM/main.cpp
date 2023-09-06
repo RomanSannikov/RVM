@@ -75,6 +75,5 @@ int main(int argc, char* argv[])
 
 	startVirtualMachine(filename, mode);
 
-	system("pause");
 	return 0;
 }  
