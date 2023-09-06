@@ -22,7 +22,17 @@ enum programMode
 
 static void parseArguments(bitmode& mode, const auto c_arguments)
 {
-	auto isArgument = [](auto& argument, std::string_view shortName, std::string_view longName) { return (!shortName.empty() && *argument == shortName) || *argument == longName; };
+	auto isArgument = [](auto& argument, std::string_view shortName, std::string_view longName)
+	{
+		return (!shortName.empty() && *argument == shortName) || *argument == longName;
+	};
+	auto next = [&c_arguments](auto& iter)
+	{
+		iter++;
+		if (iter == c_arguments.end())
+			printErrorAndExit("cannot recognize command line arguments");
+	};
+
 	for (auto c_i = c_arguments.begin() + 1; c_i != c_arguments.end(); c_i++)
 	{
 		if (isArgument(c_i, "-b", "--binary"))
@@ -31,12 +41,12 @@ static void parseArguments(bitmode& mode, const auto c_arguments)
 		}
 		else if (isArgument(c_i, "-o", "--output"))
 		{
-			c_i++;
+			next(c_i);
 			if (*c_i == "ON") mode = programMode::RUN_BINARY;
 		}
 		else if (isArgument(c_i, "-f", "--filename"))
 		{
-			c_i++;
+			next(c_i);
 			filename = *c_i;
 		}
 		else
