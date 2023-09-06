@@ -2,23 +2,15 @@
 
 #include <iostream>
 #include <string>
+#include <stdexcept>
 #include <cstdlib>
 
 #include "exceptions.hpp"
 
 
-inline void printErrorAndExit(const std::string& c_message) noexcept
+class RVMError : std::runtime_error
 {
-	std::cout << std::endl << "ERROR APPEARED!" << std::endl 
-		<< "ERROR MESSAGE: " << c_message << std::endl;
-	exit(EXIT_FAILURE);
-}
-
-
-inline void printErrorAndExit(const std::string& c_message, const unsigned c_lineNumber) noexcept
-{
-	std::cout << std::endl << "ERROR APPEARED!" << std::endl
-		<< "ERROR MESSAGE: " << c_message << std::endl 
-		<< "LINE: " << c_lineNumber << std::endl;
-	exit(EXIT_FAILURE);
-}
+public:
+	RVMError(std::string message) : runtime_error(message) {}
+	RVMError(std::string message, unsigned lineNumber) : runtime_error(message + "\nline: " + std::to_string(lineNumber)) {}
+};

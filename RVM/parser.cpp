@@ -20,7 +20,7 @@ void Parser::parse(const std::vector<Token>& c_tokens) noexcept
 		instructions.push_back(static_cast<uint8_t>(it_currentToken->tokenState));
 	}
 	else
-		printErrorAndExit(c_parserError + "cannot make an instruction", it_currentToken->lineNumber);
+		throw RVMError(c_parserError + "cannot make an instruction", it_currentToken->lineNumber);
 
 	it_lastToken = it_currentToken;
 	++it_currentToken;
@@ -29,7 +29,7 @@ void Parser::parse(const std::vector<Token>& c_tokens) noexcept
 		checkArguments(it_currentToken, it_lastToken, instructionValue, c_tokens.end());
 
 	if (it_currentToken != c_tokens.end())
-		printErrorAndExit(c_parserError + "too many arguments", it_currentToken->lineNumber);
+		throw RVMError(c_parserError + "too many arguments", it_currentToken->lineNumber);
 }
 
 
@@ -39,7 +39,7 @@ void Parser::completeParsing() noexcept
 	checkSymbolTabel();
 
 	if (!wasHlt)
-		printErrorAndExit(c_parserError + "There is no HLT instruction. It's an undefined behavior without the instructions");
+		throw RVMError(c_parserError + "There is no HLT instruction. It's an undefined behavior without the instructions");
 }
 
 
@@ -59,7 +59,7 @@ void Parser::completeJumpInstructions() noexcept
 			}
 		}
 		else 
-			printErrorAndExit(c_parserError + "label " + i + " hasn't been found");
+			throw RVMError(c_parserError + "label " + i + " hasn't been found");
 	}
 }
 
@@ -67,7 +67,7 @@ void Parser::completeJumpInstructions() noexcept
 void Parser::checkSymbolTabel() noexcept
 {
 	if (symbolTable.size() != 0)
-		printErrorAndExit(c_parserError + "not all variables were deleted");
+		throw RVMError(c_parserError + "not all variables were deleted");
 }
 
 
@@ -77,7 +77,7 @@ void Parser::addLocationOfLabel(const std::string& c_labelName, const uint16_t&&
 	jumpTableNode jumpTableNode;
 
 	if (c_it_jumpTableNode != jumpTable.end() && c_it_jumpTableNode->second.locationsOfJumps.size() == 0)
-		printErrorAndExit(c_parserError + "The label " + c_it_jumpTableNode->first + " was defined several times!");
+		throw RVMError(c_parserError + "The label " + c_it_jumpTableNode->first + " was defined several times!");
 	else if (c_it_jumpTableNode == jumpTable.end())
 	{
 		jumpTableNode.locationOfLabel = c_locationLabel;
@@ -113,7 +113,7 @@ void Parser::addLocationOfJump(const std::string& c_labelName, const uint16_t &&
 		labelNames.push_back(c_labelName);
 	}
 	else if (findLocationOfJump(c_it_jumpTableNode, c_locationOfJump) != c_it_jumpTableNode->second.locationsOfJumps.end())
-		printErrorAndExit(c_parserError + "jump instruction is already exits");
+		throw RVMError(c_parserError + "jump instruction is already exits");
 	else
 		c_it_jumpTableNode->second.locationsOfJumps.push_back(c_locationOfJump);
 
@@ -147,9 +147,9 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 		--numberOfIterations, instructionValuePattern >>= 4, ++it_currentToken, ++i)
 	{
 		if (it_currentToken == c_it_tokenEnd)
-			printErrorAndExit(c_parserError + "too few arguments", it_currentToken->lineNumber);
+			throw RVMError(c_parserError + "too few arguments", it_currentToken->lineNumber);
 		else if (valueTypes[i] != it_currentToken->tokenState)
-			printErrorAndExit(c_parserError + "the value isn't the correct type", it_currentToken->lineNumber);
+			throw RVMError(c_parserError + "the value isn't the correct type", it_currentToken->lineNumber);
 
 		if (c_instructionValue & instructionValuePattern)
 		{
@@ -165,7 +165,7 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 				if (valueTypes[i] == TokenState::number)
 				{
 					try { instructions.push_back(std::stoi(it_currentToken->stringValue)); }
-					catch (std::invalid_argument invalidArgument) { printErrorAndExit(c_parserError + "the value must be a number", it_currentToken->lineNumber); }
+					catch (std::invalid_argument invalidArgument) { throw RVMError(c_parserError + "the value must be a number", it_currentToken->lineNumber); }
 				}
 				else if (symbolTable.find(it_currentToken->stringValue) == symbolTable.end())
 				{ 
@@ -173,17 +173,17 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 					makeValue(*it_currentToken);
 				}
 				else
-					printErrorAndExit(c_parserError + "the variable " + it_currentToken->stringValue + " has been already defined", it_currentToken->lineNumber);
+					throw RVMError(c_parserError + "the variable " + it_currentToken->stringValue + " has been already defined", it_currentToken->lineNumber);
 			}
 			else if (it_currentInstruction->tokenState == TokenState::op_del)
 			{
 				if (symbolTable.erase(it_currentToken->stringValue) == 0)
-					printErrorAndExit(c_parserError + "the variable " + it_currentToken->stringValue + " hasn't been defined", it_currentToken->lineNumber);
+					throw RVMError(c_parserError + "the variable " + it_currentToken->stringValue + " hasn't been defined", it_currentToken->lineNumber);
 				makeValue(*it_currentToken);
 			}
 			else if ((it_currentInstruction->tokenState == TokenState::op_ld || it_currentInstruction->tokenState == TokenState::op_sv) 
 																	&& symbolTable.find(it_currentToken->stringValue) == symbolTable.end())
-					printErrorAndExit(c_parserError + "the value " + it_currentToken->stringValue + " hasn't been defined", it_currentToken->lineNumber);
+					throw RVMError(c_parserError + "the value " + it_currentToken->stringValue + " hasn't been defined", it_currentToken->lineNumber);
 			else
 				makeValue(*it_currentToken);
 		}
@@ -196,7 +196,7 @@ void Parser::makeValue(const Token& c_token) noexcept
 	if (c_token.tokenState == TokenState::number)
 	{
 		try { instructions.push_back(std::stoi(c_token.stringValue)); }
-		catch (std::invalid_argument invalidArgument) { printErrorAndExit(c_parserError + "the value must be a number", c_token.lineNumber); }
+		catch (std::invalid_argument invalidArgument) { throw RVMError(c_parserError + "the value must be a number", c_token.lineNumber); }
 	}
 	else if (c_token.tokenState == TokenState::word)
 	{
@@ -205,7 +205,7 @@ void Parser::makeValue(const Token& c_token) noexcept
 		instructions.push_back(0);
 	}
 	else
-		printErrorAndExit(c_parserError + "not an argument", c_token.lineNumber);
+		throw RVMError(c_parserError + "not an argument", c_token.lineNumber);
 }
 
 

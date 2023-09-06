@@ -13,7 +13,7 @@ bool Scanner::isEOF() noexcept { return file.eof(); }
 std::string Scanner::getLine(std::string& scannedLine) noexcept
 {
 	if (!file.is_open())
-		printErrorAndExit(c_scannerError + "The file is not open!");
+		throw RVMError(c_scannerError + "The file is not open!");
 
 	std::getline(file, scannedLine);
 	++lineNumber;
@@ -25,7 +25,7 @@ std::string Scanner::getLine(std::string& scannedLine) noexcept
 const std::vector<int8_t> Scanner::readBinary()
 {
 	if (!file.is_open())
-		printErrorAndExit(c_scannerError + "The file is not open!");
+		throw RVMError(c_scannerError + "The file is not open!");
 
 	std::string scanndedLine;
 	std::vector<int8_t> instructions;
