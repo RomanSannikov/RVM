@@ -11,8 +11,6 @@ inline void printErrorAndExit(const std::string& c_message) noexcept
 {
 	std::cout << std::endl << "ERROR APPEARED!" << std::endl 
 		<< "ERROR MESSAGE: " << c_message << std::endl;
-
-	system("PAUSE");
 	exit(EXIT_FAILURE);
 }
 
@@ -22,7 +20,5 @@ inline void printErrorAndExit(const std::string& c_message, const unsigned c_lin
 	std::cout << std::endl << "ERROR APPEARED!" << std::endl
 		<< "ERROR MESSAGE: " << c_message << std::endl 
 		<< "LINE: " << c_lineNumber << std::endl;
-
-	system("PAUSE");
 	exit(EXIT_FAILURE);
 }
