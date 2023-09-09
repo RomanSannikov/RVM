@@ -5,4 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(RVM_COMPILE_OPTIONS "-Wno-terminate")
 
+enable_testing()
+
 add_subdirectory(RVM)
+add_subdirectory(tests)
