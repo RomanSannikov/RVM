@@ -108,12 +108,12 @@ void VM::run(const std::vector<int8_t>& c_instructions) noexcept
 	for (; programPointer < c_instructions.size(); ++programPointer)
 	{
 		int8_t currentInstruction = c_instructions[programPointer];
-		if (static_cast<TokenState>(currentInstruction) == TokenState::op_hlt)
-			break;
 		TokenState opcode = static_cast<TokenState>(currentInstruction);
-		doInstruction(static_cast<TokenState>(currentInstruction));
+		if (opcode == TokenState::op_hlt)
+			break;
+		doInstruction(opcode);
 
-		printStack();
+		// printStack(); // Fix: this is for debugging; make a logging system
 	}
 }
 

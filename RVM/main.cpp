@@ -85,7 +85,9 @@ static void startVirtualMachine(const std::string& c_filename, const bitmode& c_
 		}
 
 		parser.completeParsing();
+		#ifndef NDEBUG
 		parser.printInstructions(); // Fix: it's temporary
+		#endif
 	}
 	else
 	{

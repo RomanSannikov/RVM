@@ -1,4 +1,4 @@
-set(TEST_SOURCES test.cpp)
+set(TEST_SOURCES test.cpp testFunctions.hpp)
 
 include(FetchContent)
 FetchContent_Declare(

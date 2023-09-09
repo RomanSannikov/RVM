@@ -98,5 +98,7 @@ private:
 
 	void allocate(const std::string&, const int8_t&) noexcept;
 	void del(const std::string&) noexcept;
+
+	friend class TestFunctions;
 };
 
