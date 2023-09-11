@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream> // Fix: temporary
 #include <vector>
 #include <unordered_map>
 #include <string>
@@ -10,7 +9,7 @@
 
 #include "instruction.hpp"
 #include "error.hpp"
-
+#include "logging.hpp"
 
 class Parser
 {
@@ -33,9 +32,6 @@ public:
 
 public:
 	void parse(const std::vector<Token>&) noexcept;
-	
-	void printInstructions() noexcept
-	{ for (const auto& i : instructions) std::cout << std::bitset<8>(i) << std::endl; }
 	
 	void outputInstructions(std::string);
 

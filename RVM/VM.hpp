@@ -1,12 +1,11 @@
 #pragma once
 
-#include <iostream> // Fix: it's temporary
 #include <vector>
 #include <unordered_map>
-#include <bitset> // Fix: just for tests
 
 #include "parser.hpp"
 #include "instruction.hpp"
+#include "logging.hpp"
 
 class Parser;
 
@@ -49,11 +48,6 @@ public:
 
 public:
 	void run(const std::vector<int8_t>&) noexcept;
-
-	void printStack() noexcept
-	{
-		std::cout << std::endl << "STACK: " << std::endl; for (auto i : stack) std::cout << std::bitset<8>(i) << std::endl;
-	}
 
 private:
 	void doInstruction(const TokenState&) noexcept;

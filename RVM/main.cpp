@@ -1,3 +1,4 @@
+#include <cassert>
 #include <bitset>
 #include <span>
 #include <ranges>
@@ -85,9 +86,7 @@ static void startVirtualMachine(const std::string& c_filename, const bitmode& c_
 		}
 
 		parser.completeParsing();
-		#ifndef NDEBUG
-		parser.printInstructions(); // Fix: it's temporary
-		#endif
+		Logger::printInstructions(parser.getInstructions());
 	}
 	else
 	{

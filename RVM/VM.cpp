@@ -113,7 +113,7 @@ void VM::run(const std::vector<int8_t>& c_instructions) noexcept
 			break;
 		doInstruction(opcode);
 
-		// printStack(); // Fix: this is for debugging; make a logging system
+		Logger::printStack(stack);
 	}
 }
 

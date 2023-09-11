@@ -3,6 +3,8 @@ project(RVM)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(RVM_COMPILE_OPTIONS "-Wall")
+set(RVM_COMPILE_OPTIONS "-Wextra")
 set(RVM_COMPILE_OPTIONS "-Wno-terminate")
 
 enable_testing()
