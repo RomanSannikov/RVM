@@ -154,10 +154,11 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 		if (c_instructionValue & instructionValuePattern)
 		{
 			if (it_currentInstruction->tokenState >= TokenState::op_jmp &&
-				it_currentInstruction->tokenState <= TokenState::op_je)
+				it_currentInstruction->tokenState <= TokenState::op_je || it_currentInstruction->tokenState == TokenState::op_call)
 			{
 				addLocationOfJump(it_currentToken->stringValue, (uint16_t)(instructions.size() - 1));
 				// Desc: locationOfLabel is 2 byte long
+				//		  because the instruction vector is of int8_t and location is of uint16_t
 				instructions.push_back(0); instructions.push_back(0);
 			}
 			else if (it_currentInstruction->tokenState == TokenState::op_new)

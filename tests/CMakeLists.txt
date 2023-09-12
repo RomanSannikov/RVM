@@ -1,4 +1,4 @@
-set(TEST_SOURCES test.cpp testFunctions.hpp)
+set(TEST_SOURCES simpleInstructionsTest.cpp testFunctions.hpp)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -8,6 +8,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 add_executable(unittests ${TEST_SOURCES})
+target_compile_options(unittests PRIVATE ${RVM_COMPILE_OPTIONS})
 target_link_libraries(unittests PUBLIC gtest_main RVM_LIB)
 target_compile_definitions(unittests PRIVATE TESTING_DATA_PATH_PREFIX="${CMAKE_CURRENT_SOURCE_DIR}/data/")
 

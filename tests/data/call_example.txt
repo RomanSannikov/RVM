@@ -1,0 +1,7 @@
+call func
+hlt
+func:
+pushn 44
+pushn 2
+div
+ret

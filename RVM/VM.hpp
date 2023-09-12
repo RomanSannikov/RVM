@@ -1,6 +1,8 @@
 #pragma once
 
+#include <stack>
 #include <vector>
+#include <cassert>
 #include <unordered_map>
 
 #include "parser.hpp"
@@ -18,8 +20,8 @@ private:
 	std::unordered_map<std::string, std::vector<int8_t>> symbolTable;
 	std::vector<int8_t> instructions;
 
-	uint16_t programPointer;
-	int8_t stackPointer;
+	std::stack<uint16_t> programPointers;
+	int16_t stackPointer;
 
 	const std::array < std::function<int8_t(const int8_t&, const int8_t&)>, 4> c_arithmeticFunctions =
 	{ std::bind(&VM::add, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::sub, this, std::placeholders::_1, std::placeholders::_2),
@@ -43,8 +45,11 @@ private:
 
 public:
 	
-	VM() : c_SIZE_OF_STACK(8), stackPointer(0), programPointer(0)
-	{ stack.reserve(c_SIZE_OF_STACK); }
+	VM() : c_SIZE_OF_STACK(8), stackPointer(0)
+	{
+		stack.reserve(c_SIZE_OF_STACK);
+		programPointers.push(0);
+	}
 
 public:
 	void run(const std::vector<int8_t>&) noexcept;
@@ -54,9 +59,9 @@ private:
 	
 	std::string decodeString() noexcept;
 	
-	void pushToStack(const int8_t&&) noexcept;
-	void pushToStack(const int8_t&) noexcept;
-	void popFromStack() noexcept;
+	void pushToStack(const int8_t&&);
+	void pushToStack(const int8_t&);
+	void popFromStack();
 
 	int8_t add(const int8_t&, const int8_t&) noexcept;
 	int8_t sub(const int8_t&, const int8_t&) noexcept;

@@ -1,0 +1,8 @@
+call loop
+hlt
+loop:
+pushn 44
+pushn 2
+div
+popn
+ret
