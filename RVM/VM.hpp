@@ -58,10 +58,6 @@ private:
 	void doInstruction(const TokenState&) noexcept;
 	
 	std::string decodeString() noexcept;
-	
-	void pushToStack(const int8_t&&);
-	void pushToStack(const int8_t&);
-	void popFromStack();
 
 	int8_t add(const int8_t&, const int8_t&) noexcept;
 	int8_t sub(const int8_t&, const int8_t&) noexcept;

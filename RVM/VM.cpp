@@ -26,7 +26,7 @@ const std::vector<int8_t>& VM::ld(const std::string& variableName) noexcept
 void VM::sv(const std::string& c_variableName) noexcept
 {
 	auto& it_foundResult = symbolTable.find(c_variableName)->second;
-	for (auto& i : it_foundResult) { i = stack.back(); popFromStack(); }
+	for (auto& i : it_foundResult) { i = stack.back(); stack.pop_back(); }
 	stackPointer -= (int8_t)it_foundResult.size();
 }
 
@@ -79,20 +79,20 @@ int8_t VM::op_nand(const int8_t& a, const int8_t& b) noexcept { --stackPointer; 
 int8_t VM::op_xor(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b ^ a; }
 int8_t VM::op_not(const int8_t& a) noexcept { return ~a; }
 
-void VM::pushn(const int8_t& a) noexcept { ++stackPointer; pushToStack(a); }
+void VM::pushn(const int8_t& a) noexcept { ++stackPointer; stack.push_back(a); }
 void VM::pushs(const std::string& c_data) noexcept
 { 
-	for (const auto& i : c_data) pushToStack(i); 
-	pushToStack(0);
+	for (const auto& i : c_data) stack.push_back(i); 
+	stack.push_back(0);
 	stackPointer += (int8_t)c_data.size() + 1;
 }
 
-void VM::popn() noexcept { popFromStack(); --stackPointer; }
+void VM::popn() noexcept { stack.pop_back(); --stackPointer; }
 
 void VM::pops() noexcept
 {
-	for (auto&& i = stack.cend(); *i != 0; --i, --stackPointer) popFromStack(); 
-	popFromStack();
+	for (auto&& i = stack.cend(); *i != 0; --i, --stackPointer) stack.pop_back(); 
+	stack.pop_back();
 	--stackPointer;
 }
 
@@ -129,7 +129,7 @@ void VM::doInstruction(const TokenState& c_opcode) noexcept
 	if (stack.size() > 0) a = stack.back();
 	if (stack.size() > 1) b = stack[stack.size() - 2];
 
-	auto popTwoTimes = [&]() { popFromStack(); popFromStack(); };
+	auto popTwoTimes = [&]() { stack.pop_back(); stack.pop_back(); };
 	auto routine = [&](const TokenState&& c_tokenState) 
 	{
 		popTwoTimes();
@@ -143,7 +143,7 @@ void VM::doInstruction(const TokenState& c_opcode) noexcept
 	if (c_opcode >= TokenState::op_add && c_opcode <= TokenState::op_div)
 	{
 		routine(TokenState::op_add);
-		pushToStack(c_arithmeticFunctions[index](a, b));
+		stack.push_back(c_arithmeticFunctions[index](a, b));
 	}
 	else if (c_opcode == TokenState::op_inc || c_opcode == TokenState::op_dec)
 	{
@@ -156,7 +156,7 @@ void VM::doInstruction(const TokenState& c_opcode) noexcept
 	{
 		const auto& c_variableData = ld(decodeString());
 		for (const auto& i : c_variableData)
-			pushToStack(i);
+			stack.push_back(i);
 	}
 	else if (c_opcode == TokenState::op_sv)
 		sv(decodeString());
@@ -174,17 +174,17 @@ void VM::doInstruction(const TokenState& c_opcode) noexcept
 	else if (c_opcode >= TokenState::op_eq && c_opcode <= TokenState::op_ls)
 	{
 		index = static_cast<int>(c_opcode) - static_cast<int>(TokenState::op_eq);
-		pushToStack(c_comparisonFunctions[index](a, b));
+		stack.push_back(c_comparisonFunctions[index](a, b));
 	}
 	else if (c_opcode >= TokenState::op_and && c_opcode <= TokenState::op_xor)
 	{
 		routine(TokenState::op_add);
-		pushToStack(c_binaryArithmeticFunctions[index](a, b));
+		stack.push_back(c_binaryArithmeticFunctions[index](a, b));
 	}
 	else if (c_opcode == TokenState::op_not)
 	{
-		popFromStack();
-		pushToStack(op_not(a));
+		stack.pop_back();
+		stack.push_back(op_not(a));
 	}
 	else if (c_opcode == TokenState::op_ret)
 		programPointers.pop();
@@ -227,30 +227,4 @@ std::string VM::decodeString() noexcept
 	}
 
 	return result;
-}
-
-
-void VM::pushToStack(const int8_t&& c_value)
-{
-	if (stack.size() + 1 > stack.capacity())
-		stack.resize(stack.size() + c_SIZE_OF_STACK);
-	
-	pushToStack(c_value);
-}
-
-void VM::pushToStack(const int8_t& c_value)
-{
-	if (stack.size() + 1 > stack.capacity())
-		stack.resize(stack.size() + c_SIZE_OF_STACK);
-	
-	stack.push_back(c_value);
-}
-
-
-void VM::popFromStack()
-{
-	stack.pop_back();
-
-	if (stack.capacity() > stack.size() + c_SIZE_OF_STACK + 1)
-		stack.resize(stack.size() - c_SIZE_OF_STACK);
 }
