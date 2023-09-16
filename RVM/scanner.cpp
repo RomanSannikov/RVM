@@ -27,15 +27,15 @@ const std::vector<int8_t> Scanner::readBinary()
 	if (!file.is_open())
 		throw RVMError(c_scannerError + "The file is not open!");
 
-	std::string scanndedLine;
+	std::string scannedLine;
 	std::vector<int8_t> instructions;
 
-	std::getline(file, scanndedLine);
+	std::getline(file, scannedLine);
 
-	assert(scanndedLine.size());
+	assert(scannedLine.size());
 
-	for (unsigned i = 0; i < scanndedLine.size(); i += 8)
-		instructions.emplace_back((int8_t)std::bitset<8>(scanndedLine.substr(i, 8)).to_ulong());
+	for (unsigned i = 0; i < scannedLine.size(); i += 8)
+		instructions.emplace_back((int8_t)std::bitset<8>(scannedLine.substr(i, 8)).to_ulong());
 
 	return instructions;
 }
