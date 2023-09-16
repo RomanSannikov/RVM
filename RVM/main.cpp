@@ -38,12 +38,12 @@ static void parseArguments(bitmode& mode, const auto c_arguments)
 	{
 		if (isArgument(c_i, "-b", "--binary"))
 		{
-			mode = programMode::RUN_BINARY;
+			mode.set(programMode::RUN_BINARY);
 		}
 		else if (isArgument(c_i, "-o", "--output"))
 		{
 			next(c_i);
-			if (*c_i == "ON") mode = programMode::RUN_BINARY;
+			if (*c_i == "ON") mode.set(programMode::MAKE_OUTPUT);
 		}
 		else if (isArgument(c_i, "-f", "--filename"))
 		{
@@ -78,7 +78,7 @@ static void startVirtualMachine(const std::string& c_filename, const bitmode& c_
 			if (lineFromScanner.empty())
 				continue;
 
-			std::cout << lineFromScanner << std::endl;
+			Logger::print(lineFromScanner);
 
 			tokenizer.tokenize(lineFromScanner, scanner.getLineNumber());
 
@@ -96,16 +96,16 @@ static void startVirtualMachine(const std::string& c_filename, const bitmode& c_
 
 	if (c_mode.test(programMode::MAKE_OUTPUT) && !c_mode.test(programMode::RUN_BINARY))
 		parser.outputInstructions(c_filename);
-
-	vm.run(parser.getInstructions());
+	else
+		vm.run(parser.getInstructions());
 }
 
 
 int main(int argc, char* argv[])
 {
 	bitmode mode;
-	const auto args = std::span(argv, argc) | std::views::transform([](const char* str) { return std::string_view{str}; });
-	parseArguments(mode, args);
+	const auto c_args = std::span(argv, argc) | std::views::transform([](const char* str) { return std::string_view{str}; });
+	parseArguments(mode, c_args);
 	startVirtualMachine(filename, mode);
 	return 0;
 }  

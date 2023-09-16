@@ -23,4 +23,11 @@ public:
         for (auto i : stack) std::cout << std::bitset<8>(i) << std::endl;
         #endif
     }
+
+    static void print(const std::string& str)
+    {
+        #ifndef NDEBUG
+        std::cout << str << std::endl;
+        #endif
+    }
 };
