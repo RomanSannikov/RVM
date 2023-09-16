@@ -52,6 +52,87 @@ TEST(SimpleInstructions, Mul)
     EXPECT_EQ(TestFunctions::getStack(vm).back(), 126);
 }
 
+TEST(SimpleInstructions, Inc)
+{
+    VM vm;
+    std::vector<int8_t> instructions = { static_cast<int8_t>(TokenState::op_pushn), 63,
+                                         static_cast<int8_t>(TokenState::op_inc),
+                                         static_cast<int8_t>(TokenState::op_inc),
+                                         static_cast<int8_t>(TokenState::op_hlt)};
+    vm.run(instructions);
+    EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
+    EXPECT_EQ(TestFunctions::getStack(vm).back(), 65);
+}
+
+TEST(SimpleInstructions, Dec)
+{
+    VM vm;
+    std::vector<int8_t> instructions = { static_cast<int8_t>(TokenState::op_pushn), 0,
+                                         static_cast<int8_t>(TokenState::op_dec),
+                                         static_cast<int8_t>(TokenState::op_dec),
+                                         static_cast<int8_t>(TokenState::op_hlt)};
+    vm.run(instructions);
+    EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
+    EXPECT_EQ(TestFunctions::getStack(vm).back(), -2);
+}
+
+TEST(SimpleInstructions, New)
+{
+    VM vm;
+    std::vector<int8_t> instructions = { static_cast<int8_t>(TokenState::op_new), 5, 'a', 'b', 'c', '\0',
+                                         static_cast<int8_t>(TokenState::op_hlt)};
+    vm.run(instructions);
+    EXPECT_TRUE(TestFunctions::getStack(vm).empty());
+    EXPECT_TRUE(TestFunctions::getSymbolTable(vm).contains("abc"));
+    EXPECT_EQ(TestFunctions::getSymbolTable(vm).at("abc").size(), 5);
+}
+
+TEST(SimpleInstructions, NewDel)
+{
+    VM vm;
+    std::vector<int8_t> instructions = { static_cast<int8_t>(TokenState::op_new), 5, 'a', 'b', 'c', '\0',
+                                         static_cast<int8_t>(TokenState::op_del), 'a', 'b', 'c', '\0',
+                                         static_cast<int8_t>(TokenState::op_hlt)};
+    vm.run(instructions);
+    EXPECT_TRUE(TestFunctions::getStack(vm).empty());
+    EXPECT_FALSE(TestFunctions::getSymbolTable(vm).contains("abc"));
+}
+
+TEST(SimpleInstructions, NewSv)
+{
+    VM vm;
+    std::vector<int8_t> instructions = { static_cast<int8_t>(TokenState::op_pushn), 2,
+                                         static_cast<int8_t>(TokenState::op_pushn), 4,
+                                         static_cast<int8_t>(TokenState::op_new), 2, 'a', '\0',
+                                         static_cast<int8_t>(TokenState::op_sv), 'a', '\0',
+                                         static_cast<int8_t>(TokenState::op_hlt)};
+    vm.run(instructions);
+    EXPECT_TRUE(TestFunctions::getStack(vm).empty());
+    EXPECT_TRUE(TestFunctions::getSymbolTable(vm).contains("a"));
+    EXPECT_EQ(TestFunctions::getSymbolTable(vm).at("a").size(), 2);
+    EXPECT_EQ(TestFunctions::getSymbolTable(vm).at("a")[0], 4);
+    EXPECT_EQ(TestFunctions::getSymbolTable(vm).at("a")[1], 2);
+}
+
+TEST(SimpleInstructions, NewSvLd)
+{
+    VM vm;
+    std::vector<int8_t> instructions = { static_cast<int8_t>(TokenState::op_pushn), 8,
+                                         static_cast<int8_t>(TokenState::op_pushn), 6,
+                                         static_cast<int8_t>(TokenState::op_pushn), 11,
+                                         static_cast<int8_t>(TokenState::op_new), 3, 'b', '\0',
+                                         static_cast<int8_t>(TokenState::op_sv), 'b', '\0',
+                                         static_cast<int8_t>(TokenState::op_ld), 'b', '\0',
+                                         static_cast<int8_t>(TokenState::op_hlt)};
+    vm.run(instructions);
+    EXPECT_EQ(TestFunctions::getStack(vm).size(), 3);
+    EXPECT_TRUE(TestFunctions::getSymbolTable(vm).contains("b"));
+    EXPECT_EQ(TestFunctions::getSymbolTable(vm).at("b").size(), 3);
+    EXPECT_EQ(TestFunctions::getStack(vm)[0], 11);
+    EXPECT_EQ(TestFunctions::getStack(vm)[1], 6);
+    EXPECT_EQ(TestFunctions::getStack(vm)[2], 8);
+};
+
 TEST(SimpleInstructions, Call442Div)
 {
     VM vm;

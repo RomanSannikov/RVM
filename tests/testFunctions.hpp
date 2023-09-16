@@ -5,6 +5,7 @@
 
 class TestFunctions
 {
-    public:
-    static const std::vector<int8_t> getStack(const VM& vm) { return vm.stack; }
+public:
+    static const auto& getStack(const VM& vm) { return vm.stack; }
+    static const auto& getSymbolTable(const VM& vm) { return vm.symbolTable; }
 };
