@@ -8,7 +8,7 @@
 #include "exceptions.hpp"
 
 
-class RVMError : std::runtime_error
+class RVMError : public std::runtime_error
 {
 public:
 	RVMError(std::string message) : runtime_error(message) {}

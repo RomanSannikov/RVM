@@ -105,7 +105,11 @@ int main(int argc, char* argv[])
 {
 	bitmode mode;
 	const auto c_args = std::span(argv, argc) | std::views::transform([](const char* str) { return std::string_view{str}; });
-	parseArguments(mode, c_args);
-	startVirtualMachine(filename, mode);
+	try {
+		parseArguments(mode, c_args);
+		startVirtualMachine(filename, mode);
+	} catch(std::exception& e) {
+		std::cerr << e.what() << std::endl;
+	}
 	return 0;
 }  
