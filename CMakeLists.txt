@@ -7,6 +7,11 @@ set(RVM_COMPILE_OPTIONS "-Wall")
 set(RVM_COMPILE_OPTIONS "-Wextra")
 set(RVM_COMPILE_OPTIONS "-Wno-terminate")
 
+if (APPLE)
+    # Because of new linker implementation in XCode 15 https://developer.apple.com/forums/thread/737707
+    add_link_options("-ld_classic")
+endif()
+
 enable_testing()
 
 add_subdirectory(RVM)
