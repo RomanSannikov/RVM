@@ -133,6 +133,19 @@ TEST(SimpleInstructions, NewSvLd)
     EXPECT_EQ(TestFunctions::getStack(vm)[2], 8);
 };
 
+TEST(SimpleInstructions, Jmp) {
+    VM vm;
+    std::vector<int8_t> instructions = { static_cast<int8_t>(TokenState::op_pushn), 6,
+                                         static_cast<int8_t>(TokenState::op_pushn), 2,
+                                         static_cast<int8_t>(TokenState::op_jmp), 0, 8,
+                                         static_cast<int8_t>(TokenState::op_hlt),
+                                         static_cast<int8_t>(TokenState::op_div),
+                                         static_cast<int8_t>(TokenState::op_hlt) };
+    vm.run(instructions);
+    EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
+    EXPECT_EQ(TestFunctions::getStack(vm).front(), 3);
+}
+
 TEST(SimpleInstructions, Call442Div)
 {
     VM vm;
