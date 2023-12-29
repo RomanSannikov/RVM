@@ -160,7 +160,7 @@ void VM::doInstruction(const TokenState& c_opcode) noexcept
 	}
 	else if (c_opcode == TokenState::op_sv)
 		sv(decodeString());
-	else if ((c_opcode >= TokenState::op_jmp && c_opcode <= TokenState::op_je) || c_opcode == TokenState::op_call)
+	else if ((c_opcode >= TokenState::op_jmp && c_opcode <= TokenState::op_jnz) || c_opcode == TokenState::op_call)
 	{
 		int16_t destination = (int16_t)(((int16_t)((int16_t)instructions[programPointers.top()]) << 8) | (int16_t)instructions[programPointers.top() + 1]);
 		index = (c_opcode != TokenState::op_call ? static_cast<int>(c_opcode) - static_cast<int>(TokenState::op_jmp) : 0);
@@ -173,6 +173,7 @@ void VM::doInstruction(const TokenState& c_opcode) noexcept
 	}
 	else if (c_opcode >= TokenState::op_eq && c_opcode <= TokenState::op_ls)
 	{
+		--programPointers.top();
 		index = static_cast<int>(c_opcode) - static_cast<int>(TokenState::op_eq);
 		stack.push_back(c_comparisonFunctions[index](a, b));
 	}
