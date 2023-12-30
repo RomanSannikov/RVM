@@ -1,41 +1,32 @@
 #include "VM.hpp"
 
 
-int8_t VM::add(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b + a;}
-int8_t VM::sub(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b - a; }
-int8_t VM::mul(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b * a; }
-int8_t VM::divide(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b / a; }
+int8_t VM::add(const int8_t& a, const int8_t& b) { --stackPointer; return b + a;}
+int8_t VM::sub(const int8_t& a, const int8_t& b) { --stackPointer; return b - a; }
+int8_t VM::mul(const int8_t& a, const int8_t& b) { --stackPointer; return b * a; }
+int8_t VM::divide(const int8_t& a, const int8_t& b) { --stackPointer; return b / a; }
 
-void VM::inc() noexcept
+void VM::inc() { ++stack[stackPointer - 1]; }
+
+void VM::dec() { --stack[stackPointer - 1]; }
+
+const std::vector<int8_t>& VM::ld(const std::string& variableName)
 {
-	++stack[stackPointer - 1];
-}
-
-void VM::dec() noexcept
-{
-	--stack[stackPointer - 1];
-}
-
-const std::vector<int8_t>& VM::ld(const std::string& variableName) noexcept
-{ 
 	const auto& c_it_foundResult = symbolTable.find(variableName)->second;
 	stackPointer += (int8_t)c_it_foundResult.size();
-	return c_it_foundResult; 
+	return c_it_foundResult;
 }
 
-void VM::sv(const std::string& c_variableName) noexcept
+void VM::sv(const std::string& c_variableName)
 {
 	auto& it_foundResult = symbolTable.find(c_variableName)->second;
 	for (auto& i : it_foundResult) { i = stack.back(); stack.pop_back(); }
 	stackPointer -= (int8_t)it_foundResult.size();
 }
 
-void VM::jmp(const int16_t& c_destination) noexcept
-{
-	programPointers.top() = c_destination;
-}
+void VM::jmp(const int16_t& c_destination) { programPointers.top() = c_destination; }
 
-void VM::jne(const int16_t& c_destination) noexcept
+void VM::jne(const int16_t& c_destination)
 {
 	if (stack[stackPointer - 1] != stack[stackPointer - 2])
 		programPointers.top() = c_destination;
@@ -43,7 +34,7 @@ void VM::jne(const int16_t& c_destination) noexcept
 		++programPointers.top();
 }
 
-void VM::je(const int16_t& c_destination) noexcept
+void VM::je(const int16_t& c_destination)
 {
 	if (stack[stackPointer - 1] == stack[stackPointer - 2])
 		programPointers.top() = c_destination;
@@ -51,7 +42,7 @@ void VM::je(const int16_t& c_destination) noexcept
 		++programPointers.top();
 }
 
-void VM::jz(const int16_t& c_destination) noexcept
+void VM::jz(const int16_t& c_destination)
 {
 	if (stack[stackPointer - 1] == 0)
 		programPointers.top() = c_destination;
@@ -59,7 +50,7 @@ void VM::jz(const int16_t& c_destination) noexcept
 		++programPointers.top();
 }
 
-void VM::jnz(const int16_t& c_destination) noexcept
+void VM::jnz(const int16_t& c_destination)
 {
 	if (stack[stackPointer - 1])
 		programPointers.top() = c_destination;
@@ -69,41 +60,41 @@ void VM::jnz(const int16_t& c_destination) noexcept
 
 // Todo: jl, jg
 
-int8_t VM::eq(const int8_t& a, const int8_t& b) noexcept { ++stackPointer; return a == b; }
-int8_t VM::gr(const int8_t& a, const int8_t& b) noexcept { ++stackPointer; return b > a; }
-int8_t VM::ls(const int8_t& a, const int8_t& b) noexcept { ++stackPointer; return b < a; }
+int8_t VM::eq(const int8_t& a, const int8_t& b) { ++stackPointer; return a == b; }
+int8_t VM::gr(const int8_t& a, const int8_t& b) { ++stackPointer; return b > a; }
+int8_t VM::ls(const int8_t& a, const int8_t& b) { ++stackPointer; return b < a; }
 
-int8_t VM::op_and(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b ^ a; }
-int8_t VM::op_or(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b | a; }
-int8_t VM::op_nand(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return ~(b & a); }
-int8_t VM::op_xor(const int8_t& a, const int8_t& b) noexcept { --stackPointer; return b ^ a; }
-int8_t VM::op_not(const int8_t& a) noexcept { return ~a; }
+int8_t VM::op_and(const int8_t& a, const int8_t& b) { --stackPointer; return b ^ a; }
+int8_t VM::op_or(const int8_t& a, const int8_t& b) { --stackPointer; return b | a; }
+int8_t VM::op_nand(const int8_t& a, const int8_t& b) { --stackPointer; return ~(b & a); }
+int8_t VM::op_xor(const int8_t& a, const int8_t& b) { --stackPointer; return b ^ a; }
+int8_t VM::op_not(const int8_t& a) { return ~a; }
 
-void VM::pushn(const int8_t& a) noexcept { ++stackPointer; stack.push_back(a); }
-void VM::pushs(const std::string& c_data) noexcept
+void VM::pushn(const int8_t& a) { ++stackPointer; stack.push_back(a); }
+void VM::pushs(const std::string& c_data)
 { 
 	for (const auto& i : c_data) stack.push_back(i); 
 	stack.push_back(0);
 	stackPointer += (int8_t)c_data.size() + 1;
 }
 
-void VM::popn() noexcept { stack.pop_back(); --stackPointer; }
+void VM::popn() { stack.pop_back(); --stackPointer; }
 
-void VM::pops() noexcept
+void VM::pops()
 {
 	for (auto&& i = stack.cend(); *i != 0; --i, --stackPointer) stack.pop_back(); 
 	stack.pop_back();
 	--stackPointer;
 }
 
-void VM::allocate(const std::string& c_variableName, const int8_t& c_variableSize) noexcept
+void VM::allocate(const std::string& c_variableName, const int8_t& c_variableSize)
 { symbolTable.insert(std::make_pair(c_variableName, std::vector<int8_t>((size_t)c_variableSize))); }
 
-void VM::del(const std::string& c_variableName) noexcept
+void VM::del(const std::string& c_variableName)
 { symbolTable.erase(c_variableName); }
 
 
-void VM::run(const std::vector<int8_t>& c_instructions) noexcept
+void VM::run(const std::vector<int8_t>& c_instructions)
 {
 	this->instructions = std::move(c_instructions);
 
@@ -121,7 +112,7 @@ void VM::run(const std::vector<int8_t>& c_instructions) noexcept
 }
 
 
-void VM::doInstruction(const TokenState& c_opcode) noexcept
+void VM::doInstruction(const TokenState& c_opcode)
 {
 	int8_t a, b;
 	int index;
@@ -216,7 +207,7 @@ void VM::doInstruction(const TokenState& c_opcode) noexcept
 }
 
 
-std::string VM::decodeString() noexcept
+std::string VM::decodeString()
 {
 	int8_t character = instructions[programPointers.top()];
 	std::string result;

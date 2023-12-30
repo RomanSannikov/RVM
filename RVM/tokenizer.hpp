@@ -27,12 +27,12 @@ private:
 public:
 	Tokenizer() : c_punctuationSymbols{{" ", ",", "\""}} {}
 	
-	void tokenize(const std::string&, const unsigned&) noexcept;
+	void tokenize(const std::string&, const unsigned&);
 
 private:
-	void recognize(Token&, const uint8_t&) noexcept;
-	void recognizeToken(Token&, const std::vector<std::string>&, const TokenState) noexcept;
+	void recognize(Token&, const uint8_t&);
+	void recognizeToken(Token&, const std::vector<std::string>&, const TokenState);
 
-	StringSlice& getSlice(const std::string&, const unsigned&, StringSlice&) noexcept;
+	StringSlice& getSlice(const std::string&, const unsigned&, StringSlice&);
 };
 

@@ -14,11 +14,14 @@
 class Parser
 {
 public:
-	struct jumpTableNode 
-	{ uint16_t locationOfLabel; std::vector<uint16_t> locationsOfJumps; };
+	struct jumpTableNode
+	{
+		uint16_t locationOfLabel;
+		std::vector<uint16_t> locationsOfJumps;
+	};
 
 	using jumpTableListIter = std::unordered_map<std::string, jumpTableNode>::iterator;
-	
+
 private:
 	std::unordered_map<std::string, uint8_t> symbolTable;
 	std::unordered_map<std::string, jumpTableNode> jumpTable;
@@ -31,28 +34,18 @@ public:
 	Parser() : wasHlt(false) {}
 
 public:
-	void parse(const std::vector<Token>&) noexcept;
-	
+	void parse(const std::vector<Token>&);
 	void outputInstructions(std::string);
-
-	void completeParsing() noexcept;
-
-	constexpr std::vector<int8_t>& getInstructions() noexcept { return instructions; }
-
+	void completeParsing();
+	constexpr std::vector<int8_t>& getInstructions() { return instructions; }
 	inline void loadInstructions(const std::vector<int8_t>& c_givenInstructions) { instructions = std::move(c_givenInstructions); }
 
 private:
-	void completeJumpInstructions() noexcept;
-	void checkSymbolTabel() noexcept;
-
-	void addLocationOfLabel(const std::string&, const uint16_t&&) noexcept;
-
-	void addLocationOfJump(const std::string&, const uint16_t &&) noexcept;
-
-	auto findLocationOfJump(const jumpTableListIter&, const unsigned&) noexcept;
-
-	void checkArguments(std::vector<Token>::const_iterator&,
-		std::vector<Token>::const_iterator&, const uint8_t&, std::vector<Token>::const_iterator) noexcept;
-
-	void makeValue(const Token&) noexcept;
+	void completeJumpInstructions();
+	void checkSymbolTabel();
+	void addLocationOfLabel(const std::string&, const uint16_t&&);
+	void addLocationOfJump(const std::string&, const uint16_t &&);
+	auto findLocationOfJump(const jumpTableListIter&, const unsigned&);
+	void checkArguments(std::vector<Token>::const_iterator&, std::vector<Token>::const_iterator&, const uint8_t&, std::vector<Token>::const_iterator);
+	void makeValue(const Token&);
 };

@@ -52,47 +52,47 @@ public:
 	}
 
 public:
-	void run(const std::vector<int8_t>&) noexcept;
+	void run(const std::vector<int8_t>&);
 
 private:
-	void doInstruction(const TokenState&) noexcept;
+	void doInstruction(const TokenState&);
 	
-	std::string decodeString() noexcept;
+	std::string decodeString();
 
-	int8_t add(const int8_t&, const int8_t&) noexcept;
-	int8_t sub(const int8_t&, const int8_t&) noexcept;
-	int8_t mul(const int8_t&, const int8_t&) noexcept;
-	int8_t divide(const int8_t&, const int8_t&) noexcept;
+	int8_t add(const int8_t&, const int8_t&);
+	int8_t sub(const int8_t&, const int8_t&);
+	int8_t mul(const int8_t&, const int8_t&);
+	int8_t divide(const int8_t&, const int8_t&);
 
-	void inc() noexcept;
-	void dec() noexcept;
+	void inc();
+	void dec();
 
-	const std::vector<int8_t>& ld(const std::string&) noexcept;
-	void sv(const std::string&) noexcept;
+	const std::vector<int8_t>& ld(const std::string&);
+	void sv(const std::string&);
 
-	void jmp(const int16_t&) noexcept;
-	void jne(const int16_t&) noexcept;
-	void je(const int16_t&) noexcept;
-	void jz(const int16_t&) noexcept;
-	void jnz(const int16_t&) noexcept;
+	void jmp(const int16_t&);
+	void jne(const int16_t&);
+	void je(const int16_t&);
+	void jz(const int16_t&);
+	void jnz(const int16_t&);
 
-	int8_t eq(const int8_t&, const int8_t&) noexcept;
-	int8_t gr(const int8_t&, const int8_t&) noexcept;
-	int8_t ls(const int8_t&, const int8_t&) noexcept;
+	int8_t eq(const int8_t&, const int8_t&);
+	int8_t gr(const int8_t&, const int8_t&);
+	int8_t ls(const int8_t&, const int8_t&);
 
-	int8_t op_and(const int8_t&, const int8_t&) noexcept;
-	int8_t op_or(const int8_t&, const int8_t&) noexcept;
-	int8_t op_nand(const int8_t&, const int8_t&) noexcept;
-	int8_t op_xor(const int8_t&, const int8_t&) noexcept;
-	int8_t op_not(const int8_t&) noexcept;
+	int8_t op_and(const int8_t&, const int8_t&);
+	int8_t op_or(const int8_t&, const int8_t&);
+	int8_t op_nand(const int8_t&, const int8_t&);
+	int8_t op_xor(const int8_t&, const int8_t&);
+	int8_t op_not(const int8_t&);
 
-	void pushn(const int8_t&) noexcept;
-	void pushs(const std::string&) noexcept;
-	void popn() noexcept;
-	void pops() noexcept;
+	void pushn(const int8_t&);
+	void pushs(const std::string&);
+	void popn();
+	void pops();
 
-	void allocate(const std::string&, const int8_t&) noexcept;
-	void del(const std::string&) noexcept;
+	void allocate(const std::string&, const int8_t&);
+	void del(const std::string&);
 
 	friend class TestFunctions;
 };

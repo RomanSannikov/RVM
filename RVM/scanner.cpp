@@ -7,10 +7,10 @@ void Scanner::open(const std::string& c_filename) { file.open(c_filename); }
 void Scanner::open(const char* const c_filename) { file.open(c_filename); }
 
 
-bool Scanner::isEOF() noexcept { return file.eof(); }
+bool Scanner::isEOF() { return file.eof(); }
 
 
-std::string Scanner::getLine(std::string& scannedLine) noexcept
+std::string Scanner::getLine(std::string& scannedLine)
 {
 	if (!file.is_open())
 		throw RVMError(c_scannerError + "The file is not open!");

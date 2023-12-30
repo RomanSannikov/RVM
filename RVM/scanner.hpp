@@ -25,9 +25,9 @@ public:
 	void open(const std::string&);
 	void open(const char* const);
 	
-	bool isEOF() noexcept;
+	bool isEOF();
 
-	std::string getLine(std::string&) noexcept;
+	std::string getLine(std::string&);
 	unsigned getLineNumber();
 
 	const std::vector<int8_t> readBinary();
