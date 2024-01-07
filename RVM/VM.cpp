@@ -153,7 +153,8 @@ void VM::doInstruction(const TokenState& c_opcode)
 		sv(decodeString());
 	else if ((c_opcode >= TokenState::op_jmp && c_opcode <= TokenState::op_jnz) || c_opcode == TokenState::op_call)
 	{
-		int16_t destination = (int16_t)(((int16_t)((int16_t)instructions[programPointers.top()]) << 8) | (int16_t)instructions[programPointers.top() + 1]);
+		// Desc: `(int16_t)0x00FF` is intended to set the high nibble of `(int16_t)instructions[programPointers.top() + 1]` to zero, since the variable is initially of type `int8_t`
+		int16_t destination = (int16_t)(((int16_t)((int16_t)instructions[programPointers.top()]) << 8) | (int16_t)0x00FF & (int16_t)instructions[programPointers.top() + 1]);
 		index = (c_opcode != TokenState::op_call ? static_cast<int>(c_opcode) - static_cast<int>(TokenState::op_jmp) : 0);
 		// Desc: if it's the call instruction then increment `programPointer` to skip the call arguments and land on the next instructions
 		if (c_opcode == TokenState::op_call) {
