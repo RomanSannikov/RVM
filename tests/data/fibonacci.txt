@@ -1,0 +1,37 @@
+pushn 0
+pushn 1
+pushn 22
+call fibonacciinit
+hlt
+
+fibonacciinit:
+new 1 maxvalue
+new 1 currentvalue
+new 1 lastvalue
+fibonacci:
+sv maxvalue
+sv currentvalue
+sv lastvalue
+ld currentvalue
+ld maxvalue
+gr
+jnz quickreturn
+popn
+eq
+jnz quickreturn
+popn
+popn
+ld lastvalue
+ld currentvalue
+add
+ld maxvalue
+call fibonacci
+ret
+
+quickreturn:
+del maxvalue
+del currentvalue
+del lastvalue
+popn
+popn
+ret

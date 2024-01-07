@@ -173,3 +173,69 @@ TEST(SimpleInstructions, Call442Div)
     EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
     EXPECT_EQ(TestFunctions::getStack(vm).back(), 22);
 }
+
+TEST(SimpleInstructions, Fibonacci) {
+    const std::string c_filename = "tests/data/fibonacci.txt";
+    std::string lineFromScanner;
+
+    Scanner scanner;
+	Tokenizer tokenizer;
+	Parser parser;
+
+    {
+        scanner.open(c_filename);
+
+        while (!scanner.isEOF())
+        {
+            scanner.getLine(lineFromScanner);
+
+            if (lineFromScanner.empty())
+                continue;
+
+            tokenizer.tokenize(lineFromScanner, scanner.getLineNumber());
+            parser.parse(tokenizer.tokens);
+        }
+
+        parser.completeParsing();
+    }
+
+    {
+        VM vm;
+        std::vector<int8_t> instructions = parser.getInstructions();
+        instructions[5] = 1;
+        vm.run(instructions);
+
+        EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
+        EXPECT_EQ(TestFunctions::getStack(vm).back(), 1);
+    }
+
+    {
+        VM vm;
+        std::vector<int8_t> instructions = parser.getInstructions();
+        instructions[5] = 11;
+        vm.run(instructions);
+
+        EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
+        EXPECT_EQ(TestFunctions::getStack(vm).back(), 13);
+    }
+
+    {
+        VM vm;
+        std::vector<int8_t> instructions = parser.getInstructions();
+        instructions[5] = 33;
+        vm.run(instructions);
+
+        EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
+        EXPECT_EQ(TestFunctions::getStack(vm).back(), 34);
+    }
+
+    {
+        VM vm;
+        std::vector<int8_t> instructions = parser.getInstructions();
+        instructions[5] = 89;
+        vm.run(instructions);
+
+        EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
+        EXPECT_EQ(TestFunctions::getStack(vm).back(), 89);
+    }
+}
