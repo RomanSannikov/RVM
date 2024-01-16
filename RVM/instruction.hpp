@@ -5,7 +5,7 @@
 #include <array>
 #include <functional>
 
-enum class TokenState : unsigned
+enum class TokenState : int8_t
 {
 	op_add = 0,
 	op_sub,
