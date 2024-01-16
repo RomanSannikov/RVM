@@ -25,10 +25,14 @@ public:
 		#endif
 	}
 
-	static void printStack(const std::vector<Integral auto>& stack)
+	static void printStack(const std::vector<Integral auto>& stack, const Integral auto& instruction) {
+		printStack(stack, "(" + getInstructionName(instruction) + ")");
+	}
+
+	static void printStack(const std::vector<Integral auto>& stack, const std::string message = "")
 	{
 		#ifndef NDEBUG
-		std::cout << std::endl << "STACK: " << std::endl;
+		std::cout << std::endl << "STACK: " << message << std::endl;
 		for (auto i : stack) std::cout << std::bitset<8>(i) << std::endl;
 		#endif
 	}

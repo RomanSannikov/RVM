@@ -107,7 +107,7 @@ void VM::run(const std::vector<int8_t>& c_instructions)
 		doInstruction(opcode);
 		assert(stackPointer >= 0);
 
-		Logger::printStack(stack);
+		Logger::printStack(stack, currentInstruction);
 	}
 }
 
