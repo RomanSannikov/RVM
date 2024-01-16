@@ -9,12 +9,12 @@ RVM is a VM that runs Rolang ByteCode
 You start the RVM with the given args. Basically, it scans the first line, tokenizes it, makes an instruction out of that (parsing part), and save the instruction in the array. There are 3 types of instruction: opcode, opcode + opDef + operand + operand, opcode + loc. opcode = 1 byte, opDef = 1 byte, operand = 2 bytes, loc = 4 bytes. To make the jump instruction, the parser’s gotten the Jump Tabel. When everything is parsed, the parser fills up the values of jump instructions (pointers to labels). The parser always tracks the line number. When all instructions have been parsed, the next step is the running part of the VM.
 
 <ol>
-    <li>scan a line</li>
-    <li>tokenize the line</li>
-    <li>parse the line (it makes an instruction in bin. representation)</li>
-    <li>save the instruction in the instruction array</li>
-    <li>if the next line exists, go to the first stage </li>
-    <li>execute the instructions from the instruction array</li>
+	<li>scan a line</li>
+	<li>tokenize the line</li>
+	<li>parse the line (it makes an instruction in bin. representation)</li>
+	<li>save the instruction in the instruction array</li>
+	<li>if the next line exists, go to the first stage </li>
+	<li>execute the instructions from the instruction array</li>
 </ol>
  
  
