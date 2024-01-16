@@ -1,0 +1,29 @@
+pushn 5
+call factorial
+hlt
+
+factorial:
+pushn 1
+eq
+je return
+popn
+ls
+jnz return
+popn
+popn
+new 1 n
+sv n
+ld n
+ld n
+del n
+dec
+call factorial
+mul
+ret
+
+return:
+popn
+popn
+popn
+pushn 1
+ret

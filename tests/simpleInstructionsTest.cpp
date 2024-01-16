@@ -239,3 +239,68 @@ TEST(SimpleInstructions, Fibonacci) {
 		EXPECT_EQ(TestFunctions::getStack(vm).back(), 89);
 	}
 }
+
+TEST(SimpleInstructions, FractorialTxt) {
+	const std::string c_filename = "tests/data/fractorial.txt";
+	std::string lineFromScanner;
+
+	Scanner scanner;
+	Tokenizer tokenizer;
+	Parser parser;
+
+	auto fractorial = [](int n, auto&& self) -> int { return (n <= 1 ? 1 : n * self(n - 1, self)); };
+
+	{
+		scanner.open(c_filename);
+
+		while (!scanner.isEOF())
+		{
+			scanner.getLine(lineFromScanner);
+
+			if (lineFromScanner.empty())
+				continue;
+
+			tokenizer.tokenize(lineFromScanner, scanner.getLineNumber());
+			parser.parse(tokenizer.tokens);
+		}
+
+		parser.completeParsing();
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		VM vm;
+		std::vector<int8_t> instructions = parser.getInstructions();
+		instructions[1] = i;
+		vm.run(instructions);
+
+		EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
+		EXPECT_EQ(TestFunctions::getStack(vm).back(), fractorial(i, fractorial));
+	}
+}
+
+TEST(SimpleInstructions, FractorialBytecode) {
+	const std::string c_filename = "tests/data/fractorial.rbc";
+	std::string lineFromScanner;
+
+	Scanner scanner;
+	Parser parser;
+
+	auto fractorial = [](int n, auto&& self) -> int { return (n <= 1 ? 1 : n * self(n - 1, self)); };
+
+	{
+		scanner.open(c_filename);
+		parser.loadInstructions(scanner.readBinary());
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		VM vm;
+		std::vector<int8_t> instructions = parser.getInstructions();
+		instructions[1] = i;
+		vm.run(instructions);
+
+		EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
+		EXPECT_EQ(TestFunctions::getStack(vm).back(), fractorial(i, fractorial));
+	}
+}
