@@ -1,27 +1,26 @@
 #include "VM.hpp"
 
 
-int8_t VM::add(const int8_t& a, const int8_t& b) { --stackPointer; return b + a;}
-int8_t VM::sub(const int8_t& a, const int8_t& b) { --stackPointer; return b - a; }
-int8_t VM::mul(const int8_t& a, const int8_t& b) { --stackPointer; return b * a; }
-int8_t VM::divide(const int8_t& a, const int8_t& b) { --stackPointer; return b / a; }
+stackType VM::add(const stackType& a, const stackType& b) { --stackPointer; return b + a;}
+stackType VM::sub(const stackType& a, const stackType& b) { --stackPointer; return b - a; }
+stackType VM::mul(const stackType& a, const stackType& b) { --stackPointer; return b * a; }
+stackType VM::divide(const stackType& a, const stackType& b) { --stackPointer; return b / a; }
 
 void VM::inc() { ++stack[stackPointer - 1]; }
 
 void VM::dec() { --stack[stackPointer - 1]; }
 
-const std::vector<int8_t>& VM::ld(const std::string& variableName)
+void VM::ld(const stackType& a)
 {
-	const auto& c_it_foundResult = symbolTable.find(variableName)->second;
-	stackPointer += (int8_t)c_it_foundResult.size();
-	return c_it_foundResult;
+	stack.push_back(*(pool.get() + a));
+	++stackPointer;
 }
 
-void VM::sv(const std::string& c_variableName)
+void VM::sv(const stackType& a, const stackType& b)
 {
-	auto& it_foundResult = symbolTable.find(c_variableName)->second;
-	for (auto& i : it_foundResult) { i = stack.back(); stack.pop_back(); }
-	stackPointer -= (int8_t)it_foundResult.size();
+	pool.get()[b] = a;
+	stack.pop_back();
+	--stackPointer;
 }
 
 void VM::jmp(const int16_t& c_destination) { programPointers.top() = c_destination; }
@@ -31,7 +30,7 @@ void VM::jne(const int16_t& c_destination)
 	if (stack[stackPointer - 1] != stack[stackPointer - 2])
 		programPointers.top() = c_destination;
 	else
-		++programPointers.top();
+		programPointers.top() += 2;
 }
 
 void VM::je(const int16_t& c_destination)
@@ -39,7 +38,7 @@ void VM::je(const int16_t& c_destination)
 	if (stack[stackPointer - 1] == stack[stackPointer - 2])
 		programPointers.top() = c_destination;
 	else
-		++programPointers.top();
+		programPointers.top() += 2;
 }
 
 void VM::jz(const int16_t& c_destination)
@@ -47,7 +46,7 @@ void VM::jz(const int16_t& c_destination)
 	if (stack[stackPointer - 1] == 0)
 		programPointers.top() = c_destination;
 	else
-		++programPointers.top();
+		programPointers.top() += 2;
 }
 
 void VM::jnz(const int16_t& c_destination)
@@ -55,27 +54,30 @@ void VM::jnz(const int16_t& c_destination)
 	if (stack[stackPointer - 1])
 		programPointers.top() = c_destination;
 	else
-		++programPointers.top();
+		programPointers.top() += 2;
 }
 
 // Todo: jl, jg
 
-int8_t VM::eq(const int8_t& a, const int8_t& b) { ++stackPointer; return a == b; }
-int8_t VM::gr(const int8_t& a, const int8_t& b) { ++stackPointer; return b > a; }
-int8_t VM::ls(const int8_t& a, const int8_t& b) { ++stackPointer; return b < a; }
+stackType VM::eq(const stackType& a, const stackType& b) { ++stackPointer; return a == b; }
+stackType VM::gr(const stackType& a, const stackType& b) { ++stackPointer; return b > a; }
+stackType VM::ls(const stackType& a, const stackType& b) { ++stackPointer; return b < a; }
 
-int8_t VM::op_and(const int8_t& a, const int8_t& b) { --stackPointer; return b ^ a; }
-int8_t VM::op_or(const int8_t& a, const int8_t& b) { --stackPointer; return b | a; }
-int8_t VM::op_nand(const int8_t& a, const int8_t& b) { --stackPointer; return ~(b & a); }
-int8_t VM::op_xor(const int8_t& a, const int8_t& b) { --stackPointer; return b ^ a; }
-int8_t VM::op_not(const int8_t& a) { return ~a; }
+stackType VM::op_and(const stackType& a, const stackType& b) { --stackPointer; return b ^ a; }
+stackType VM::op_or(const stackType& a, const stackType& b) { --stackPointer; return b | a; }
+stackType VM::op_nand(const stackType& a, const stackType& b) { --stackPointer; return ~(b & a); }
+stackType VM::op_xor(const stackType& a, const stackType& b) { --stackPointer; return b ^ a; }
+stackType VM::op_not(const stackType& a) { return ~a; }
 
-void VM::pushn(const int8_t& a) { ++stackPointer; stack.push_back(a); }
+void VM::pushn(const stackType& a) {
+	++stackPointer;
+	stack.push_back(a);
+}
 void VM::pushs(const std::string& c_data)
 { 
 	for (const auto& i : c_data) stack.push_back(i); 
 	stack.push_back(0);
-	stackPointer += (int8_t)c_data.size() + 1;
+	stackPointer += (stackType)c_data.size() + 1;
 }
 
 void VM::popn() { stack.pop_back(); --stackPointer; }
@@ -87,20 +89,29 @@ void VM::pops()
 	--stackPointer;
 }
 
-void VM::allocate(const std::string& c_variableName, const int8_t& c_variableSize)
-{ symbolTable.insert(std::make_pair(c_variableName, std::vector<int8_t>((size_t)c_variableSize))); }
+void VM::allocate()
+{
+	// Todo: Allocate different amount of bytes
+	// Desc: Allocation of "an object". But, actually, this just the same variable that is stored on the stack
+	auto allocationOffset = (new(pool.get() + poolPointer) stackType) - pool.get();
+	stack.push_back(allocationOffset);
+	stackPointer++;
+	poolPointer += sizeof(stackType);
+}
 
-void VM::del(const std::string& c_variableName)
-{ symbolTable.erase(c_variableName); }
+void VM::del()
+{
+	// Todo: Consider this either removing or implementing
+}
 
 
-void VM::run(const std::vector<int8_t>& c_instructions)
+void VM::run(const std::vector<instructionType>& c_instructions)
 {
 	this->instructions = std::move(c_instructions);
 
 	for (; programPointers.top() < c_instructions.size(); ++programPointers.top())
 	{
-		int8_t currentInstruction = c_instructions[programPointers.top()];
+		instructionType currentInstruction = c_instructions[programPointers.top()];
 		TokenState opcode = static_cast<TokenState>(currentInstruction);
 		if (opcode == TokenState::op_hlt)
 			break;
@@ -114,7 +125,7 @@ void VM::run(const std::vector<int8_t>& c_instructions)
 
 void VM::doInstruction(const TokenState& c_opcode)
 {
-	int8_t a, b;
+	stackType a, b;
 	int index;
 	
 	if (stack.size() > 0) a = stack.back();
@@ -125,11 +136,7 @@ void VM::doInstruction(const TokenState& c_opcode)
 	{
 		popTwoTimes();
 		index = static_cast<int>(c_opcode) - static_cast<int>(c_tokenState);
-		// Desc: `programPointer` has been incremented
-		--programPointers.top();
 	};
-
-	++programPointers.top();
 
 	if (c_opcode >= TokenState::op_add && c_opcode <= TokenState::op_div)
 	{
@@ -138,22 +145,17 @@ void VM::doInstruction(const TokenState& c_opcode)
 	}
 	else if (c_opcode == TokenState::op_inc || c_opcode == TokenState::op_dec)
 	{
-		// Desc: `programPointer` has been incremented
-		--programPointers.top();
 		index = static_cast<int>(c_opcode) - static_cast<int>(TokenState::op_inc);
 		incAndDecFunctions[index]();
 	}
 	else if (c_opcode == TokenState::op_ld)
-	{
-		const auto& c_variableData = ld(decodeString());
-		for (const auto& i : c_variableData)
-			stack.push_back(i);
-	}
+		ld(a);
 	else if (c_opcode == TokenState::op_sv)
-		sv(decodeString());
+		sv(a, b);
 	else if ((c_opcode >= TokenState::op_jmp && c_opcode <= TokenState::op_jnz) || c_opcode == TokenState::op_call)
 	{
-		// Desc: `(int16_t)0x00FF` is intended to set the high nibble of `(int16_t)instructions[programPointers.top() + 1]` to zero, since the variable is initially of type `int8_t`
+		++programPointers.top();
+		// Desc: `(int16_t)0x00FF` is intended to set the high nibble of `(int16_t)instructions[programPointers.top() + 1]` to zero, since the variable is initially of type `uint8_t`
 		int16_t destination = (int16_t)(((int16_t)((int16_t)instructions[programPointers.top()]) << 8) | (int16_t)0x00FF & (int16_t)instructions[programPointers.top() + 1]);
 		index = (c_opcode != TokenState::op_call ? static_cast<int>(c_opcode) - static_cast<int>(TokenState::op_jmp) : 0);
 		// Desc: if it's the call instruction then increment `programPointer` to skip the call arguments and land on the next instructions
@@ -165,7 +167,6 @@ void VM::doInstruction(const TokenState& c_opcode)
 	}
 	else if (c_opcode >= TokenState::op_eq && c_opcode <= TokenState::op_ls)
 	{
-		--programPointers.top();
 		index = static_cast<int>(c_opcode) - static_cast<int>(TokenState::op_eq);
 		stack.push_back(c_comparisonFunctions[index](a, b));
 	}
@@ -182,35 +183,23 @@ void VM::doInstruction(const TokenState& c_opcode)
 	else if (c_opcode == TokenState::op_ret)
 		programPointers.pop();
 	else if (c_opcode == TokenState::op_pushn)
-		pushn(instructions[programPointers.top()]);
+		pushn(instructions[++programPointers.top()]);
 	else if (c_opcode == TokenState::op_pushs)
 		pushs(decodeString());
 	else if (c_opcode == TokenState::op_popn)
-	{
-		// Desc: `programPointer` has been incremented
-		--programPointers.top();
 		popn();
-	}
 	else if (c_opcode == TokenState::op_pops)
-	{
-		// Desc: `programPointer` has been incremented
-		--programPointers.top();
 		pops();
-	}
 	else if (c_opcode == TokenState::op_new)
-	{
-		const int8_t c_data = instructions[programPointers.top()];
-		++programPointers.top();
-		allocate(decodeString(), c_data);
-	}
+		allocate();
 	else if (c_opcode == TokenState::op_del)
-		del(decodeString());
+		del();
 }
 
 
 std::string VM::decodeString()
 {
-	int8_t character = instructions[programPointers.top()];
+	instructionType character = instructions[++programPointers.top()];
 	std::string result;
 
 	while (character != 0)

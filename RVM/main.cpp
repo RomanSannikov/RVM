@@ -64,9 +64,9 @@ static void startVirtualMachine(const std::string& c_filename, const bitmode& c_
 	Tokenizer tokenizer;
 	Parser parser;
 	VM vm;
-	
+
 	std::string lineFromScanner;
-	
+
 	if (!c_mode.test(programMode::RUN_BINARY))
 	{
 		scanner.open(c_filename);

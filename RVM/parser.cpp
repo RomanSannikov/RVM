@@ -3,7 +3,7 @@
 
 void Parser::parse(const std::vector<Token>& c_tokens)
 {
-	uint8_t instructionValue = 0;
+	instructionType instructionValue = 0;
 	auto it_currentToken = c_tokens.begin();
 	decltype(it_currentToken) it_lastToken;
 	
@@ -16,8 +16,8 @@ void Parser::parse(const std::vector<Token>& c_tokens)
 	{
 		if (it_currentToken->tokenState == TokenState::op_hlt)
 			wasHlt = true;
-		instructionValue = c_instructionValues[static_cast<uint8_t>(c_tokens[0].tokenState)];
-		instructions.push_back(static_cast<uint8_t>(it_currentToken->tokenState));
+		instructionValue = c_instructionValues[static_cast<instructionType>(c_tokens[0].tokenState)];
+		instructions.push_back(static_cast<instructionType>(it_currentToken->tokenState));
 	}
 	else
 		throw RVMError(c_parserError + "cannot make an instruction", it_currentToken->lineNumber);
@@ -36,7 +36,6 @@ void Parser::parse(const std::vector<Token>& c_tokens)
 void Parser::completeParsing()
 {
 	completeJumpInstructions();
-	checkSymbolTabel();
 
 	if (!wasHlt)
 		throw RVMError(c_parserError + "There is no HLT instruction. It's an undefined behavior without the instructions");
@@ -53,21 +52,14 @@ void Parser::completeJumpInstructions()
 		{
 			for (const auto& c_locationOfJump : c_it_jumpTableNode->second.locationsOfJumps)
 			{
-				int8_t* pointerToInstructions = instructions.data();
+				instructionType* pointerToInstructions = instructions.data();
 				pointerToInstructions[c_locationOfJump + 1] = c_it_jumpTableNode->second.locationOfLabel >> 8;
-				pointerToInstructions[c_locationOfJump + 2] = (uint8_t)c_it_jumpTableNode->second.locationOfLabel;
+				pointerToInstructions[c_locationOfJump + 2] = (instructionType)c_it_jumpTableNode->second.locationOfLabel;
 			}
 		}
 		else 
 			throw RVMError(c_parserError + "label " + i + " hasn't been found");
 	}
-}
-
-
-void Parser::checkSymbolTabel()
-{
-	if (symbolTable.size() != 0)
-		throw RVMError(c_parserError + "not all variables were deleted");
 }
 
 
@@ -158,33 +150,34 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 			{
 				addLocationOfJump(it_currentToken->stringValue, (uint16_t)(instructions.size() - 1));
 				// Desc: locationOfLabel is 2 byte long
-				//		  because the instruction vector is of int8_t and location is of uint16_t
+				//		  because the instruction vector is of uint8_t and location is of uint16_t
 				instructions.push_back(0); instructions.push_back(0);
 			}
-			else if (it_currentInstruction->tokenState == TokenState::op_new)
-			{
-				if (valueTypes[i] == TokenState::number)
-				{
-					try { instructions.push_back(std::stoi(it_currentToken->stringValue)); }
-					catch (std::invalid_argument invalidArgument) { throw RVMError(c_parserError + "the value must be a number", it_currentToken->lineNumber); }
-				}
-				else if (symbolTable.find(it_currentToken->stringValue) == symbolTable.end())
-				{ 
-					symbolTable.insert(std::make_pair(it_currentToken->stringValue, variableSize));
-					makeValue(*it_currentToken);
-				}
-				else
-					throw RVMError(c_parserError + "the variable " + it_currentToken->stringValue + " has been already defined", it_currentToken->lineNumber);
-			}
-			else if (it_currentInstruction->tokenState == TokenState::op_del)
-			{
-				if (symbolTable.erase(it_currentToken->stringValue) == 0)
-					throw RVMError(c_parserError + "the variable " + it_currentToken->stringValue + " hasn't been defined", it_currentToken->lineNumber);
-				makeValue(*it_currentToken);
-			}
-			else if ((it_currentInstruction->tokenState == TokenState::op_ld || it_currentInstruction->tokenState == TokenState::op_sv) 
-																	&& symbolTable.find(it_currentToken->stringValue) == symbolTable.end())
-					throw RVMError(c_parserError + "the value " + it_currentToken->stringValue + " hasn't been defined", it_currentToken->lineNumber);
+			// Todo: Remove commented code
+			// else if (it_currentInstruction->tokenState == TokenState::op_new)
+			// {
+			// 	if (valueTypes[i] == TokenState::number)
+			// 	{
+			// 		try { instructions.push_back(std::stoi(it_currentToken->stringValue)); }
+			// 		catch (std::invalid_argument invalidArgument) { throw RVMError(c_parserError + "the value must be a number", it_currentToken->lineNumber); }
+			// 	}
+			// 	else if (symbolTable.find(it_currentToken->stringValue) == symbolTable.end())
+			// 	{ 
+			// 		symbolTable.insert(std::make_pair(it_currentToken->stringValue, variableSize));
+			// 		makeValue(*it_currentToken);
+			// 	}
+			// 	else
+			// 		throw RVMError(c_parserError + "the variable " + it_currentToken->stringValue + " has been already defined", it_currentToken->lineNumber);
+			// }
+			// else if (it_currentInstruction->tokenState == TokenState::op_del)
+			// {
+			// 	if (symbolTable.erase(it_currentToken->stringValue) == 0)
+			// 		throw RVMError(c_parserError + "the variable " + it_currentToken->stringValue + " hasn't been defined", it_currentToken->lineNumber);
+			// 	makeValue(*it_currentToken);
+			// }
+			// else if ((it_currentInstruction->tokenState == TokenState::op_ld || it_currentInstruction->tokenState == TokenState::op_sv) 
+			// 														&& symbolTable.find(it_currentToken->stringValue) == symbolTable.end())
+			// 		throw RVMError(c_parserError + "the value " + it_currentToken->stringValue + " hasn't been defined", it_currentToken->lineNumber);
 			else
 				makeValue(*it_currentToken);
 		}

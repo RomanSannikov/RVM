@@ -7,11 +7,11 @@
 #include <cassert>
 
 #include "error.hpp"
+#include "instruction.hpp"
 
 class Scanner
 {
 private:
-	const unsigned c_lineSize = 128;
 	std::ifstream file;
 	unsigned lineNumber;
 
@@ -30,5 +30,5 @@ public:
 	std::string getLine(std::string&);
 	unsigned getLineNumber();
 
-	const std::vector<int8_t> readBinary();
+	const std::vector<instructionType> readBinary();
 };

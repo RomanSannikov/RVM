@@ -1,0 +1,5 @@
+new
+pushn 3
+sv
+ld
+hlt

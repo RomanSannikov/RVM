@@ -22,20 +22,20 @@ std::string Scanner::getLine(std::string& scannedLine)
 }
 
 
-const std::vector<int8_t> Scanner::readBinary()
+const std::vector<instructionType> Scanner::readBinary()
 {
 	if (!file.is_open())
 		throw RVMError(c_scannerError + "The file is not open!");
 
 	std::string scannedLine;
-	std::vector<int8_t> instructions;
+	std::vector<instructionType> instructions;
 
 	std::getline(file, scannedLine);
 
 	assert(scannedLine.size());
 
 	for (unsigned i = 0; i < scannedLine.size(); i += 8)
-		instructions.emplace_back((int8_t)std::bitset<8>(scannedLine.substr(i, 8)).to_ulong());
+		instructions.emplace_back((instructionType)std::bitset<sizeof(instructionType) * 8>(scannedLine.substr(i, 8)).to_ulong());
 
 	return instructions;
 }
