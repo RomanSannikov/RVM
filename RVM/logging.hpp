@@ -11,29 +11,33 @@ concept Integral = std::is_integral<T>::value;
 
 class Logger {
 public:
-	static void printInstructionName(const Integral auto& instruction) {
+	template <Integral T>
+	static void printInstructionName(const T& instruction) {
 		#ifndef NDEBUG
 		std::cout << getInstructionName(instruction) << std::endl;
 		#endif
 	}
 
-	static void printInstructions(const std::vector<Integral auto>& instructions)
+	template <Integral T>
+	static void printInstructions(const std::vector<T>& instructions)
 	{
 		#ifndef NDEBUG
 		for (size_t i = 0; i < instructions.size(); i++)
-			std::printf("%d: %s (%s)\n", i, std::bitset<8>(instructions[i]).to_string().c_str(), getInstructionName(instructions[i]).c_str());
+			std::printf("%d: %s (%s)\n", i, std::bitset<sizeof(T) * 8>(instructions[i]).to_string().c_str(), getInstructionName(instructions[i]).c_str());
 		#endif
 	}
 
-	static void printStack(const std::vector<Integral auto>& stack, const Integral auto& instruction) {
+	template <Integral T, Integral K>
+	static void printStack(const std::vector<T>& stack, const K& instruction) {
 		printStack(stack, "(" + getInstructionName(instruction) + ")");
 	}
 
-	static void printStack(const std::vector<Integral auto>& stack, const std::string message = "")
+	template <Integral T>
+	static void printStack(const std::vector<T>& stack, const std::string message = "")
 	{
 		#ifndef NDEBUG
 		std::cout << std::endl << "STACK: " << message << std::endl;
-		for (auto i : stack) std::cout << std::bitset<8>(i) << std::endl;
+		for (auto i : stack) std::cout << std::bitset<sizeof(T) * 8>(i) << std::endl;
 		#endif
 	}
 
@@ -44,6 +48,6 @@ public:
 		#endif
 	}
 
-private:
-	static std::string getInstructionName(const Integral auto& instruction) { return (instruction < c_stringInstructions.size() ? c_stringInstructions[instruction] : ""); }
+	template <Integral T>
+	static std::string getInstructionName(const T& instruction) { return (instruction < c_stringInstructions.size() ? c_stringInstructions[instruction] : ""); }
 };

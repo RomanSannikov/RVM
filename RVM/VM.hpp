@@ -3,27 +3,36 @@
 #include <stack>
 #include <vector>
 #include <cassert>
+#include <memory>
 #include <unordered_map>
 
 #include "parser.hpp"
 #include "instruction.hpp"
 #include "logging.hpp"
 
+using stackType = int16_t;
+
 class Parser;
 
 class VM
 {
+
 private:
 	const unsigned c_SIZE_OF_STACK;
 
-	std::vector<int8_t> stack;
-	std::unordered_map<std::string, std::vector<int8_t>> symbolTable;
-	std::vector<int8_t> instructions;
+	// Todo: Make a real arean class
+	std::shared_ptr<stackType> pool = std::make_shared<stackType>(1024);
+	// Desc: Pointer to free memory
+	int16_t poolPointer = 0;
+
+	std::vector<stackType> stack;
+	std::unordered_map<std::string, std::vector<instructionType>> symbolTable;
+	std::vector<instructionType> instructions;
 
 	std::stack<uint16_t> programPointers;
-	int16_t stackPointer;
+	int32_t stackPointer;
 
-	const std::array < std::function<int8_t(const int8_t&, const int8_t&)>, 4> c_arithmeticFunctions =
+	const std::array < std::function<stackType(const stackType&, const stackType&)>, 4> c_arithmeticFunctions =
 	{ std::bind(&VM::add, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::sub, this, std::placeholders::_1, std::placeholders::_2),
 	  std::bind(&VM::mul, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::divide, this, std::placeholders::_1, std::placeholders::_2) };
 
@@ -35,11 +44,11 @@ private:
 	  std::bind(&VM::je, this, std::placeholders::_1), 
 	  std::bind(&VM::jz, this, std::placeholders::_1), std::bind(&VM::jnz, this, std::placeholders::_1) };
 
-	const std::array < std::function<int8_t(const int8_t&, const int8_t&)>, 3> c_comparisonFunctions =
+	const std::array < std::function<stackType(const stackType&, const stackType&)>, 3> c_comparisonFunctions =
 	{ std::bind(&VM::eq, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::gr, this, std::placeholders::_1, std::placeholders::_2),
 	  std::bind(&VM::ls, this, std::placeholders::_1, std::placeholders::_2) };
 
-	const std::array < std::function<int8_t(const int8_t&, const int8_t&)>, 4> c_binaryArithmeticFunctions =
+	const std::array < std::function<stackType(const stackType&, const stackType&)>, 4> c_binaryArithmeticFunctions =
 	{ std::bind(&VM::op_and, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::op_or, this, std::placeholders::_1, std::placeholders::_2),
 	  std::bind(&VM::op_nand, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::op_xor, this, std::placeholders::_1, std::placeholders::_2) };
 
@@ -52,23 +61,23 @@ public:
 	}
 
 public:
-	void run(const std::vector<int8_t>&);
+	void run(const std::vector<instructionType>&);
 
 private:
 	void doInstruction(const TokenState&);
 	
 	std::string decodeString();
 
-	int8_t add(const int8_t&, const int8_t&);
-	int8_t sub(const int8_t&, const int8_t&);
-	int8_t mul(const int8_t&, const int8_t&);
-	int8_t divide(const int8_t&, const int8_t&);
+	stackType add(const stackType&, const stackType&);
+	stackType sub(const stackType&, const stackType&);
+	stackType mul(const stackType&, const stackType&);
+	stackType divide(const stackType&, const stackType&);
 
 	void inc();
 	void dec();
 
-	const std::vector<int8_t>& ld(const std::string&);
-	void sv(const std::string&);
+	void ld(const stackType&);
+	void sv(const stackType&, const stackType&);
 
 	void jmp(const int16_t&);
 	void jne(const int16_t&);
@@ -76,23 +85,23 @@ private:
 	void jz(const int16_t&);
 	void jnz(const int16_t&);
 
-	int8_t eq(const int8_t&, const int8_t&);
-	int8_t gr(const int8_t&, const int8_t&);
-	int8_t ls(const int8_t&, const int8_t&);
+	stackType eq(const stackType&, const stackType&);
+	stackType gr(const stackType&, const stackType&);
+	stackType ls(const stackType&, const stackType&);
 
-	int8_t op_and(const int8_t&, const int8_t&);
-	int8_t op_or(const int8_t&, const int8_t&);
-	int8_t op_nand(const int8_t&, const int8_t&);
-	int8_t op_xor(const int8_t&, const int8_t&);
-	int8_t op_not(const int8_t&);
+	stackType op_and(const stackType&, const stackType&);
+	stackType op_or(const stackType&, const stackType&);
+	stackType op_nand(const stackType&, const stackType&);
+	stackType op_xor(const stackType&, const stackType&);
+	stackType op_not(const stackType&);
 
-	void pushn(const int8_t&);
+	void pushn(const stackType&);
 	void pushs(const std::string&);
 	void popn();
 	void pops();
 
-	void allocate(const std::string&, const int8_t&);
-	void del(const std::string&);
+	void allocate();
+	void del();
 
 	friend class TestFunctions;
 };

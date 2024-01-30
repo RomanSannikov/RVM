@@ -5,7 +5,9 @@
 #include <array>
 #include <functional>
 
-enum class TokenState : int8_t
+using instructionType = uint8_t;
+
+enum class TokenState : instructionType
 {
 	op_add = 0,
 	op_sub,
@@ -82,17 +84,15 @@ NUM STR NUM STR
 **  **  **  **  =  byte
 1value  2value
 */
-#define NONE 0b00000000
-const std::array<uint8_t, 30> c_instructionValues
+static constexpr int NONE = 0b00000000;
+const std::array<instructionType, 30> c_instructionValues
 				{ NONE, NONE, NONE, NONE, // add sub mul div
 				NONE, NONE, // inc dec
-				0b00110000, 0b00110000, // ld sv 
+				NONE, NONE, // ld sv 
 				0b00110000, 0b00110000, 0b00110000, 0b00110000, 0b00110000, // jmp jne je jz jnz
 				NONE, NONE, NONE, // eq gr ls
 				NONE, NONE, NONE, NONE, NONE, // and or nand xor not
 				0b00110000, NONE, // call ret
 				0b11000000, 0b00110000, NONE, NONE, // pushn pushs popn pops
-				0b11000011, 0b00110000, // new del
+				NONE, NONE, // new del
 				NONE }; // hlt
-
-#undef NONE

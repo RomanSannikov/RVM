@@ -23,10 +23,9 @@ public:
 	using jumpTableListIter = std::unordered_map<std::string, jumpTableNode>::iterator;
 
 private:
-	std::unordered_map<std::string, uint8_t> symbolTable;
 	std::unordered_map<std::string, jumpTableNode> jumpTable;
 	std::vector<std::string> labelNames;
-	std::vector<int8_t> instructions;
+	std::vector<instructionType> instructions;
 
 	bool wasHlt;
 
@@ -37,12 +36,11 @@ public:
 	void parse(const std::vector<Token>&);
 	void outputInstructions(std::string);
 	void completeParsing();
-	constexpr std::vector<int8_t>& getInstructions() { return instructions; }
-	inline void loadInstructions(const std::vector<int8_t>& c_givenInstructions) { instructions = std::move(c_givenInstructions); }
+	constexpr std::vector<instructionType>& getInstructions() { return instructions; }
+	inline void loadInstructions(const std::vector<instructionType>& c_givenInstructions) { instructions = std::move(c_givenInstructions); }
 
 private:
 	void completeJumpInstructions();
-	void checkSymbolTabel();
 	void addLocationOfLabel(const std::string&, const uint16_t&&);
 	void addLocationOfJump(const std::string&, const uint16_t &&);
 	auto findLocationOfJump(const jumpTableListIter&, const unsigned&);
