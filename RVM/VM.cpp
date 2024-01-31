@@ -12,13 +12,13 @@ void VM::dec() { --stack[stackPointer - 1]; }
 
 void VM::ld(const stackType& a)
 {
-	stack.push_back(*(pool.get() + a));
+	stack.push_back(pool.get()[a].get());
 	++stackPointer;
 }
 
 void VM::sv(const stackType& a, const stackType& b)
 {
-	pool.get()[b] = a;
+	pool.get()[b].set(a);
 	stack.pop_back();
 	--stackPointer;
 }
@@ -93,10 +93,10 @@ void VM::allocate()
 {
 	// Todo: Allocate different amount of bytes
 	// Desc: Allocation of "an object". But, actually, this just the same variable that is stored on the stack
-	auto allocationOffset = (new(pool.get() + poolPointer) stackType) - pool.get();
+	auto allocationOffset = (new(pool.get() + poolPointer) Object<stackType>) - pool.get();
 	stack.push_back(allocationOffset);
 	stackPointer++;
-	poolPointer += sizeof(stackType);
+	poolPointer += sizeof(Object<stackType>);
 }
 
 void VM::del()

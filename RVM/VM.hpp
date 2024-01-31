@@ -9,6 +9,7 @@
 #include "parser.hpp"
 #include "instruction.hpp"
 #include "logging.hpp"
+#include "object.hpp"
 
 using stackType = int16_t;
 
@@ -21,7 +22,7 @@ private:
 	const unsigned c_SIZE_OF_STACK;
 
 	// Todo: Make a real arean class
-	std::shared_ptr<stackType> pool = std::make_shared<stackType>(1024);
+	std::shared_ptr<Object<stackType>[]> pool = std::make_shared<Object<stackType>[]>(1024);
 	// Desc: Pointer to free memory
 	int16_t poolPointer = 0;
 
