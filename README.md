@@ -1,71 +1,83 @@
-
 # Rolang Virtual Machine
- 
- 
-RVM is a VM that runs Rolang ByteCode
- 
- 
-### How it works:<br>
-You start the RVM with the given args. Basically, it scans the first line, tokenizes it, makes an instruction out of that (parsing part), and save the instruction in the array. There are 3 types of instruction: opcode, opcode + opDef + operand + operand, opcode + loc. opcode = 1 byte, opDef = 1 byte, operand = 2 bytes, loc = 4 bytes. To make the jump instruction, the parser’s gotten the Jump Tabel. When everything is parsed, the parser fills up the values of jump instructions (pointers to labels). The parser always tracks the line number. When all instructions have been parsed, the next step is the running part of the VM.
 
-<ol>
-	<li>scan a line</li>
-	<li>tokenize the line</li>
-	<li>parse the line (it makes an instruction in bin. representation)</li>
-	<li>save the instruction in the instruction array</li>
-	<li>if the next line exists, go to the first stage </li>
-	<li>execute the instructions from the instruction array</li>
-</ol>
- 
- 
-### How the jump instructions work: <br>
-The RVM has the Jump Tabel. The JT stores label names, their locations, and jump instruction locations. If a label appears, its name and location are written. If a jump appears, its location and the label name are written.<br>
+`RVM` is a VM that runs Rolang ByteCode
 
+# Build
 
-### Tokenizer
-Note, the tokenizer ignores punctuation symbols
+```
+cmake -B build/
+make -C build/
+```
 
-### Command Line Arguments:<br>
-none - error, at least one argument should be written<br>
-one arg - filename. By default, RVM try to read the file like it has RBC in there<br>
--f - then a filename goes<br>
--b - run a binary representation of Rolang ByteCode<br>
--o - output Rolang ByteCode<br>
+The `RVM` executable will be placed in `bin/`.
 
-### Supported instructions:<br>
-add<br>
-sub    <br>
-mul    <br>
-div    <br>
-inc<br>
-dec<br>
-ld    word<br>
-sv    word<br>
-jmp    word<br>
-jne    word<br>
-je     word<br>
-jz     word<br>
-jnz     word<br>
-eq<br>
-gr<br>
-ls<br>
-and<br>
-or<br>
-nan<br>
-xor<br>
-not<br>
-call   word<br>
-ret <br>
-pushn  num    <br>
-pushs  word    <br>
-popn   num    <br>
-pops   word    <br>
-new    num, word<br>
-del    word<br>
-hlt<br>
-`<label>`<br>
+# Usage
 
-### License
+```
+RVM -f <file>				# run ByteCode written as text
+RVM -b <binary file>		# run ByteCode written as binary (.rbc file extension)
+RVM -f <file> -o <ON/OFF>	# convert text ByteCode to binary ByteCode
+```
+
+You can find test examples in the `tests/data/` directory.
+
+# Overview of implementation
+**There are 3 types of instructions:**
+* `opcode`
+* `opcode + opDef + operand + operand`
+* `opcode + loc`
+
+**Sizes of each part:**
+* `opcode` = 1 byte
+* `opDef` = 1 byte
+* `operand` = 2 bytes
+* `loc` = 4 bytes
+
+**`RVM` steps:**
+1. scan a line
+2. tokenize the line
+3. parse the line (it converts the instruction into binary representation)
+4. save the instruction in the instruction array
+5. if the next line exists, go to the stage 1.
+6. execute the instructions from the instruction array
+
+`RVM` has a `Jump Table` that stores label names, their locations, and the corresponding jump instruction locations. When the parser encounters a label or jump instruction, it writes their locations and names to the `Jump Table`. Once all instructions have been processed, the parsing phase ends by assigning the jump locations to the respective jump calls.
+
+### Rolang ByteCode instructions:
+```
+add
+sub
+mul
+div
+inc
+dec
+ld     <word>
+sv     <word>
+jmp    <word>
+jne    <word>
+je     <word>
+jz     <word>
+jnz    <word>
+eq
+gr
+ls
+and
+or
+nan
+xor
+not
+call   <word>
+ret
+pushn  <num>
+pushs  <word>
+popn   <num>
+pops   <word>
+new    <num>, <word>
+del    <word>
+hlt
+<label>
+```
+
+# License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
