@@ -1,6 +1,6 @@
 # Rolang Virtual Machine
 
-`RVM` is a VM that runs Rolang ByteCode
+`RVM` is a VM that runs `Rolang ByteCode`
 
 # Build
 
@@ -14,12 +14,55 @@ The `RVM` executable will be placed in `bin/`.
 # Usage
 
 ```
-RVM -f <file>				# run ByteCode written as text
+RVM -f <file>			# run ByteCode written as text
 RVM -b <binary file>		# run ByteCode written as binary (.rbc file extension)
 RVM -f <file> -o <ON/OFF>	# convert text ByteCode to binary ByteCode
 ```
 
 You can find test examples in the `tests/data/` directory.
+
+# Example
+
+The provided example demonstrates the `Rolang ByteCode` extracted from `tests/data/simpleTest.txt`
+```
+pushn 0
+pushn 5
+loop:
+dec
+jne loop
+popn
+popn
+
+hlt
+```
+
+This little program is the equivalent of the following code snippet in `C`:
+
+```
+for (int i = 0; i < 5; i++) {}
+```
+
+To run this example just type:
+
+```
+RVM -f tests/data/simpleTest.txt
+```
+
+`RVM` can process and generate `Rolang ByteCode` in the `rbc` binary format. In order to convert the example above to the `rbc` format, use this command:
+
+```
+RVM -f tests/data/simpleTest.txt -o ON
+```
+
+After executing this line, you will find a new file called `simpleTest.rbc` in the `tests/data/` directory with the following content:
+
+```
+0001011100000000000101110000010100000101000010010000000000000100000110010001100100011101
+```
+
+From a technical standpoint, it should be noted that this is not genuine binary code, but rather plain text. This conversion is carried out specifically for the purpose of debugging.
+
+Also, as you can see, the Rolang ByteCode must end with the `hlt` instruction.
 
 # Overview of implementation
 **There are 3 types of instructions:**
