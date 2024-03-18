@@ -1,6 +1,36 @@
 #include "parser.hpp"
 
 
+void Parser::parseFromFile(const std::string& c_filename, bool in_binary)
+{
+	Scanner scanner(c_filename);
+	Tokenizer tokenizer;
+
+	if (in_binary) {
+		loadInstructions(scanner.readBinary());
+	} else {
+		std::string lineFromScanner;
+
+		while (!scanner.isEOF())
+		{
+			scanner.getLine(lineFromScanner);
+
+			if (lineFromScanner.empty())
+				continue;
+
+			Logger::print(lineFromScanner);
+
+			tokenizer.tokenize(lineFromScanner, scanner.getLineNumber());
+
+			parse(tokenizer.tokens);
+		}
+
+		completeParsing();
+		Logger::printInstructions(getInstructions());
+	}
+}
+
+
 void Parser::parse(const std::vector<Token>& c_tokens)
 {
 	instructionType instructionValue = 0;

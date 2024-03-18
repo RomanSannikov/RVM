@@ -176,28 +176,10 @@ TEST(SimpleInstructions, DISABLED_Call442Div)
 
 TEST(SimpleInstructions, DISABLED_Fibonacci) {
 	const std::string c_filename = "tests/data/fibonacci.txt";
-	std::string lineFromScanner;
 
-	Scanner scanner;
-	Tokenizer tokenizer;
 	Parser parser;
 
-	{
-		scanner.open(c_filename);
-
-		while (!scanner.isEOF())
-		{
-			scanner.getLine(lineFromScanner);
-
-			if (lineFromScanner.empty())
-				continue;
-
-			tokenizer.tokenize(lineFromScanner, scanner.getLineNumber());
-			parser.parse(tokenizer.tokens);
-		}
-
-		parser.completeParsing();
-	}
+	parser.parseFromFile(c_filename, false);
 
 	{
 		VM vm;
@@ -242,30 +224,12 @@ TEST(SimpleInstructions, DISABLED_Fibonacci) {
 
 TEST(SimpleInstructions, DISABLED_FractorialTxt) {
 	const std::string c_filename = "tests/data/fractorial.txt";
-	std::string lineFromScanner;
 
-	Scanner scanner;
-	Tokenizer tokenizer;
 	Parser parser;
 
 	auto fractorial = [](int n, auto&& self) -> int { return (n <= 1 ? 1 : n * self(n - 1, self)); };
 
-	{
-		scanner.open(c_filename);
-
-		while (!scanner.isEOF())
-		{
-			scanner.getLine(lineFromScanner);
-
-			if (lineFromScanner.empty())
-				continue;
-
-			tokenizer.tokenize(lineFromScanner, scanner.getLineNumber());
-			parser.parse(tokenizer.tokens);
-		}
-
-		parser.completeParsing();
-	}
+	parser.parseFromFile(c_filename, false);
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -281,17 +245,12 @@ TEST(SimpleInstructions, DISABLED_FractorialTxt) {
 
 TEST(SimpleInstructions, DISABLED_FractorialBytecode) {
 	const std::string c_filename = "tests/data/fractorial.rbc";
-	std::string lineFromScanner;
 
-	Scanner scanner;
 	Parser parser;
 
 	auto fractorial = [](int n, auto&& self) -> int { return (n <= 1 ? 1 : n * self(n - 1, self)); };
 
-	{
-		scanner.open(c_filename);
-		parser.loadInstructions(scanner.readBinary());
-	}
+	parser.parseFromFile(c_filename, true);
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -303,4 +262,18 @@ TEST(SimpleInstructions, DISABLED_FractorialBytecode) {
 		EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
 		EXPECT_EQ(TestFunctions::getStack(vm).back(), fractorial(i, fractorial));
 	}
+}
+
+TEST(SimpleInstructions, SimpleTestTxt) {
+	const std::string c_filename = "tests/data/simpleTest.txt";
+
+	Parser parser;
+	VM vm;
+
+	parser.parseFromFile(c_filename, false);
+
+	std::vector<instructionType> instructions = parser.getInstructions();
+	vm.run(instructions);
+
+	EXPECT_EQ(TestFunctions::getStack(vm).size(), 0);
 }

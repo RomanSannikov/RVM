@@ -8,6 +8,8 @@
 #include <list>
 
 #include "instruction.hpp"
+#include "scanner.hpp"
+#include "tokenizer.hpp"
 #include "error.hpp"
 #include "logging.hpp"
 
@@ -33,17 +35,18 @@ public:
 	Parser() : wasHlt(false) {}
 
 public:
-	void parse(const std::vector<Token>&);
+	void parseFromFile(const std::string&, bool);
 	void outputInstructions(std::string);
-	void completeParsing();
 	constexpr std::vector<instructionType>& getInstructions() { return instructions; }
-	inline void loadInstructions(const std::vector<instructionType>& c_givenInstructions) { instructions = std::move(c_givenInstructions); }
 
 private:
+	void parse(const std::vector<Token>&);
+	void completeParsing();
 	void completeJumpInstructions();
 	void addLocationOfLabel(const std::string&, const uint16_t&&);
 	void addLocationOfJump(const std::string&, const uint16_t &&);
 	auto findLocationOfJump(const jumpTableListIter&, const unsigned&);
 	void checkArguments(std::vector<Token>::const_iterator&, std::vector<Token>::const_iterator&, const uint8_t&, std::vector<Token>::const_iterator);
 	void makeValue(const Token&);
+	inline void loadInstructions(const std::vector<instructionType>& c_givenInstructions) { instructions = std::move(c_givenInstructions); }
 };
