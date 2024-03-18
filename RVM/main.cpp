@@ -4,8 +4,6 @@
 #include <ranges>
 #include <string_view>
 
-#include "scanner.hpp"
-#include "tokenizer.hpp"
 #include "parser.hpp"
 #include "VM.hpp"
 
@@ -59,40 +57,11 @@ static void parseArguments(bitmode& mode, const auto c_arguments)
 
 
 static void startVirtualMachine(const std::string& c_filename, const bitmode& c_mode)
-{	
-	Scanner scanner;
-	Tokenizer tokenizer;
+{
 	Parser parser;
 	VM vm;
 
-	std::string lineFromScanner;
-
-	if (!c_mode.test(programMode::RUN_BINARY))
-	{
-		scanner.open(c_filename);
-
-		while (!scanner.isEOF())
-		{
-			scanner.getLine(lineFromScanner);
-
-			if (lineFromScanner.empty())
-				continue;
-
-			Logger::print(lineFromScanner);
-
-			tokenizer.tokenize(lineFromScanner, scanner.getLineNumber());
-
-			parser.parse(tokenizer.tokens);
-		}
-
-		parser.completeParsing();
-		Logger::printInstructions(parser.getInstructions());
-	}
-	else
-	{
-		scanner.open(c_filename);
-		parser.loadInstructions(scanner.readBinary());
-	}
+	parser.parseFromFile(c_filename, c_mode.test(programMode::RUN_BINARY));
 
 	if (c_mode.test(programMode::MAKE_OUTPUT) && !c_mode.test(programMode::RUN_BINARY))
 		parser.outputInstructions(c_filename);

@@ -30,7 +30,7 @@ void VM::jne(const int16_t& c_destination)
 	if (stack[stackPointer - 1] != stack[stackPointer - 2])
 		programPointers.top() = c_destination;
 	else
-		programPointers.top() += 2;
+		++programPointers.top();
 }
 
 void VM::je(const int16_t& c_destination)
@@ -38,7 +38,7 @@ void VM::je(const int16_t& c_destination)
 	if (stack[stackPointer - 1] == stack[stackPointer - 2])
 		programPointers.top() = c_destination;
 	else
-		programPointers.top() += 2;
+		++programPointers.top();
 }
 
 void VM::jz(const int16_t& c_destination)
@@ -46,7 +46,7 @@ void VM::jz(const int16_t& c_destination)
 	if (stack[stackPointer - 1] == 0)
 		programPointers.top() = c_destination;
 	else
-		programPointers.top() += 2;
+		++programPointers.top();
 }
 
 void VM::jnz(const int16_t& c_destination)
@@ -54,7 +54,7 @@ void VM::jnz(const int16_t& c_destination)
 	if (stack[stackPointer - 1])
 		programPointers.top() = c_destination;
 	else
-		programPointers.top() += 2;
+		++programPointers.top();
 }
 
 // Todo: jl, jg
@@ -73,6 +73,7 @@ void VM::pushn(const stackType& a) {
 	++stackPointer;
 	stack.push_back(a);
 }
+
 void VM::pushs(const std::string& c_data)
 { 
 	for (const auto& i : c_data) stack.push_back(i); 
@@ -80,7 +81,10 @@ void VM::pushs(const std::string& c_data)
 	stackPointer += (stackType)c_data.size() + 1;
 }
 
-void VM::popn() { stack.pop_back(); --stackPointer; }
+void VM::popn() {
+	stack.pop_back();
+	--stackPointer;
+}
 
 void VM::pops()
 {
