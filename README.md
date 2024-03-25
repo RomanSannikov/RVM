@@ -21,6 +21,8 @@ RVM -f <file> -o <ON/OFF>	# convert text ByteCode to binary ByteCode
 
 You can find test examples in the `tests/data/` directory.
 
+The demo is shown down below.
+
 # Example
 
 The provided example demonstrates the `Rolang ByteCode` extracted from `tests/data/simpleTest.txt`
@@ -120,6 +122,10 @@ del    <word>
 hlt
 <label>
 ```
+
+# Demo
+
+![GIF](docs/RVM.gif)
 
 # License
 
