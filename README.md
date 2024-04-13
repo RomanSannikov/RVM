@@ -41,7 +41,7 @@ hlt
 This little program is the equivalent of the following code snippet in `C`:
 
 ```
-for (int i = 0; i < 5; i++) {}
+for (int i = 5; i != 0; i--) {}
 ```
 
 To run this example just type:
