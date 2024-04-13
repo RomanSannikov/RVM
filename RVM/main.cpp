@@ -21,7 +21,7 @@ enum programMode
 
 static void parseArguments(bitmode& mode, const auto c_arguments)
 {
-	auto isArgument = [](auto& argument, std::string_view shortName, std::string_view longName)
+	auto isArgument = [](const auto& argument, std::string_view shortName, std::string_view longName)
 	{
 		return (!shortName.empty() && *argument == shortName) || *argument == longName;
 	};
@@ -72,9 +72,9 @@ static void startVirtualMachine(const std::string& c_filename, const bitmode& c_
 
 int main(int argc, char* argv[])
 {
-	bitmode mode;
 	const auto c_args = std::span(argv, argc) | std::views::transform([](const char* str) { return std::string_view{str}; });
 	try {
+		bitmode mode;
 		parseArguments(mode, c_args);
 		startVirtualMachine(filename, mode);
 	} catch(std::exception& e) {

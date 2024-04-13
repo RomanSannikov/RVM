@@ -1,11 +1,14 @@
 #pragma once
 
+#include <cmath>
 #include <stack>
 #include <vector>
 #include <cassert>
 #include <memory>
 #include <unordered_map>
 
+#include "BaseGC.hpp"
+#include "EpsilonGC.hpp"
 #include "parser.hpp"
 #include "instruction.hpp"
 #include "logging.hpp"
@@ -19,15 +22,16 @@ class VM
 {
 
 private:
-	const unsigned c_SIZE_OF_STACK;
+	const size_t c_STACK_SIZE;
+	const size_t c_POOL_SIZE;
 
-	// Todo: Make a real arean class
-	std::shared_ptr<Object<stackType>[]> pool = std::make_shared<Object<stackType>[]>(1024);
-	// Desc: Pointer to free memory
-	int16_t poolPointer = 0;
+	std::shared_ptr<char[]> pool;
+	stackType poolPointer = 0;
 
+	std::shared_ptr<BaseGC> gc;
+
+	std::vector<ObjectType> objectRepresentationTable = { ObjectType::INT, ObjectType::DOUBLE, ObjectType::REF };
 	std::vector<stackType> stack;
-	std::unordered_map<std::string, std::vector<instructionType>> symbolTable;
 	std::vector<instructionType> instructions;
 
 	std::stack<uint16_t> programPointers;
@@ -54,10 +58,9 @@ private:
 	  std::bind(&VM::op_nand, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::op_xor, this, std::placeholders::_1, std::placeholders::_2) };
 
 public:
-	
-	VM() : c_SIZE_OF_STACK(8), stackPointer(0)
+	VM() : c_STACK_SIZE(8), c_POOL_SIZE(1024), stackPointer(0), gc(std::make_shared<EpsilonGC>()), pool(std::make_shared<char[]>(c_POOL_SIZE))
 	{
-		stack.reserve(c_SIZE_OF_STACK);
+		stack.reserve(c_STACK_SIZE);
 		programPointers.push(0);
 	}
 
@@ -78,7 +81,7 @@ private:
 	void dec();
 
 	void ld(const stackType&);
-	void sv(const stackType&, const stackType&);
+	void sv(const stackType&);
 
 	void jmp(const int16_t&);
 	void jne(const int16_t&);
@@ -96,12 +99,14 @@ private:
 	stackType op_xor(const stackType&, const stackType&);
 	stackType op_not(const stackType&);
 
+	void dup(const stackType&);
+
 	void pushn(const stackType&);
 	void pushs(const std::string&);
 	void popn();
 	void pops();
 
-	void allocate();
+	void allocate(const stackType&);
 	void del();
 
 	friend class TestFunctions;

@@ -13,7 +13,7 @@ public:
 	std::vector<Token> tokens;
 
 private:
-	const std::vector<std::string> c_punctuationSymbols;
+	const std::vector<std::string> c_punctuationSymbols = {" ", ",", "\""};
 
 	enum : uint8_t
 	{ c_WORD = 0, c_NUMBER,	c_PUNCTUATIONSYMBOL };
@@ -25,7 +25,7 @@ private:
 	};
 
 public:
-	Tokenizer() : c_punctuationSymbols{{" ", ",", "\""}} {}
+	Tokenizer() = default;
 	
 	void tokenize(const std::string&, const unsigned&);
 

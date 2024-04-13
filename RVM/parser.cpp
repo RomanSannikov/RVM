@@ -77,8 +77,8 @@ void Parser::completeJumpInstructions()
 	for (const auto& i : labelNames)
 	{
 		const auto&& c_it_jumpTableNode = jumpTable.find(i);
-		
-		if (c_it_jumpTableNode != jumpTable.end() || c_it_jumpTableNode->second.locationsOfJumps.size() != 0)
+
+		if (c_it_jumpTableNode != jumpTable.end() && c_it_jumpTableNode->second.locationsOfJumps.size() != 0)
 		{
 			for (const auto& c_locationOfJump : c_it_jumpTableNode->second.locationsOfJumps)
 			{
@@ -149,8 +149,6 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 	uint8_t numberOfIterations = 0;
 	std::array<TokenState, 2> valueTypes;
 
-	uint8_t variableSize;
-
 	for (uint8_t i = 0b11110000; i != 0; i >>= 4)
 		if (c_instructionValue & i)
 			++numberOfIterations;
@@ -183,31 +181,6 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 				//		  because the instruction vector is of uint8_t and location is of uint16_t
 				instructions.push_back(0); instructions.push_back(0);
 			}
-			// Todo: Remove commented code
-			// else if (it_currentInstruction->tokenState == TokenState::op_new)
-			// {
-			// 	if (valueTypes[i] == TokenState::number)
-			// 	{
-			// 		try { instructions.push_back(std::stoi(it_currentToken->stringValue)); }
-			// 		catch (std::invalid_argument invalidArgument) { throw RVMError(c_parserError + "the value must be a number", it_currentToken->lineNumber); }
-			// 	}
-			// 	else if (symbolTable.find(it_currentToken->stringValue) == symbolTable.end())
-			// 	{ 
-			// 		symbolTable.insert(std::make_pair(it_currentToken->stringValue, variableSize));
-			// 		makeValue(*it_currentToken);
-			// 	}
-			// 	else
-			// 		throw RVMError(c_parserError + "the variable " + it_currentToken->stringValue + " has been already defined", it_currentToken->lineNumber);
-			// }
-			// else if (it_currentInstruction->tokenState == TokenState::op_del)
-			// {
-			// 	if (symbolTable.erase(it_currentToken->stringValue) == 0)
-			// 		throw RVMError(c_parserError + "the variable " + it_currentToken->stringValue + " hasn't been defined", it_currentToken->lineNumber);
-			// 	makeValue(*it_currentToken);
-			// }
-			// else if ((it_currentInstruction->tokenState == TokenState::op_ld || it_currentInstruction->tokenState == TokenState::op_sv) 
-			// 														&& symbolTable.find(it_currentToken->stringValue) == symbolTable.end())
-			// 		throw RVMError(c_parserError + "the value " + it_currentToken->stringValue + " hasn't been defined", it_currentToken->lineNumber);
 			else
 				makeValue(*it_currentToken);
 		}
@@ -220,12 +193,11 @@ void Parser::makeValue(const Token& c_token)
 	if (c_token.tokenState == TokenState::number)
 	{
 		try { instructions.push_back(std::stoi(c_token.stringValue)); }
-		catch (std::invalid_argument invalidArgument) { throw RVMError(c_parserError + "the value must be a number", c_token.lineNumber); }
+		catch (const std::invalid_argument& invalidArgument) { throw RVMError(c_parserError + "the value must be a number", c_token.lineNumber); }
 	}
 	else if (c_token.tokenState == TokenState::word)
 	{
-		for (auto& i : c_token.stringValue)
-			instructions.push_back(i);
+		std::copy(c_token.stringValue.begin(), c_token.stringValue.end(), instructions.begin());
 		instructions.push_back(0);
 	}
 	else
@@ -235,7 +207,7 @@ void Parser::makeValue(const Token& c_token)
 
 void Parser::outputInstructions(std::string filename)
 {
-	for (unsigned i = filename.size() - 1; i >= 0; --i)
+	for (size_t i = filename.size() - 1; !filename.empty() && i == 0; --i)
 	{
 		if (filename[i] != '.') filename.pop_back();
 		else break;

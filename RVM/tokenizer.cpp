@@ -78,8 +78,8 @@ Tokenizer::StringSlice& Tokenizer::getSlice(const std::string& c_line, const uns
 		slice.mode = c_NUMBER;
 	else
 	{
-		for(auto& i : c_punctuationSymbols) if (i[0] == c_line[c_startPoint]) return (slice = {1, c_PUNCTUATIONSYMBOL });
-		return (slice = {0, c_PUNCTUATIONSYMBOL});
+		bool isPunctuationSymbol = std::any_of(c_punctuationSymbols.begin(), c_punctuationSymbols.end(), [&](const auto& symbol) { return symbol[0] == c_line[c_startPoint]; });
+		return (isPunctuationSymbol ? (slice = {1, c_PUNCTUATIONSYMBOL }) : (slice = {0, c_PUNCTUATIONSYMBOL}));
 	}
 
 	++slice.length;

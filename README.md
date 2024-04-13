@@ -89,6 +89,9 @@ Also, as you can see, the Rolang ByteCode must end with the `hlt` instruction.
 `RVM` has a `Jump Table` that stores label names, their locations, and the corresponding jump instruction locations. When the parser encounters a label or jump instruction, it writes their locations and names to the `Jump Table`. Once all instructions have been processed, the parsing phase ends by assigning the jump locations to the respective jump calls.
 
 ### Rolang ByteCode instructions:
+
+The VM have a set of 31 instructions.
+
 ```
 add
 sub
@@ -111,17 +114,19 @@ or
 nan
 xor
 not
+dup    <num>
 call   <word>
 ret
 pushn  <num>
 pushs  <word>
 popn   <num>
 pops   <word>
-new    <num>, <word>
+new    <num>
 del    <word>
 hlt
-<label>
 ```
+
+Also, labels can be used to indicate where to jump.
 
 # Demo
 

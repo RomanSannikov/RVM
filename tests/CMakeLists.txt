@@ -1,4 +1,4 @@
-set(TEST_SOURCES simpleInstructionsTest.cpp testFunctions.hpp)
+set(TEST_SOURCES instructionsTest.cpp fileTest.cpp testFunctions.hpp)
 
 include(FetchContent)
 FetchContent_Declare(

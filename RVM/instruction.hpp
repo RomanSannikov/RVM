@@ -36,6 +36,8 @@ enum class TokenState : instructionType
 	op_xor,
 	op_not,
 
+	op_dup,
+
 	op_call,
 	op_ret,
 
@@ -64,7 +66,8 @@ const std::vector<std::string> c_stringInstructions =
 	"jmp", "jne", "je", "jz", "jnz",
 	"eq", "gr", "ls",
 	"and", "or", "nand", "xor", "not",
-	"call", "ret", 
+	"dup",
+	"call", "ret",
 	"pushn", "pushs", "popn", "pops",
 	"new", "del", 
 	"hlt"
@@ -85,14 +88,15 @@ NUM STR NUM STR
 1value  2value
 */
 static constexpr int NONE = 0b00000000;
-const std::array<instructionType, 30> c_instructionValues
+const std::array<instructionType, 31> c_instructionValues
 				{ NONE, NONE, NONE, NONE, // add sub mul div
 				NONE, NONE, // inc dec
 				NONE, NONE, // ld sv 
 				0b00110000, 0b00110000, 0b00110000, 0b00110000, 0b00110000, // jmp jne je jz jnz
 				NONE, NONE, NONE, // eq gr ls
 				NONE, NONE, NONE, NONE, NONE, // and or nand xor not
+				0b11000000, // dup
 				0b00110000, NONE, // call ret
 				0b11000000, 0b00110000, NONE, NONE, // pushn pushs popn pops
-				NONE, NONE, // new del
+				0b11000000, NONE, // new del
 				NONE }; // hlt

@@ -13,12 +13,12 @@ class Scanner
 {
 private:
 	std::ifstream file;
-	unsigned lineNumber;
+	unsigned lineNumber = 0;
 
 public:
-	Scanner() {}
-	Scanner(const std::string& c_filename) : file(c_filename) {}
-	Scanner(const char* const c_filename) : file(c_filename) {}
+	Scanner() = default;
+	explicit Scanner(const std::string& c_filename) : file(c_filename) {}
+	explicit Scanner(const char* const c_filename) : file(c_filename) {}
 
 	~Scanner() { file.close(); }
 	
