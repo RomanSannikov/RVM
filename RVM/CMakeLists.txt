@@ -1,4 +1,4 @@
-file(GLOB RVM_SOURCES main.cpp VM.cpp EpsilonGC.cpp tokenizer.cpp scanner.cpp parser.cpp logging.hpp)
+file(GLOB RVM_SOURCES main.cpp VM.cpp EpsilonGC.cpp STWGC.cpp tokenizer.cpp scanner.cpp parser.cpp logging.hpp)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_HOME_DIRECTORY}/bin)
 

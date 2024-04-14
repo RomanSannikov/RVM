@@ -9,41 +9,15 @@
 
 #include "BaseGC.hpp"
 #include "EpsilonGC.hpp"
+#include "STWGC.hpp"
 #include "parser.hpp"
 #include "instruction.hpp"
 #include "logging.hpp"
 #include "object.hpp"
-
-using stackType = int16_t;
+#include "StackFrameManager.hpp"
+#include "utils.hpp"
 
 class Parser;
-
-class StackFrameManager
-{
-private:
-	struct StackFrame {
-		uint16_t programPointer = 0;
-		const stackType variableAccessOffset = 0;
-		std::vector<stackType> variables;
-	};
-
-	std::vector<StackFrame> frames;
-
-public:
-	StackFrameManager() = default;
-
-	void pushFrame(uint16_t newProgramPointer = 0) {
-		// Descr: The first frame is global one, so we need to have access to all global and local variables
-		stackType newOffset = (frames.empty() ? 0 : frames.front().variableAccessOffset + static_cast<stackType>(frames.back().variables.size()));
-		frames.push_back({.programPointer = newProgramPointer, .variableAccessOffset = newOffset});
-	}
-	void popFrame() { frames.pop_back(); }
-	void incProgramPointer() { ++frames.back().programPointer; }
-	uint16_t getProgramPointer() { return frames.back().programPointer; }
-	void setProgramPointer(uint16_t new_value) { frames.back().programPointer = new_value; }
-	void addVariable(stackType reference) { frames.back().variables.push_back(reference); }
-	stackType getVariable(stackType variableNumber) { return frames.back().variables.at(variableNumber); }
-};
 
 class VM
 {
@@ -54,7 +28,7 @@ private:
 	std::shared_ptr<std::byte[]> pool = std::make_shared<std::byte[]>(c_POOL_SIZE);
 	stackType poolPointer = 0;
 
-	std::shared_ptr<BaseGC> gc = std::make_shared<EpsilonGC>();
+	std::shared_ptr<BaseGC> gc = std::make_shared<STWGC>();
 
 	std::vector<ObjectType> objectRepresentationTable = { ObjectType::INT, ObjectType::DOUBLE, ObjectType::REF };
 	std::vector<stackType> stack;

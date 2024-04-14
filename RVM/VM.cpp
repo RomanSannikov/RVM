@@ -168,7 +168,7 @@ void VM::allocate(const stackType& objectNumber)
 	stackFrame.addVariable(allocationOffset);
 
 	// Todo: Make this depend on arguments
-	if (std::isgreater(static_cast<double>(poolPointer) / static_cast<double>(c_POOL_SIZE), 0.8)) gc->run();
+	if (std::isgreater(static_cast<double>(poolPointer) / static_cast<double>(c_POOL_SIZE), 0.8)) gc->run(stackFrame, pool, poolPointer);
 }
 
 void VM::del()

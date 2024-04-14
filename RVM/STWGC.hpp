@@ -1,11 +1,13 @@
 #pragma once
 
-#include "BaseGC.hpp"
-#include "logging.hpp"
+#include <algorithm>
+#include <cstring>
 
-class EpsilonGC : public BaseGC {
+#include "BaseGC.hpp"
+
+class STWGC : public BaseGC {
 public:
-	EpsilonGC() = default;
+	STWGC() = default;
 
 	void run(StackFrameManager&, std::shared_ptr<std::byte[]>&, stackType&) override;
 };
