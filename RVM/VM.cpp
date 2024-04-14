@@ -36,7 +36,7 @@ void VM::ld(const uint16_t& variableNumber)
 				++stackPointer;
 			}
 		} break;
-		default: throw RVMError("Invalid object type");
+		default: throw ExecutorError("Invalid object type");
 	}
 }
 
@@ -66,7 +66,7 @@ void VM::sv(const uint16_t& variableNumber)
 			}
 			setValue(convertor.value_double);
 		} break;
-		default: throw RVMError("Invalid object type");
+		default: throw ExecutorError("Invalid object type");
 	}
 }
 
@@ -149,7 +149,7 @@ void VM::pops()
 
 void VM::allocate(const stackType& objectNumber)
 {
-	if (objectNumber < 0 || objectNumber >= objectRepresentationTable.size()) throw RVMError("Invalid object number passed to the Object Representation Table");
+	if (objectNumber < 0 || objectNumber >= objectRepresentationTable.size()) throw ExecutorError("Invalid object number passed to the Object Representation Table");
 
 	auto objectType = objectRepresentationTable[objectNumber];
 	stackType allocationOffset = 0;
@@ -163,7 +163,7 @@ void VM::allocate(const stackType& objectNumber)
 
 	if (objectType == ObjectType::INT || objectType == ObjectType::REF) allocateObject.template operator()<stackType>();
 	else if (objectType == ObjectType::DOUBLE) allocateObject.template operator()<double>();
-	else throw RVMError("Invalid object type");
+	else throw ExecutorError("Invalid object type");
 
 	stackFrame.addVariable(allocationOffset);
 

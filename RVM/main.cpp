@@ -29,7 +29,7 @@ static void parseArguments(bitmode& mode, const auto c_arguments)
 	{
 		iter++;
 		if (iter == c_arguments.end())
-			throw RVMError("cannot recognize command line arguments");
+			throw ArgumentParserError("cannot recognize command line arguments");
 	};
 
 	for (auto c_i = c_arguments.begin() + 1; c_i != c_arguments.end(); c_i++)
@@ -50,7 +50,7 @@ static void parseArguments(bitmode& mode, const auto c_arguments)
 		}
 		else
 		{
-			throw RVMError("cannot recognize command line arguments");
+			throw ArgumentParserError("cannot recognize command line arguments");
 		}
 	}
 }

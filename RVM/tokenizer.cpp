@@ -29,7 +29,7 @@ void Tokenizer::tokenize(const std::string& c_lineFromScanner, const unsigned& c
 		recognize(newToken, slice.mode);
 
 		if (newToken.tokenState == TokenState::word && tokens.size() == 0)
-			throw RVMError(c_lexerError + "cannot recognize the instruction " + newToken.stringValue, newToken.lineNumber);
+			throw LexerError("cannot recognize the instruction " + newToken.stringValue, newToken.lineNumber);
 
 		currentPoint += slice.length;
 	

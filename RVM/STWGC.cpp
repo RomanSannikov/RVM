@@ -15,7 +15,7 @@ void STWGC::run(StackFrameManager& frames, std::shared_ptr<std::byte[]>& pool, s
 				case ObjectType::DOUBLE:
 					objectSize = sizeof(Object<double>);
 					break;
-				default: throw RVMError("Invalid object type");
+				default: throw GCError("Invalid object type");
 			}
 			std::memmove(static_cast<std::byte*>(pool.get()) + offset, static_cast<std::byte*>(pool.get()) + variable, objectSize);
 			variable = offset;

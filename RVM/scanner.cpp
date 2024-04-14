@@ -13,7 +13,7 @@ bool Scanner::isEOF() { return file.eof(); }
 std::string Scanner::getLine(std::string& scannedLine)
 {
 	if (!file.is_open())
-		throw RVMError(c_scannerError + "The file is not open!");
+		throw ScannerError("The file is not open!");
 
 	std::getline(file, scannedLine);
 	++lineNumber;
@@ -25,7 +25,7 @@ std::string Scanner::getLine(std::string& scannedLine)
 const std::vector<instructionType> Scanner::readBinary()
 {
 	if (!file.is_open())
-		throw RVMError(c_scannerError + "The file is not open!");
+		throw ScannerError("The file is not open!");
 
 	std::string scannedLine;
 	std::vector<instructionType> instructions;

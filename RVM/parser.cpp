@@ -50,7 +50,7 @@ void Parser::parse(const std::vector<Token>& c_tokens)
 		instructions.push_back(static_cast<instructionType>(it_currentToken->tokenState));
 	}
 	else
-		throw RVMError(c_parserError + "cannot make an instruction", it_currentToken->lineNumber);
+		throw ParserError("cannot make an instruction", it_currentToken->lineNumber);
 
 	it_lastToken = it_currentToken;
 	++it_currentToken;
@@ -59,7 +59,7 @@ void Parser::parse(const std::vector<Token>& c_tokens)
 		checkArguments(it_currentToken, it_lastToken, instructionValue, c_tokens.end());
 
 	if (it_currentToken != c_tokens.end())
-		throw RVMError(c_parserError + "too many arguments", it_currentToken->lineNumber);
+		throw ParserError("too many arguments", it_currentToken->lineNumber);
 }
 
 
@@ -68,7 +68,7 @@ void Parser::completeParsing()
 	completeJumpInstructions();
 
 	if (!wasHlt)
-		throw RVMError(c_parserError + "There is no HLT instruction. It's an undefined behavior without the instructions");
+		throw ParserError("There is no HLT instruction. It's an undefined behavior without the instructions");
 }
 
 
@@ -88,7 +88,7 @@ void Parser::completeJumpInstructions()
 			}
 		}
 		else 
-			throw RVMError(c_parserError + "label " + i + " hasn't been found");
+			throw ParserError("label " + i + " hasn't been found");
 	}
 }
 
@@ -99,7 +99,7 @@ void Parser::addLocationOfLabel(const std::string& c_labelName, const uint16_t&&
 	jumpTableNode jumpTableNode;
 
 	if (c_it_jumpTableNode != jumpTable.end() && c_it_jumpTableNode->second.locationsOfJumps.size() == 0)
-		throw RVMError(c_parserError + "The label " + c_it_jumpTableNode->first + " was defined several times!");
+		throw ParserError("The label " + c_it_jumpTableNode->first + " was defined several times!");
 	else if (c_it_jumpTableNode == jumpTable.end())
 	{
 		jumpTableNode.locationOfLabel = c_locationLabel;
@@ -135,7 +135,7 @@ void Parser::addLocationOfJump(const std::string& c_labelName, const uint16_t &&
 		labelNames.push_back(c_labelName);
 	}
 	else if (findLocationOfJump(c_it_jumpTableNode, c_locationOfJump) != c_it_jumpTableNode->second.locationsOfJumps.end())
-		throw RVMError(c_parserError + "jump instruction is already exits");
+		throw ParserError("jump instruction is already exits");
 	else
 		c_it_jumpTableNode->second.locationsOfJumps.push_back(c_locationOfJump);
 
@@ -167,9 +167,9 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 		--numberOfIterations, instructionValuePattern >>= 4, ++it_currentToken, ++i)
 	{
 		if (it_currentToken == c_it_tokenEnd)
-			throw RVMError(c_parserError + "too few arguments", it_currentToken->lineNumber);
+			throw ParserError("too few arguments", it_currentToken->lineNumber);
 		else if (valueTypes[i] != it_currentToken->tokenState)
-			throw RVMError(c_parserError + "the value isn't the correct type", it_currentToken->lineNumber);
+			throw ParserError("the value isn't the correct type", it_currentToken->lineNumber);
 
 		if (c_instructionValue & instructionValuePattern)
 		{
@@ -193,7 +193,7 @@ void Parser::makeValue(const Token& c_token)
 	if (c_token.tokenState == TokenState::number)
 	{
 		try { instructions.push_back(std::stoi(c_token.stringValue)); }
-		catch (const std::invalid_argument& invalidArgument) { throw RVMError(c_parserError + "the value must be a number", c_token.lineNumber); }
+		catch (const std::invalid_argument& invalidArgument) { throw ParserError("the value must be a number", c_token.lineNumber); }
 	}
 	else if (c_token.tokenState == TokenState::word)
 	{
@@ -201,7 +201,7 @@ void Parser::makeValue(const Token& c_token)
 		instructions.push_back(0);
 	}
 	else
-		throw RVMError(c_parserError + "not an argument", c_token.lineNumber);
+		throw ParserError("not an argument", c_token.lineNumber);
 }
 
 
