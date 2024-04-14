@@ -88,15 +88,19 @@ NUM STR NUM STR
 1value  2value
 */
 static constexpr int NONE = 0b00000000;
+static constexpr int NUM1 = 0b11000000;
+static constexpr int STR1 = 0b00110000;
+static constexpr int NUM2 = 0b00001100;
+static constexpr int STR2 = 0b00000011;
 const std::array<instructionType, 31> c_instructionValues
 				{ NONE, NONE, NONE, NONE, // add sub mul div
 				NONE, NONE, // inc dec
 				NONE, NONE, // ld sv 
-				0b00110000, 0b00110000, 0b00110000, 0b00110000, 0b00110000, // jmp jne je jz jnz
+				STR1, STR1, STR1, STR1, STR1, // jmp jne je jz jnz
 				NONE, NONE, NONE, // eq gr ls
 				NONE, NONE, NONE, NONE, NONE, // and or nand xor not
-				0b11000000, // dup
-				0b00110000, NONE, // call ret
-				0b11000000, 0b00110000, NONE, NONE, // pushn pushs popn pops
-				0b11000000, NONE, // new del
+				NUM1, // dup
+				STR1, NONE, // call ret
+				NUM1, STR1, NONE, NONE, // pushn pushs popn pops
+				NUM1, NONE, // new del
 				NONE }; // hlt
