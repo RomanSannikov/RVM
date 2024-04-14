@@ -90,7 +90,7 @@ Also, as you can see, the Rolang ByteCode must end with the `hlt` instruction.
 
 ### Rolang ByteCode instructions:
 
-The VM have a set of 31 instructions.
+The VM have a set of 30 instructions.
 
 ```
 add
@@ -122,7 +122,6 @@ pushs  <word>
 popn   <num>
 pops   <word>
 new    <num>
-del    <word>
 hlt
 ```
 

@@ -101,7 +101,6 @@ private:
 	void pops();
 
 	void allocate(const stackType&);
-	void del();
 
 	friend class TestFunctions;
 };

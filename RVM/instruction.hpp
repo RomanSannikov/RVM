@@ -46,7 +46,6 @@ enum class TokenState : instructionType
 	op_pops,
 
 	op_new,
-	op_del,
 
 	op_hlt,
 
@@ -68,7 +67,7 @@ const std::vector<std::string> c_stringInstructions =
 	"dup",
 	"call", "ret",
 	"pushn", "pushs", "popn", "pops",
-	"new", "del", 
+	"new",
 	"hlt"
 };
 
@@ -101,5 +100,5 @@ const std::array<instructionType, 31> c_instructionValues
 				NUM1, // dup
 				STR1, NONE, // call ret
 				NUM1, STR1, NONE, NONE, // pushn pushs popn pops
-				NUM1, NONE, // new del
+				NUM1, // new
 				NONE }; // hlt

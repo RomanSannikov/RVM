@@ -171,11 +171,6 @@ void VM::allocate(const stackType& objectNumber)
 	if (std::isgreater(static_cast<double>(poolPointer) / static_cast<double>(c_POOL_SIZE), 0.8)) gc->run(stackFrame, pool, poolPointer);
 }
 
-void VM::del()
-{
-	// Todo: Consider this either removing or implementing
-}
-
 
 void VM::run(const std::vector<instructionType>& c_instructions)
 {
@@ -270,8 +265,7 @@ void VM::doInstruction(const TokenState& c_opcode)
 	else if (c_opcode == TokenState::op_new) {
 		stackFrame.incProgramPointer();
 		allocate(instructions[stackFrame.getProgramPointer()]);
-	} else if (c_opcode == TokenState::op_del)
-		del();
+	}
 }
 
 
