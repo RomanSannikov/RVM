@@ -66,12 +66,12 @@ TEST(File, DISABLED_Fibonacci) {
 	}
 }
 
-TEST(File, DISABLED_FractorialTxt) {
-	const std::string c_filename = "tests/data/fractorial.txt";
+TEST(File, FactorialTxt) {
+	const std::string c_filename = "tests/data/factorial.txt";
 
 	Parser parser;
 
-	auto fractorial = [](int n, auto&& self) -> int { return (n <= 1 ? 1 : n * self(n - 1, self)); };
+	auto factorial = [](int n, auto&& self) -> int { return (n <= 1 ? 1 : n * self(n - 1, self)); };
 
 	parser.parseFromFile(c_filename, false);
 
@@ -83,16 +83,16 @@ TEST(File, DISABLED_FractorialTxt) {
 		vm.run(instructions);
 
 		EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-		EXPECT_EQ(TestFunctions::getStack(vm).back(), fractorial(i, fractorial));
+		EXPECT_EQ(TestFunctions::getStack(vm).back(), factorial(i, factorial));
 	}
 }
 
-TEST(File, DISABLED_FractorialBytecode) {
-	const std::string c_filename = "tests/data/fractorial.rbc";
+TEST(File, FactorialBytecode) {
+	const std::string c_filename = "tests/data/factorial.rbc";
 
 	Parser parser;
 
-	auto fractorial = [](int n, auto&& self) -> int { return (n <= 1 ? 1 : n * self(n - 1, self)); };
+	auto factorial = [](int n, auto&& self) -> int { return (n <= 1 ? 1 : n * self(n - 1, self)); };
 
 	parser.parseFromFile(c_filename, true);
 
@@ -104,6 +104,6 @@ TEST(File, DISABLED_FractorialBytecode) {
 		vm.run(instructions);
 
 		EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-		EXPECT_EQ(TestFunctions::getStack(vm).back(), fractorial(i, fractorial));
+		EXPECT_EQ(TestFunctions::getStack(vm).back(), factorial(i, factorial));
 	}
 }

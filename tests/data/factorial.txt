@@ -11,11 +11,7 @@ ls
 jnz return
 popn
 popn
-new 1 n
-sv n
-ld n
-ld n
-del n
+dup 1
 dec
 call factorial
 mul
