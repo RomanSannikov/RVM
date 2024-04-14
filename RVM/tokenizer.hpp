@@ -1,11 +1,9 @@
 #pragma once
 
-#include <array>
 #include <algorithm>
-#include <cstring>
 
 #include "instruction.hpp"
-#include "error.hpp"
+#include "exceptions.hpp"
 
 class Tokenizer
 {

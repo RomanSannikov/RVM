@@ -1,23 +1,17 @@
 #pragma once
 
 #include <cmath>
-#include <stack>
 #include <vector>
 #include <cassert>
 #include <memory>
-#include <unordered_map>
+#include <functional>
 
-#include "BaseGC.hpp"
-#include "EpsilonGC.hpp"
 #include "STWGC.hpp"
-#include "parser.hpp"
 #include "instruction.hpp"
 #include "logging.hpp"
 #include "object.hpp"
 #include "StackFrameManager.hpp"
 #include "utils.hpp"
-
-class Parser;
 
 class VM
 {

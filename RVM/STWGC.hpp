@@ -1,7 +1,7 @@
 #pragma once
 
-#include <algorithm>
 #include <cstring>
+#include <memory>
 
 #include "BaseGC.hpp"
 

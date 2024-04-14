@@ -1,6 +1,6 @@
 #pragma once
 
-#include "error.hpp"
+#include "exceptions.hpp"
 #include "object.hpp"
 #include "StackFrameManager.hpp"
 

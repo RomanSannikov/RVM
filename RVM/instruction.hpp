@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 #include <array>
-#include <functional>
 
 using instructionType = uint8_t;
 

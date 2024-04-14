@@ -6,7 +6,7 @@
 #include <bitset>
 #include <cassert>
 
-#include "error.hpp"
+#include "exceptions.hpp"
 #include "instruction.hpp"
 
 class Scanner

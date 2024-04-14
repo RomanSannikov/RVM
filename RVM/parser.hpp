@@ -3,14 +3,11 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
-#include <fstream>
-#include <bitset> // Fix: just for tests
-#include <list>
 
 #include "instruction.hpp"
 #include "scanner.hpp"
 #include "tokenizer.hpp"
-#include "error.hpp"
+#include "exceptions.hpp"
 #include "logging.hpp"
 
 class Parser
