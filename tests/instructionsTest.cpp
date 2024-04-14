@@ -134,9 +134,9 @@ TEST(Instructions, New3Times)
 	VM vm;
 	std::vector<instructionType> instructions = { static_cast<instructionType>(TokenState::op_new), 0,
 										 static_cast<instructionType>(TokenState::op_new), 1,
-										 static_cast<instructionType>(TokenState::op_new), 2,};
+										 static_cast<instructionType>(TokenState::op_new), 2};
 	vm.run(instructions);
-	EXPECT_EQ(TestFunctions::getStack(vm).size(), 3);
+	EXPECT_EQ(TestFunctions::getStack(vm).size(), 0);
 }
 
 TEST(Instructions, NewSvInt)
@@ -144,7 +144,7 @@ TEST(Instructions, NewSvInt)
 	VM vm;
 	std::vector<instructionType> instructions = { static_cast<instructionType>(TokenState::op_pushn), 99,
 										 static_cast<instructionType>(TokenState::op_new), 0,
-										 static_cast<instructionType>(TokenState::op_sv)};
+										 static_cast<instructionType>(TokenState::op_sv), 0};
 	vm.run(instructions);
 	EXPECT_EQ(TestFunctions::getStack(vm).size(), 0);
 }
@@ -154,8 +154,8 @@ TEST(Instructions, NewSvIntLd)
 	VM vm;
 	std::vector<instructionType> instructions = { static_cast<instructionType>(TokenState::op_pushn), 99,
 										 static_cast<instructionType>(TokenState::op_new), 0,
-										 static_cast<instructionType>(TokenState::op_sv),
-										 static_cast<instructionType>(TokenState::op_ld)};
+										 static_cast<instructionType>(TokenState::op_sv), 0,
+										 static_cast<instructionType>(TokenState::op_ld), 0};
 	vm.run(instructions);
 	EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
 	EXPECT_EQ(TestFunctions::getStack(vm).back(), 99);

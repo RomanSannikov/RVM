@@ -18,7 +18,7 @@ TEST(File, SimpleTestTxt) {
 	EXPECT_EQ(TestFunctions::getStack(vm).size(), 0);
 }
 
-TEST(File, DISABLED_Fibonacci) {
+TEST(File, Fibonacci) {
 	const std::string c_filename = "tests/data/fibonacci.txt";
 
 	Parser parser;

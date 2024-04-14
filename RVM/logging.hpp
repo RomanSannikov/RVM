@@ -28,8 +28,9 @@ public:
 	static void printStack(const std::vector<T>& stack, const std::string& message = "")
 	{
 		#ifndef NDEBUG
-		std::cout << std::endl << "STACK: " << message << std::endl;
+		std::cout << "STACK: " << message << std::endl;
 		for (auto i : stack) std::cout << std::bitset<sizeof(T) * 8>(i) << std::endl;
+		std::cout << std::endl;
 		#endif
 	}
 

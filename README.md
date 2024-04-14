@@ -99,8 +99,8 @@ mul
 div
 inc
 dec
-ld     <word>
-sv     <word>
+ld     <num>
+sv     <num>
 jmp    <word>
 jne    <word>
 je     <word>

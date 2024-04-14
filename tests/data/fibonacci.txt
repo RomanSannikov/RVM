@@ -1,19 +1,18 @@
 pushn 0
 pushn 1
 pushn 22
-call fibonacciinit
+call fibonacci
 hlt
 
-fibonacciinit:
-new 1 maxvalue
-new 1 currentvalue
-new 1 lastvalue
 fibonacci:
-sv maxvalue
-sv currentvalue
-sv lastvalue
-ld currentvalue
-ld maxvalue
+new 0
+new 0
+new 0
+sv 0
+sv 1
+sv 2
+ld 1
+ld 0
 gr
 jnz quickreturn
 popn
@@ -21,17 +20,14 @@ eq
 jnz quickreturn
 popn
 popn
-ld lastvalue
-ld currentvalue
+ld 2
+ld 1
 add
-ld maxvalue
+ld 0
 call fibonacci
 ret
 
 quickreturn:
-del maxvalue
-del currentvalue
-del lastvalue
 popn
 popn
 ret

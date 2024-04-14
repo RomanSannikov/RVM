@@ -95,7 +95,7 @@ static constexpr int STR2 = 0b00000011;
 const std::array<instructionType, 31> c_instructionValues
 				{ NONE, NONE, NONE, NONE, // add sub mul div
 				NONE, NONE, // inc dec
-				NONE, NONE, // ld sv 
+				NUM1, NUM1, // ld sv 
 				STR1, STR1, STR1, STR1, STR1, // jmp jne je jz jnz
 				NONE, NONE, NONE, // eq gr ls
 				NONE, NONE, NONE, NONE, NONE, // and or nand xor not

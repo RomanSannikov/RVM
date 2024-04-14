@@ -10,10 +10,11 @@ void VM::inc() { ++stack[stackPointer - 1]; }
 
 void VM::dec() { --stack[stackPointer - 1]; }
 
-void VM::ld(const stackType& offset)
+void VM::ld(const uint16_t& variableNumber)
 {
-	auto objectType = reinterpret_cast<BaseObject*>(static_cast<char*>(pool.get()) + offset)->getType();
-	auto getValue = [&]<Arithmetic T>() -> auto { return reinterpret_cast<Object<T>*>(static_cast<char*>(pool.get()) + offset)->getValue(); };
+	auto offset = stackFrame.getVariable(variableNumber);
+	auto objectType = reinterpret_cast<BaseObject*>(static_cast<std::byte*>(pool.get()) + offset)->getType();
+	auto getValue = [&]<Arithmetic T>() -> auto { return reinterpret_cast<Object<T>*>(static_cast<std::byte*>(pool.get()) + offset)->getValue(); };
 
 	switch(objectType) {
 		case ObjectType::INT:
@@ -21,6 +22,7 @@ void VM::ld(const stackType& offset)
 		{
 			auto value = getValue.template operator()<stackType>();
 			stack.push_back(value);
+			++stackPointer;
 		} break;
 		case ObjectType::DOUBLE:
 		{
@@ -29,27 +31,28 @@ void VM::ld(const stackType& offset)
 			//  Bytes of the double are stored on the stack like this: upper bytes are on the top
 			union { double value_double; uint64_t value_int; } convertor;
 			convertor.value_double = getValue.template operator()<double>();
-			for (unsigned i = 0; i < sizeof(decltype(convertor.value_int)) / sizeof(stackType); i++)
+			for (unsigned i = 0; i < sizeof(decltype(convertor.value_int)) / sizeof(stackType); i++) {
 				stack.push_back(static_cast<stackType>(convertor.value_int >> i * sizeof(stackType)));
+				++stackPointer;
+			}
 		} break;
 		default: throw RVMError("Invalid object type");
 	}
-
-	++stackPointer;
 }
 
-void VM::sv(const stackType& offset)
+void VM::sv(const uint16_t& variableNumber)
 {
-	auto objectType = reinterpret_cast<BaseObject*>(static_cast<char*>(pool.get()) + offset)->getType();
-	auto setValue = [&]<Arithmetic T>(const T& value) -> auto { return reinterpret_cast<Object<T>*>(static_cast<char*>(pool.get()) + offset)->setValue(value); };
+	auto offset = stackFrame.getVariable(variableNumber);
+	auto objectType = reinterpret_cast<BaseObject*>(static_cast<std::byte*>(pool.get()) + offset)->getType();
+	auto setValue = [&]<Arithmetic T>(const T& value) -> auto { return reinterpret_cast<Object<T>*>(static_cast<std::byte*>(pool.get()) + offset)->setValue(value); };
 
 	switch(objectType) {
 		case ObjectType::INT:
 		case ObjectType::REF:
 		{
+			setValue(stack.back());
 			stack.pop_back();
 			--stackPointer;
-			setValue(stack.back());
 		} break;
 		case ObjectType::DOUBLE:
 		{
@@ -65,43 +68,40 @@ void VM::sv(const stackType& offset)
 		} break;
 		default: throw RVMError("Invalid object type");
 	}
-
-	stack.pop_back();
-	--stackPointer;
 }
 
-void VM::jmp(const int16_t& c_destination) { programPointers.top() = c_destination; }
+void VM::jmp(const int16_t& c_destination) { stackFrame.setProgramPointer(c_destination); }
 
 void VM::jne(const int16_t& c_destination)
 {
 	if (stack[stackPointer - 1] != stack[stackPointer - 2])
-		programPointers.top() = c_destination;
+		stackFrame.setProgramPointer(c_destination);
 	else
-		++programPointers.top();
+		stackFrame.incProgramPointer();
 }
 
 void VM::je(const int16_t& c_destination)
 {
 	if (stack[stackPointer - 1] == stack[stackPointer - 2])
-		programPointers.top() = c_destination;
+		stackFrame.setProgramPointer(c_destination);
 	else
-		++programPointers.top();
+		stackFrame.incProgramPointer();
 }
 
 void VM::jz(const int16_t& c_destination)
 {
 	if (stack[stackPointer - 1] == 0)
-		programPointers.top() = c_destination;
+		stackFrame.setProgramPointer(c_destination);
 	else
-		++programPointers.top();
+		stackFrame.incProgramPointer();
 }
 
 void VM::jnz(const int16_t& c_destination)
 {
 	if (stack[stackPointer - 1])
-		programPointers.top() = c_destination;
+		stackFrame.setProgramPointer(c_destination);
 	else
-		++programPointers.top();
+		stackFrame.incProgramPointer();
 }
 
 // Todo: jl, jg
@@ -156,8 +156,8 @@ void VM::allocate(const stackType& objectNumber)
 
 	auto allocateObject = [&]<Arithmetic T>()
 	{
-		Object<T>* object = new(static_cast<char*>(pool.get()) + poolPointer) Object<T>(objectType);
-		allocationOffset = reinterpret_cast<char*>(object) - pool.get();
+		Object<T>* object = new(static_cast<std::byte*>(pool.get()) + poolPointer) Object<T>(objectType);
+		allocationOffset = reinterpret_cast<std::byte*>(object) - pool.get();
 		poolPointer += sizeof(Object<T>);
 	};
 
@@ -165,11 +165,10 @@ void VM::allocate(const stackType& objectNumber)
 	else if (objectType == ObjectType::DOUBLE) allocateObject.template operator()<double>();
 	else throw RVMError("Invalid object type");
 
+	stackFrame.addVariable(allocationOffset);
+
 	// Todo: Make this depend on arguments
 	if (std::isgreater(static_cast<double>(poolPointer) / static_cast<double>(c_POOL_SIZE), 0.8)) gc->run();
-
-	stack.push_back(allocationOffset);
-	stackPointer++;
 }
 
 void VM::del()
@@ -182,12 +181,13 @@ void VM::run(const std::vector<instructionType>& c_instructions)
 {
 	this->instructions = std::move(c_instructions);
 
-	for (; programPointers.top() < c_instructions.size(); ++programPointers.top())
+	for (; stackFrame.getProgramPointer() < c_instructions.size(); stackFrame.incProgramPointer())
 	{
-		instructionType currentInstruction = c_instructions[programPointers.top()];
+		instructionType currentInstruction = c_instructions[stackFrame.getProgramPointer()];
 		TokenState opcode = static_cast<TokenState>(currentInstruction);
 		if (opcode == TokenState::op_hlt)
 			break;
+		Logger::print("Instruction: " + Logger::getInstructionName(currentInstruction));
 		doInstruction(opcode);
 		assert(stackPointer >= 0);
 
@@ -219,20 +219,23 @@ void VM::doInstruction(const TokenState& c_opcode)
 		int index = static_cast<int>(c_opcode) - static_cast<int>(TokenState::op_inc);
 		incAndDecFunctions[index]();
 	}
-	else if (c_opcode == TokenState::op_ld)
-		ld(a);
-	else if (c_opcode == TokenState::op_sv)
-		sv(a);
-	else if ((c_opcode >= TokenState::op_jmp && c_opcode <= TokenState::op_jnz) || c_opcode == TokenState::op_call)
+	else if (c_opcode == TokenState::op_ld) {
+		stackFrame.incProgramPointer();
+		ld(instructions[stackFrame.getProgramPointer()]);
+	} else if (c_opcode == TokenState::op_sv) {
+		stackFrame.incProgramPointer();
+		sv(instructions[stackFrame.getProgramPointer()]);
+	} else if ((c_opcode >= TokenState::op_jmp && c_opcode <= TokenState::op_jnz) || c_opcode == TokenState::op_call)
 	{
-		++programPointers.top();
-		// Desc: `(int16_t)0x00FF` is intended to set the high nibble of `(int16_t)instructions[programPointers.top() + 1]` to zero, since the variable is initially of type `uint8_t`
-		int16_t destination = (int16_t)(((int16_t)((int16_t)instructions[programPointers.top()]) << 8) | (int16_t)0x00FF & (int16_t)instructions[programPointers.top() + 1]);
+		stackFrame.incProgramPointer();
+		// Desc: `(int16_t)0x00FF` is intended to set the high nibble of `(int16_t)instructions[stackFrame.getProgramPointer() + 1]` to zero, since the variable is initially of type `uint8_t`
+		int16_t destination = (int16_t)(((int16_t)((int16_t)instructions[stackFrame.getProgramPointer()]) << 8) | (int16_t)0x00FF & (int16_t)instructions[stackFrame.getProgramPointer() + 1]);
 		int index = (c_opcode != TokenState::op_call ? static_cast<int>(c_opcode) - static_cast<int>(TokenState::op_jmp) : 0);
 		// Desc: if it's the call instruction then increment `programPointer` to skip the call arguments and land on the next instructions
 		if (c_opcode == TokenState::op_call) {
-			auto newProgramPointer = ++programPointers.top();
-			programPointers.push(newProgramPointer);
+			stackFrame.incProgramPointer();
+			auto newProgramPointer = stackFrame.getProgramPointer();
+			stackFrame.pushFrame(newProgramPointer);
 		}
 		c_jumpFunctions[index](destination - 1);
 	}
@@ -250,34 +253,39 @@ void VM::doInstruction(const TokenState& c_opcode)
 		stack.pop_back();
 		stack.push_back(op_not(a));
 	}
-	else if (c_opcode == TokenState::op_dup)
-		dup(instructions[++programPointers.top()]);
-	else if (c_opcode == TokenState::op_ret)
-		programPointers.pop();
-	else if (c_opcode == TokenState::op_pushn)
-		pushn(instructions[++programPointers.top()]);
-	else if (c_opcode == TokenState::op_pushs)
+	else if (c_opcode == TokenState::op_dup) {
+		stackFrame.incProgramPointer();
+		dup(instructions[stackFrame.getProgramPointer()]);
+	} else if (c_opcode == TokenState::op_ret)
+		stackFrame.popFrame();
+	else if (c_opcode == TokenState::op_pushn) {
+		stackFrame.incProgramPointer();
+		pushn(instructions[stackFrame.getProgramPointer()]);
+	} else if (c_opcode == TokenState::op_pushs)
 		pushs(decodeString());
 	else if (c_opcode == TokenState::op_popn)
 		popn();
 	else if (c_opcode == TokenState::op_pops)
 		pops();
-	else if (c_opcode == TokenState::op_new)
-		allocate(instructions[++programPointers.top()]);
-	else if (c_opcode == TokenState::op_del)
+	else if (c_opcode == TokenState::op_new) {
+		stackFrame.incProgramPointer();
+		allocate(instructions[stackFrame.getProgramPointer()]);
+	} else if (c_opcode == TokenState::op_del)
 		del();
 }
 
 
 std::string VM::decodeString()
 {
-	instructionType character = instructions[++programPointers.top()];
+	stackFrame.incProgramPointer();
+	instructionType character = instructions[stackFrame.getProgramPointer()];
 	std::string result;
 
 	while (character != 0)
 	{
 		result.push_back(character);
-		character = instructions[++programPointers.top()];
+		stackFrame.incProgramPointer();
+		character = instructions[stackFrame.getProgramPointer()];
 	}
 
 	return result;
