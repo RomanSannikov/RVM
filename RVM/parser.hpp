@@ -3,6 +3,7 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include <filesystem>
 
 #include "instruction.hpp"
 #include "scanner.hpp"
@@ -32,8 +33,8 @@ public:
 	Parser() : wasHlt(false) {}
 
 public:
-	void parseFromFile(const std::string&, bool);
-	void outputInstructions(std::string);
+	void parseFromFile(const std::filesystem::path&, bool);
+	void outputInstructions(std::filesystem::path);
 	constexpr std::vector<instructionType>& getInstructions() { return instructions; }
 
 private:

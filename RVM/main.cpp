@@ -3,13 +3,14 @@
 #include <span>
 #include <ranges>
 #include <string_view>
+#include <filesystem>
 
 #include "parser.hpp"
 #include "VM.hpp"
 
 
 using bitmode = std::bitset<8>;
-std::string filename;
+std::filesystem::path filename;
 
 
 enum programMode
@@ -56,7 +57,7 @@ static void parseArguments(bitmode& mode, const auto c_arguments)
 }
 
 
-static void startVirtualMachine(const std::string& c_filename, const bitmode& c_mode)
+static void startVirtualMachine(const std::filesystem::path& c_filename, const bitmode& c_mode)
 {
 	Parser parser;
 	VM vm;

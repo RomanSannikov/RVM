@@ -1,7 +1,7 @@
 #include "parser.hpp"
 
 
-void Parser::parseFromFile(const std::string& c_filename, bool in_binary)
+void Parser::parseFromFile(const std::filesystem::path& c_filename, bool in_binary)
 {
 	Scanner scanner(c_filename);
 	Tokenizer tokenizer;
@@ -112,17 +112,6 @@ void Parser::addLocationOfLabel(const std::string& c_labelName, const uint16_t&&
 }
 
 
-auto Parser::findLocationOfJump(const jumpTableListIter& c_labelIterator, const unsigned& c_locationToFind)
-{
-	if (c_labelIterator != jumpTable.end())
-		for (auto i = c_labelIterator->second.locationsOfJumps.begin(); i != c_labelIterator->second.locationsOfJumps.end(); ++i)
-			if (*i == c_locationToFind)
-				return i;
-
-	return c_labelIterator->second.locationsOfJumps.end();
-}
-
-
 void Parser::addLocationOfJump(const std::string& c_labelName, const uint16_t && c_locationOfJump)
 {
 	const auto& c_it_jumpTableNode = jumpTable.find(c_labelName);
@@ -134,7 +123,8 @@ void Parser::addLocationOfJump(const std::string& c_labelName, const uint16_t &&
 		jumpTable.insert(std::make_pair(c_labelName, jumpTableNode));
 		labelNames.push_back(c_labelName);
 	}
-	else if (findLocationOfJump(c_it_jumpTableNode, c_locationOfJump) != c_it_jumpTableNode->second.locationsOfJumps.end())
+	else if (std::find(c_it_jumpTableNode->second.locationsOfJumps.begin(), c_it_jumpTableNode->second.locationsOfJumps.end(), c_locationOfJump)
+			 != c_it_jumpTableNode->second.locationsOfJumps.end())
 		throw ParserError("jump instruction is already exits");
 	else
 		c_it_jumpTableNode->second.locationsOfJumps.push_back(c_locationOfJump);
@@ -152,8 +142,8 @@ void Parser::checkArguments(std::vector<Token>::const_iterator& it_currentToken,
 	for (uint8_t i = 0b11110000; i != 0; i >>= 4)
 		if (c_instructionValue & i)
 			++numberOfIterations;
-	
-	// Desc: Fiding out what value types are
+
+	// Desc: Finding out what value types are
 	for (uint8_t i = 0b11000000, index = 0, counter = 4; i != 0; i >>= 2, --counter)
 	{
 		if (c_instructionValue & i)
@@ -205,14 +195,9 @@ void Parser::makeValue(const Token& c_token)
 }
 
 
-void Parser::outputInstructions(std::string filename)
+void Parser::outputInstructions(std::filesystem::path filename)
 {
-	for (size_t i = filename.size() - 1; !filename.empty() && i == 0; --i)
-	{
-		if (filename[i] != '.') filename.pop_back();
-		else break;
-	}
-	filename.append("rbc");
+	filename.replace_extension("rbc");
 
 	std::ofstream output(filename);
 	for (const auto& i : instructions) output << std::bitset<8>(i);

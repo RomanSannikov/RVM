@@ -1,11 +1,12 @@
 #include <vector>
+#include <filesystem>
 
 #include <gtest/gtest.h>
 
 #include "testFunctions.hpp"
 
 TEST(File, SimpleTestTxt) {
-	const std::string c_filename = "tests/data/simpleTest.txt";
+	const std::filesystem::path c_filename = "tests/data/simpleTest.txt";
 
 	Parser parser;
 	VM vm;
@@ -19,7 +20,7 @@ TEST(File, SimpleTestTxt) {
 }
 
 TEST(File, Fibonacci) {
-	const std::string c_filename = "tests/data/fibonacci.txt";
+	const std::filesystem::path c_filename = "tests/data/fibonacci.txt";
 
 	Parser parser;
 
@@ -67,7 +68,7 @@ TEST(File, Fibonacci) {
 }
 
 TEST(File, FactorialTxt) {
-	const std::string c_filename = "tests/data/factorial.txt";
+	const std::filesystem::path c_filename = "tests/data/factorial.txt";
 
 	Parser parser;
 
@@ -88,7 +89,7 @@ TEST(File, FactorialTxt) {
 }
 
 TEST(File, FactorialBytecode) {
-	const std::string c_filename = "tests/data/factorial.rbc";
+	const std::filesystem::path c_filename = "tests/data/factorial.rbc";
 
 	Parser parser;
 

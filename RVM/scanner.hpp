@@ -5,6 +5,7 @@
 #include <vector>
 #include <bitset>
 #include <cassert>
+#include <filesystem>
 
 #include "exceptions.hpp"
 #include "instruction.hpp"
@@ -17,13 +18,11 @@ private:
 
 public:
 	Scanner() = default;
-	explicit Scanner(const std::string& c_filename) : file(c_filename) {}
-	explicit Scanner(const char* const c_filename) : file(c_filename) {}
+	explicit Scanner(const std::filesystem::path& c_filename) : file(c_filename) {}
 
 	~Scanner() { file.close(); }
 	
-	void open(const std::string&);
-	void open(const char* const);
+	void open(const std::filesystem::path&);
 	
 	bool isEOF();
 

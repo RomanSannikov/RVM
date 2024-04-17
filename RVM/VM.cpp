@@ -118,8 +118,7 @@ stackType VM::op_not(const stackType& a) { return ~a; }
 
 void VM::dup(const stackType& numberOfDuplicates) {
 	assert(stack.size() >= numberOfDuplicates);
-	for (stackType i = 0; i < numberOfDuplicates; i++)
-		stack.push_back(stack[stack.size() - numberOfDuplicates]);
+	std::copy_n(stack.end() - numberOfDuplicates, numberOfDuplicates, std::back_inserter(stack));
 	stackPointer += numberOfDuplicates;
 }
 
