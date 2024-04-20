@@ -20,16 +20,16 @@ public:
 	}
 
 	template <Integral T, Integral K>
-	static void printStack(const std::vector<T>& stack, const K& instruction) {
+	static void printStack(const Stack<T>& stack, const K& instruction) {
 		printStack(stack, "(" + getInstructionName(instruction) + ")");
 	}
 
 	template <Integral T>
-	static void printStack(const std::vector<T>& stack, const std::string& message = "")
+	static void printStack(const Stack<T>& stack, const std::string& message = "")
 	{
 		#ifndef NDEBUG
 		std::cout << "STACK: " << message << std::endl;
-		for (auto i : stack) std::cout << std::bitset<sizeof(T) * 8>(i) << std::endl;
+		for (const auto& i : stack) std::cout << std::bitset<sizeof(T) * 8>(i) << std::endl;
 		std::cout << std::endl;
 		#endif
 	}

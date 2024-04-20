@@ -33,7 +33,7 @@ TEST(File, Fibonacci) {
 		vm.run(instructions);
 
 		EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-		EXPECT_EQ(TestFunctions::getStack(vm).back(), 1);
+		EXPECT_EQ(TestFunctions::getStack(vm)[-1], 1);
 	}
 
 	{
@@ -43,7 +43,7 @@ TEST(File, Fibonacci) {
 		vm.run(instructions);
 
 		EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-		EXPECT_EQ(TestFunctions::getStack(vm).back(), 13);
+		EXPECT_EQ(TestFunctions::getStack(vm)[-1], 13);
 	}
 
 	{
@@ -53,7 +53,7 @@ TEST(File, Fibonacci) {
 		vm.run(instructions);
 
 		EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-		EXPECT_EQ(TestFunctions::getStack(vm).back(), 34);
+		EXPECT_EQ(TestFunctions::getStack(vm)[-1], 34);
 	}
 
 	{
@@ -63,7 +63,7 @@ TEST(File, Fibonacci) {
 		vm.run(instructions);
 
 		EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-		EXPECT_EQ(TestFunctions::getStack(vm).back(), 89);
+		EXPECT_EQ(TestFunctions::getStack(vm)[-1], 89);
 	}
 }
 
@@ -84,7 +84,7 @@ TEST(File, FactorialTxt) {
 		vm.run(instructions);
 
 		EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-		EXPECT_EQ(TestFunctions::getStack(vm).back(), factorial(i, factorial));
+		EXPECT_EQ(TestFunctions::getStack(vm)[-1], factorial(i, factorial));
 	}
 }
 
@@ -105,6 +105,6 @@ TEST(File, FactorialBytecode) {
 		vm.run(instructions);
 
 		EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-		EXPECT_EQ(TestFunctions::getStack(vm).back(), factorial(i, factorial));
+		EXPECT_EQ(TestFunctions::getStack(vm)[-1], factorial(i, factorial));
 	}
 }

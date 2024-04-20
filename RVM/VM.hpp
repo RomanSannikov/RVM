@@ -16,7 +16,6 @@
 class VM
 {
 private:
-	const size_t c_STACK_SIZE = 8;
 	const size_t c_POOL_SIZE = 1024;
 
 	std::shared_ptr<std::byte[]> pool = std::make_shared<std::byte[]>(c_POOL_SIZE);
@@ -25,11 +24,9 @@ private:
 	std::shared_ptr<BaseGC> gc = std::make_shared<STWGC>();
 
 	std::vector<ObjectType> objectRepresentationTable = { ObjectType::INT, ObjectType::DOUBLE, ObjectType::REF };
-	std::vector<stackType> stack;
+	Stack<stackType> stack;
 	StackFrameManager stackFrame;
 	std::vector<instructionType> instructions;
-
-	int32_t stackPointer = 0;
 
 	const std::array < std::function<stackType(const stackType&, const stackType&)>, 4> c_arithmeticFunctions =
 	{ std::bind(&VM::add, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::sub, this, std::placeholders::_1, std::placeholders::_2),
@@ -52,11 +49,7 @@ private:
 	  std::bind(&VM::op_nand, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::op_xor, this, std::placeholders::_1, std::placeholders::_2) };
 
 public:
-	VM()
-	{
-		stack.reserve(c_STACK_SIZE);
-		stackFrame.pushFrame();
-	}
+	VM() { stackFrame.pushFrame(); }
 
 public:
 	void run(const std::vector<instructionType>&);

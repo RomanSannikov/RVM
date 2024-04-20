@@ -1,14 +1,14 @@
 #include "VM.hpp"
 
 
-stackType VM::add(const stackType& a, const stackType& b) { --stackPointer; return b + a;}
-stackType VM::sub(const stackType& a, const stackType& b) { --stackPointer; return b - a; }
-stackType VM::mul(const stackType& a, const stackType& b) { --stackPointer; return b * a; }
-stackType VM::divide(const stackType& a, const stackType& b) { --stackPointer; return b / a; }
+stackType VM::add(const stackType& a, const stackType& b) { return b + a;}
+stackType VM::sub(const stackType& a, const stackType& b) { return b - a; }
+stackType VM::mul(const stackType& a, const stackType& b) { return b * a; }
+stackType VM::divide(const stackType& a, const stackType& b) { return b / a; }
 
-void VM::inc() { ++stack[stackPointer - 1]; }
+void VM::inc() { ++stack[-1]; }
 
-void VM::dec() { --stack[stackPointer - 1]; }
+void VM::dec() { --stack[-1]; }
 
 void VM::ld(const uint16_t& variableNumber)
 {
@@ -21,8 +21,7 @@ void VM::ld(const uint16_t& variableNumber)
 		case ObjectType::REF:
 		{
 			auto value = getValue.template operator()<stackType>();
-			stack.push_back(value);
-			++stackPointer;
+			stack += value;
 		} break;
 		case ObjectType::DOUBLE:
 		{
@@ -31,10 +30,8 @@ void VM::ld(const uint16_t& variableNumber)
 			//  Bytes of the double are stored on the stack like this: upper bytes are on the top
 			union { double value_double; uint64_t value_int; } convertor;
 			convertor.value_double = getValue.template operator()<double>();
-			for (unsigned i = 0; i < sizeof(decltype(convertor.value_int)) / sizeof(stackType); i++) {
-				stack.push_back(static_cast<stackType>(convertor.value_int >> i * sizeof(stackType)));
-				++stackPointer;
-			}
+			for (unsigned i = 0; i < sizeof(decltype(convertor.value_int)) / sizeof(stackType); i++)
+				stack += static_cast<stackType>(convertor.value_int >> i * sizeof(stackType));
 		} break;
 		default: throw ExecutorError("Invalid object type");
 	}
@@ -50,9 +47,8 @@ void VM::sv(const uint16_t& variableNumber)
 		case ObjectType::INT:
 		case ObjectType::REF:
 		{
-			setValue(stack.back());
-			stack.pop_back();
-			--stackPointer;
+			setValue(stack[-1]);
+			--stack;
 		} break;
 		case ObjectType::DOUBLE:
 		{
@@ -60,9 +56,8 @@ void VM::sv(const uint16_t& variableNumber)
 			union { double value_double; uint64_t value_int; } convertor;
 			convertor.value_int = 0;
 			for (unsigned i = 0; i < sizeof(decltype(convertor.value_int)) / sizeof(stackType); i++) {
-				convertor.value_int = (convertor.value_int << static_cast<int>(i != 0) * sizeof(stackType)) | static_cast<decltype(convertor.value_int)>(stack.back());
-				stack.pop_back();
-				--stackPointer;
+				convertor.value_int = (convertor.value_int << static_cast<int>(i != 0) * sizeof(stackType)) | static_cast<decltype(convertor.value_int)>(stack[-1]);
+				--stack;
 			}
 			setValue(convertor.value_double);
 		} break;
@@ -74,7 +69,7 @@ void VM::jmp(const int16_t& c_destination) { stackFrame.setProgramPointer(c_dest
 
 void VM::jne(const int16_t& c_destination)
 {
-	if (stack[stackPointer - 1] != stack[stackPointer - 2])
+	if (stack[-1] != stack[-2])
 		stackFrame.setProgramPointer(c_destination);
 	else
 		stackFrame.incProgramPointer();
@@ -82,7 +77,7 @@ void VM::jne(const int16_t& c_destination)
 
 void VM::je(const int16_t& c_destination)
 {
-	if (stack[stackPointer - 1] == stack[stackPointer - 2])
+	if (stack[-1] == stack[-2])
 		stackFrame.setProgramPointer(c_destination);
 	else
 		stackFrame.incProgramPointer();
@@ -90,7 +85,7 @@ void VM::je(const int16_t& c_destination)
 
 void VM::jz(const int16_t& c_destination)
 {
-	if (stack[stackPointer - 1] == 0)
+	if (stack[-1] == 0)
 		stackFrame.setProgramPointer(c_destination);
 	else
 		stackFrame.incProgramPointer();
@@ -98,7 +93,7 @@ void VM::jz(const int16_t& c_destination)
 
 void VM::jnz(const int16_t& c_destination)
 {
-	if (stack[stackPointer - 1])
+	if (stack[-1])
 		stackFrame.setProgramPointer(c_destination);
 	else
 		stackFrame.incProgramPointer();
@@ -106,44 +101,35 @@ void VM::jnz(const int16_t& c_destination)
 
 // Todo: jl, jg
 
-stackType VM::eq(const stackType& a, const stackType& b) { ++stackPointer; return a == b; }
-stackType VM::gr(const stackType& a, const stackType& b) { ++stackPointer; return b > a; }
-stackType VM::ls(const stackType& a, const stackType& b) { ++stackPointer; return b < a; }
+stackType VM::eq(const stackType& a, const stackType& b) { return a == b; }
+stackType VM::gr(const stackType& a, const stackType& b) { return b > a; }
+stackType VM::ls(const stackType& a, const stackType& b) { return b < a; }
 
-stackType VM::op_and(const stackType& a, const stackType& b) { --stackPointer; return b ^ a; }
-stackType VM::op_or(const stackType& a, const stackType& b) { --stackPointer; return b | a; }
-stackType VM::op_nand(const stackType& a, const stackType& b) { --stackPointer; return ~(b & a); }
-stackType VM::op_xor(const stackType& a, const stackType& b) { --stackPointer; return b ^ a; }
+stackType VM::op_and(const stackType& a, const stackType& b) { return b ^ a; }
+stackType VM::op_or(const stackType& a, const stackType& b) { return b | a; }
+stackType VM::op_nand(const stackType& a, const stackType& b) { return ~(b & a); }
+stackType VM::op_xor(const stackType& a, const stackType& b) { return b ^ a; }
 stackType VM::op_not(const stackType& a) { return ~a; }
 
 void VM::dup(const stackType& numberOfDuplicates) {
 	assert(stack.size() >= numberOfDuplicates);
 	std::copy_n(stack.end() - numberOfDuplicates, numberOfDuplicates, std::back_inserter(stack));
-	stackPointer += numberOfDuplicates;
 }
 
-void VM::pushn(const stackType& a) {
-	++stackPointer;
-	stack.push_back(a);
-}
+void VM::pushn(const stackType& a) { stack += a; }
 
 void VM::pushs(const std::string& c_data)
 {
 	std::copy(c_data.begin(), c_data.end(), stack.begin());
-	stack.push_back(0);
-	stackPointer += (stackType)c_data.size() + 1;
+	stack += 0; // Add a terminator at the end
 }
 
-void VM::popn() {
-	stack.pop_back();
-	--stackPointer;
-}
+void VM::popn() { --stack; }
 
 void VM::pops()
 {
-	for (auto&& i = stack.cend(); *i != 0; --i, --stackPointer) stack.pop_back(); 
-	stack.pop_back();
-	--stackPointer;
+	auto terminator = std::find(stack.crbegin(), stack.crend(), 0);
+	stack.operator--(std::distance(stack.crbegin(), terminator)); // Remove until a terminator
 }
 
 void VM::allocate(const stackType& objectNumber)
@@ -183,7 +169,6 @@ void VM::run(const std::vector<instructionType>& c_instructions)
 			break;
 		Logger::print("Instruction: " + Logger::getInstructionName(currentInstruction));
 		doInstruction(opcode);
-		assert(stackPointer >= 0);
 
 		Logger::printStack(stack, currentInstruction);
 	}
@@ -194,19 +179,19 @@ void VM::doInstruction(const TokenState& c_opcode)
 {
 	stackType a, b;
 	
-	if (stack.size() > 0) a = stack.back();
-	if (stack.size() > 1) b = stack[stack.size() - 2];
+	if (stack.size() > 0) a = stack[-1];
+	if (stack.size() > 1) b = stack[-2];
 
-	auto popTwoTimes = [&]() { stack.pop_back(); stack.pop_back(); };
 	auto getFunctionIndex = [&](const TokenState&& c_tokenState) -> auto
 	{
-		popTwoTimes();
+		--stack;
+		--stack;
 		return static_cast<int>(c_opcode) - static_cast<int>(c_tokenState);
 	};
 
 	if (c_opcode >= TokenState::op_add && c_opcode <= TokenState::op_div)
 	{
-		stack.push_back(c_arithmeticFunctions[getFunctionIndex(TokenState::op_add)](a, b));
+		stack += c_arithmeticFunctions[getFunctionIndex(TokenState::op_add)](a, b);
 	}
 	else if (c_opcode == TokenState::op_inc || c_opcode == TokenState::op_dec)
 	{
@@ -236,16 +221,16 @@ void VM::doInstruction(const TokenState& c_opcode)
 	else if (c_opcode >= TokenState::op_eq && c_opcode <= TokenState::op_ls)
 	{
 		int index = static_cast<int>(c_opcode) - static_cast<int>(TokenState::op_eq);
-		stack.push_back(c_comparisonFunctions[index](a, b));
+		stack += c_comparisonFunctions[index](a, b);
 	}
 	else if (c_opcode >= TokenState::op_and && c_opcode <= TokenState::op_xor)
 	{
-		stack.push_back(c_binaryArithmeticFunctions[getFunctionIndex(TokenState::op_add)](a, b));
+		stack += c_binaryArithmeticFunctions[getFunctionIndex(TokenState::op_add)](a, b);
 	}
 	else if (c_opcode == TokenState::op_not)
 	{
-		stack.pop_back();
-		stack.push_back(op_not(a));
+		--stack;
+		stack += op_not(a);
 	}
 	else if (c_opcode == TokenState::op_dup) {
 		stackFrame.incProgramPointer();

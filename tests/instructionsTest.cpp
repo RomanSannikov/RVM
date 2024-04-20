@@ -13,7 +13,7 @@ TEST(Instructions, Add)
 										 static_cast<instructionType>(TokenState::op_hlt)};
 	vm.run(instructions);
 	EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-	EXPECT_EQ(TestFunctions::getStack(vm).back(), 4);
+	EXPECT_EQ(TestFunctions::getStack(vm)[-1], 4);
 }
 
 TEST(Instructions, Sub)
@@ -25,7 +25,7 @@ TEST(Instructions, Sub)
 										 static_cast<instructionType>(TokenState::op_hlt)};
 	vm.run(instructions);
 	EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-	EXPECT_EQ(TestFunctions::getStack(vm).back(), -2);
+	EXPECT_EQ(TestFunctions::getStack(vm)[-1], -2);
 }
 
 TEST(Instructions, Div)
@@ -37,7 +37,7 @@ TEST(Instructions, Div)
 										 static_cast<instructionType>(TokenState::op_hlt)};
 	vm.run(instructions);
 	EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-	EXPECT_EQ(TestFunctions::getStack(vm).back(), 8);
+	EXPECT_EQ(TestFunctions::getStack(vm)[-1], 8);
 }
 
 TEST(Instructions, Mul)
@@ -49,7 +49,7 @@ TEST(Instructions, Mul)
 										 static_cast<instructionType>(TokenState::op_hlt)};
 	vm.run(instructions);
 	EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-	EXPECT_EQ(TestFunctions::getStack(vm).back(), 126);
+	EXPECT_EQ(TestFunctions::getStack(vm)[-1], 126);
 }
 
 TEST(Instructions, Inc)
@@ -61,7 +61,7 @@ TEST(Instructions, Inc)
 										 static_cast<instructionType>(TokenState::op_hlt)};
 	vm.run(instructions);
 	EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-	EXPECT_EQ(TestFunctions::getStack(vm).back(), 65);
+	EXPECT_EQ(TestFunctions::getStack(vm)[-1], 65);
 }
 
 TEST(Instructions, Dec)
@@ -73,7 +73,7 @@ TEST(Instructions, Dec)
 										 static_cast<instructionType>(TokenState::op_hlt)};
 	vm.run(instructions);
 	EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-	EXPECT_EQ(TestFunctions::getStack(vm).back(), -2);
+	EXPECT_EQ(TestFunctions::getStack(vm)[-1], -2);
 }
 
 TEST(Instructions, Jmp) {
@@ -86,7 +86,7 @@ TEST(Instructions, Jmp) {
 										 static_cast<instructionType>(TokenState::op_hlt) };
 	vm.run(instructions);
 	EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-	EXPECT_EQ(TestFunctions::getStack(vm).front(), 3);
+	EXPECT_EQ(TestFunctions::getStack(vm)[0], 3);
 }
 
 TEST(Instructions, Jz) {
@@ -114,7 +114,7 @@ TEST(Instructions, Call442Div)
 										 static_cast<instructionType>(TokenState::op_ret)};
 	vm.run(instructions);
 	EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-	EXPECT_EQ(TestFunctions::getStack(vm).back(), 22);
+	EXPECT_EQ(TestFunctions::getStack(vm)[-1], 22);
 }
 
 TEST(Instructions, Dup)
@@ -126,7 +126,7 @@ TEST(Instructions, Dup)
 	vm.run(instructions);
 	auto& stack = TestFunctions::getStack(vm);
 	EXPECT_EQ(TestFunctions::getStack(vm).size(), 4);
-	for (int i = 0; i < 4; i++) EXPECT_EQ(TestFunctions::getStack(vm).at(i), 99);
+	for (int i = 0; i < 4; i++) EXPECT_EQ(TestFunctions::getStack(vm)[i], 99);
 }
 
 TEST(Instructions, New3Times)
@@ -158,5 +158,5 @@ TEST(Instructions, NewSvIntLd)
 										 static_cast<instructionType>(TokenState::op_ld), 0};
 	vm.run(instructions);
 	EXPECT_EQ(TestFunctions::getStack(vm).size(), 1);
-	EXPECT_EQ(TestFunctions::getStack(vm).back(), 99);
+	EXPECT_EQ(TestFunctions::getStack(vm)[-1], 99);
 }

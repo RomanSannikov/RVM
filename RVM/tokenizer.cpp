@@ -42,7 +42,7 @@ void Tokenizer::recognize(Token& token, const uint8_t& c_mode)
 {
 	if (c_mode == c_WORD)
 	{
-		if (token.stringValue[token.stringValue.size() - 1] == ':')
+		if (token.stringValue.back() == ':')
 		{
 			token.tokenState = TokenState::label;
 			token.stringValue.pop_back();
@@ -55,11 +55,11 @@ void Tokenizer::recognize(Token& token, const uint8_t& c_mode)
 }
 
 
-void Tokenizer::recognizeToken(Token& token, const std::vector<std::string>& c_array, const TokenState c_tokenState)
+void Tokenizer::recognizeToken(Token& token, const std::vector<std::string>& c_instructions, const TokenState c_tokenState)
 {
-	for (unsigned i = 0; i < c_array.size(); ++i)
+	for (unsigned i = 0; i < c_instructions.size(); ++i)
 	{
-		if (token.stringValue == c_array[i])
+		if (token.stringValue == c_instructions[i])
 		{
 			token.tokenState = static_cast<TokenState>(static_cast<int>(c_tokenState) + i);
 			return;
@@ -78,8 +78,8 @@ Tokenizer::StringSlice& Tokenizer::getSlice(const std::string& c_line, const uns
 		slice.mode = c_NUMBER;
 	else
 	{
-		bool isPunctuationSymbol = std::any_of(c_punctuationSymbols.begin(), c_punctuationSymbols.end(), [&](const auto& symbol) { return symbol[0] == c_line[c_startPoint]; });
-		return (isPunctuationSymbol ? (slice = {1, c_PUNCTUATIONSYMBOL }) : (slice = {0, c_PUNCTUATIONSYMBOL}));
+		bool isPunctuationSymbol = std::any_of(c_punctuationSymbols.begin(), c_punctuationSymbols.end(), [&](const auto& symbol) { return symbol.front() == c_line[c_startPoint]; });
+		return slice = {static_cast<unsigned>(isPunctuationSymbol), c_PUNCTUATIONSYMBOL};
 	}
 
 	++slice.length;

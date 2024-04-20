@@ -46,7 +46,7 @@ void Parser::parse(const std::vector<Token>& c_tokens)
 	{
 		if (it_currentToken->tokenState == TokenState::op_hlt)
 			wasHlt = true;
-		instructionValue = c_instructionValues[static_cast<instructionType>(c_tokens[0].tokenState)];
+		instructionValue = c_instructionValues[static_cast<instructionType>(c_tokens.front().tokenState)];
 		instructions.push_back(static_cast<instructionType>(it_currentToken->tokenState));
 	}
 	else
