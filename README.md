@@ -44,7 +44,7 @@ This little program is the equivalent of the following code snippet in `C`:
 for (int i = 5; i != 0; i--) {}
 ```
 
-To run this example just type:
+To run this example just type the following line (you may want to type `./bin/RVM` instead of just `RVM` since the binary is in the `bin/` directory):
 
 ```
 RVM -f tests/data/simpleTest.txt
