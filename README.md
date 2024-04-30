@@ -59,7 +59,7 @@ RVM -f tests/data/simpleTest.txt -o ON
 After executing this line, you will find a new file called `simpleTest.rbc` in the `tests/data/` directory with the following content:
 
 ```
-0001011100000000000101110000010100000101000010010000000000000100000110010001100100011101
+0001100000000000000110000000010100000101000010010000000000000100000110100001101000011101
 ```
 
 From a technical standpoint, it should be noted that this is not genuine binary code, but rather plain text. This conversion is carried out specifically for the purpose of debugging.
