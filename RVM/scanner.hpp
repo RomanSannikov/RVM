@@ -6,6 +6,7 @@
 #include <bitset>
 #include <cassert>
 #include <filesystem>
+#include <algorithm>
 
 #include "exceptions.hpp"
 #include "instruction.hpp"

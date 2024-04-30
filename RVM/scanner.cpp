@@ -32,7 +32,12 @@ const std::vector<instructionType> Scanner::readBinary()
 	assert(scannedLine.size());
 
 	for (unsigned i = 0; i < scannedLine.size(); i += 8)
-		instructions.emplace_back((instructionType)std::bitset<sizeof(instructionType) * 8>(scannedLine.substr(i, 8)).to_ulong());
+	{
+		const auto binary_sequence = scannedLine.substr(i, 8);
+		if (!std::all_of(binary_sequence.begin(), binary_sequence.end(), [](const auto& ch) { return ch == '0' || ch == '1'; }))
+			throw ScannerError("The binary file contains non-binary symbols");
+		instructions.emplace_back(static_cast<instructionType>(std::bitset<sizeof(instructionType) * 8>(binary_sequence).to_ulong()));
+	}
 
 	return instructions;
 }

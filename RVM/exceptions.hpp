@@ -12,7 +12,7 @@ public:
 class ArgumentParserError : public RVMError
 {
 public:
-	explicit ArgumentParserError(const std::string& message) : RVMError("Argument Parser Error: " + message) {}
+	explicit ArgumentParserError(const std::string& message) : RVMError("Argument Parser Error: " + message + "\nRVM -h for help") {}
 };
 
 class LexerError : public RVMError

@@ -201,5 +201,6 @@ void Parser::outputInstructions(std::filesystem::path filename)
 
 	std::ofstream output(filename);
 	for (const auto& i : instructions) output << std::bitset<8>(i);
+	std::cout << "Written to " << filename.generic_string() << std::endl;
 	output.close();
 }

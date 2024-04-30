@@ -1,6 +1,6 @@
 # Rolang Virtual Machine
 
-`RVM` is a VM that runs `Rolang ByteCode`
+`RVM` is a virtual machine that runs `Rolang ByteCode`
 
 # Build
 
@@ -14,9 +14,16 @@ The `RVM` executable will be placed in `bin/`.
 # Usage
 
 ```
-RVM -f <file>			# run ByteCode written as text
-RVM -b <binary file>		# run ByteCode written as binary (.rbc file extension)
-RVM -f <file> -o <ON/OFF>	# convert text ByteCode to binary ByteCode
+USAGE:
+  RVM [submodule] [options] <file>
+
+SUBMODULES:
+  run            run the code from the file (this is a default submodule)
+  convert        convert the provided file from one format to another
+
+OPTIONS:
+  -b, --binary   hint that the provided file is in the rbc format
+  -h, --help     prints help information
 ```
 
 You can find test examples in the `tests/data/` directory.
