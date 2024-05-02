@@ -126,8 +126,8 @@ call   <word>
 ret
 pushn  <num>
 pushs  <word>
-popn   <num>
-pops   <word>
+popn
+pops
 new    <num>
 hlt
 ```
