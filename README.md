@@ -97,42 +97,106 @@ Also, as you can see, the Rolang ByteCode must end with the `hlt` instruction.
 
 ### Rolang ByteCode instructions:
 
-The VM have a set of 30 instructions.
+The VM has a set of 30 instructions.
 
 ```
 add
+  sums two top stack numbers
+
 sub
+  subtracts two top stack numbers
+
 mul
+  multiplies two top stack numbers
+
 div
+  divides two top stack numbers
+
 inc
+  increments top stack element
+
 dec
+  decrements top stack element
+
 ld     <num>
+  loads <num>'s variable onto the stack
+
 sv     <num>
+  saves <num>'s variable onto the stack
+
 jmp    <word>
+  jumps to the label <word>
+
 jne    <word>
+  jumps to the label <word> if two top stack elements are not equal
+
 je     <word>
+  jumps to the label <word> if two top stack elements are equal
+
 jz     <word>
+  jumps to the label <word> if top stack element is zero
+
 jnz    <word>
+  jumps to the label <word> if top stack element is not zero
+
 eq
+  pushes 1 onto the stack if two top stack elements are equal, otherwise - 0
+
 gr
+  pushes 1 onto the stack if top stack element is greater than the second top stack element, otherwise - 0
+
 ls
+  pushes 1 onto the stack if top stack element is less than the second top stack element, otherwise - 0
+
 and
+  pushes the result of anding two top stack elements onto the stack
+
 or
-nan
+  pushes the result of oring two top stack elements onto the stack
+
+nand
+  pushes the result of nanding two top stack elements onto the stack
+
 xor
+  pushes the result of xoring two top stack elements onto the stack
+
 not
+  pushes the result of notting two top stack elements onto the stack
+
 dup    <num>
+  pushes a duplicate of the top stack element onto the stack
+
 call   <word>
+  executes a jump to the ladel <word> with saving the current stack frame to be able to return to the same place
+
 ret
+  returns to the last stack frame position (from the last call)
+
 pushn  <num>
+  pushes the given number <num>
+
 pushs  <word>
+  pushes the given string <word> ending with '\0'
+
 popn
+  pops the top number
+
 pops
+  pops the top string terminating with '\0' (pops everything until '\0')
+
 new    <num>
+  allocates a heap object of the type <num>
+
 hlt
+  halts the execution of the program
 ```
 
 Also, labels can be used to indicate where to jump.
+
+Since the VM is stack based, it has the following approach for taking operands for two-operand operations:
+
+`<operand1> <operation> <operand2>`,
+  where `<operand1>` is the top stack element and `<operand2>` is the top stack element after `<operand1>` is popped.
 
 # Demo
 
