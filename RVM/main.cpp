@@ -9,13 +9,13 @@
 
 #include "parser.hpp"
 #include "VM.hpp"
+#include "EpsilonGC.hpp"
+#include "STWGC.hpp"
+#include "startupUtils.hpp"
 
 
 using namespace std::literals;
-using bitmode = std::bitset<8>;
 
-
-std::filesystem::path filename;
 
 const std::string_view c_help_message =
 R"(RVM - Rolang Virtual Machine
@@ -119,28 +119,10 @@ hlt
 Also, labels can be used to indicate where to jump.
 )";
 
-
-enum programSubmodule
-{
-	NONE_SUBMODULE = 0,
-	EXECUTOR,
-	CONVERTOR
-};
-
-enum submoduleMode
-{
-	BINARY = 0
-};
-
-enum helpModes
-{
-	NONE_MODE = 0,
-	BYTECODE,
-	GENERAL
-};
+std::filesystem::path filename;
 
 
-static std::pair<programSubmodule, bitmode> parseArguments(const auto& c_arguments)
+static struct programOptions parseArguments(const auto& c_arguments)
 {
 	auto isArgument = [](const auto& argument, std::optional<std::string_view> shortName, std::optional<std::string_view> longName)
 	{
@@ -148,15 +130,15 @@ static std::pair<programSubmodule, bitmode> parseArguments(const auto& c_argumen
 	};
 
 	// Descr: flag either has one of the given options or has non of them
-	auto optionalNext = [&c_arguments](auto& iter, std::vector<std::pair<std::string_view, const std::function<void(int)>>> c_options)
+	auto optionalNext = [&c_arguments](const auto& iter, std::vector<std::pair<std::string_view, const std::function<void()>>> c_options)
 	{
-		auto defaultCall = [&c_options]() { if (!c_options.empty() && c_options.back().first.empty()) c_options.back().second(0); };
-		if (++iter == c_arguments.end()) { defaultCall(); return; }
-		for (auto option = c_options.cbegin(); option != c_options.cend(); option++)
+		auto defaultCall = [&c_options]() { if (!c_options.empty() && c_options.back().first.empty()) c_options.back().second(); };
+		if (iter == c_arguments.end()) { defaultCall(); return; }
+		for (const auto& option : c_options)
 		{
-			if (*iter == option->first)
+			if (*iter == option.first)
 			{
-				option->second(c_options.cbegin() - option);
+				option.second();
 				return;
 			}
 		}
@@ -165,67 +147,96 @@ static std::pair<programSubmodule, bitmode> parseArguments(const auto& c_argumen
 		throw ArgumentParserError("Invalid argument");
 	};
 
-	helpModes helpMode = (c_arguments.empty() ? helpModes::GENERAL : helpModes::NONE_MODE);
-	programSubmodule submodule = programSubmodule::NONE_SUBMODULE;
-	auto iter = c_arguments.begin();
-	bitmode mode;
-
-	const static std::vector<std::pair<std::string_view, const std::function<void(int)>>> helpOptions =
+	// Descr: mandatory flag options
+	auto mandatoryNext = [&c_arguments](const auto& iter, std::vector<std::pair<std::string_view, const std::function<void()>>> c_options)
 	{
-		{"bytecode"sv, [&helpMode](int mode) { helpMode = static_cast<helpModes>(mode + 1); }}, // Descr: This cast is not really safe
-		{{}, [&helpMode](int) { helpMode = helpModes::GENERAL; }} // Descr: Default value
+		if (iter == c_arguments.end()) throw ArgumentParserError("Invalid argument");
+		for (const auto& option : c_options)
+		{
+			if (*iter == option.first)
+			{
+				option.second();
+				return;
+			}
+		}
+		throw ArgumentParserError("Invalid argument");
 	};
 
-	for (; (helpMode == helpModes::NONE_MODE) && (submodule == programSubmodule::NONE_SUBMODULE) && (iter != c_arguments.end()); iter++)
-	{
-		if (*iter == "run") submodule = programSubmodule::EXECUTOR;
-		else if (*iter == "convert") submodule = programSubmodule::CONVERTOR;
-		else if (*iter == "help") optionalNext(iter, helpOptions);
-	}
+	programOptions::helpModes helpMode = (c_arguments.empty() ? programOptions::helpModes::GENERAL : programOptions::helpModes::NONE);
+	programOptions programOptions;
+	auto iter = c_arguments.begin();
 
-	if (submodule == programSubmodule::NONE_SUBMODULE) submodule = programSubmodule::EXECUTOR;
-	if (iter == c_arguments.end()) iter = c_arguments.begin();
-
-	for (; !(helpMode == helpModes::NONE_MODE) && iter != c_arguments.end(); iter++)
+	const static std::vector<std::pair<std::string_view, const std::function<void()>>> submoduleOptions =
 	{
-		if (isArgument(iter, {}, "--help"))
-			optionalNext(iter, helpOptions);
-		else if (isArgument(iter, "-h", {}))
-			helpMode = helpModes::GENERAL;
-		else if (isArgument(iter, "-b", "--binary"))
-			mode.set(submoduleMode::BINARY);
+		{"run"sv, [&programOptions]() { programOptions.submodule = programOptions::programSubmodule::EXECUTOR; }},
+		{"convert"sv, [&programOptions]() { programOptions.submodule = programOptions::programSubmodule::CONVERTOR; }},
+		{"help"sv, [&helpMode]() { helpMode = programOptions::helpModes::GENERAL; }},
+		{{}, [&programOptions]() { programOptions.submodule = programOptions::programSubmodule::EXECUTOR; }} // Descr: Default value
+	};
+
+	const static std::vector<std::pair<std::string_view, const std::function<void()>>> helpOptions =
+	{
+		{"bytecode"sv, [&helpMode]() { helpMode = programOptions::helpModes::BYTECODE; }},
+		{{}, [&helpMode]() { helpMode = programOptions::helpModes::GENERAL; }} // Descr: Default value
+	};
+
+	const static std::vector<std::pair<std::string_view, const std::function<void()>>> gcOptions =
+	{
+		{"epsilon"sv, [&programOptions]() { programOptions.gcType = programOptions::gcType::EPSILON; }},
+		{"stw"sv, [&programOptions]() { programOptions.gcType = programOptions::gcType::STW; }}
+	};
+
+	// Descr: Submodule is always first
+	optionalNext(iter, submoduleOptions);
+
+	for (; (helpMode == programOptions::helpModes::NONE) && (iter != c_arguments.end()); iter++)
+	{
+		if (isArgument(iter, {}, "--help"sv))
+			optionalNext(++iter, helpOptions);
+		else if (isArgument(iter, "-h"sv, {}))
+			helpMode = programOptions::helpModes::GENERAL;
+		else if (isArgument(iter, "-b"sv, "--binary"sv))
+			programOptions.submoduleMode = programOptions::submoduleMode::BINARY;
+		else if (isArgument(iter, {}, "--gc"sv))
+			mandatoryNext(++iter, gcOptions);
 		else if (std::filesystem::exists(*iter) && !std::filesystem::is_directory(*iter) && filename.empty())
 			filename = *iter;
 		else
 			break;
 	}
 
-	if (helpMode != helpModes::NONE_MODE)
+	if (helpMode != programOptions::helpModes::NONE)
 	{
-		std::printf(helpMode == helpModes::GENERAL ? c_help_message.data() : c_bytecode_help_message.data());
+		std::printf(helpMode == programOptions::helpModes::GENERAL ? c_help_message.data() : c_bytecode_help_message.data());
 		std::exit(0);
 	}
 	else if (iter != c_arguments.end())
 		throw ArgumentParserError("cannot recognize command line argument: " + std::string(*iter) + ". It is either an invalid argument or a non-existent file");
 	else if (filename.empty())
 		throw ArgumentParserError("provide a file");
-	else if (submodule == programSubmodule::CONVERTOR && mode.test(submoduleMode::BINARY))
+	else if (programOptions.submodule == programOptions::programSubmodule::CONVERTOR && programOptions.submoduleMode == programOptions::submoduleMode::BINARY)
 		throw ArgumentParserError("convertion from the binary format to the text format is not supported at the moment");
 
-	return std::make_pair(submodule, mode);
+	return programOptions;
 }
 
 
-static void startVirtualMachine(const std::filesystem::path& c_filename, const std::pair<programSubmodule, bitmode>& c_mode)
+static void startVirtualMachine(const std::filesystem::path& c_filename, const programOptions& programOptions)
 {
+	std::shared_ptr<BaseGC> gc;
+	if (programOptions.gcType == programOptions::gcType::STW)
+		gc = std::make_shared<STWGC>();
+	else
+		gc = std::make_shared<EpsilonGC>();
+
 	Parser parser;
-	VM vm;
+	VM vm(gc);
 
-	parser.parseFromFile(c_filename, c_mode.second.test(submoduleMode::BINARY));
+	parser.parseFromFile(c_filename, programOptions.submoduleMode == programOptions::submoduleMode::BINARY);
 
-	if (c_mode.first == programSubmodule::EXECUTOR)
+	if (programOptions.submodule == programOptions::programSubmodule::EXECUTOR)
 		vm.run(parser.getInstructions());
-	else if (c_mode.first == programSubmodule::CONVERTOR)
+	else if (programOptions.submodule == programOptions::programSubmodule::CONVERTOR)
 		parser.outputInstructions(c_filename);
 	else
 		throw ArgumentParserError("invalid program submodule");
@@ -237,8 +248,8 @@ int main(int argc, char* argv[])
 	const int start_from = static_cast<int>(argc > 0);
 	const auto c_args = std::span(argv + start_from, argc - start_from) | std::views::transform([](const char* str) { return std::string_view{str}; });
 	try {
-		const auto c_mode = parseArguments(c_args);
-		startVirtualMachine(filename, c_mode);
+		const auto programOptions = parseArguments(c_args);
+		startVirtualMachine(filename, programOptions);
 	} catch(std::exception& e) {
 		std::cerr << e.what() << std::endl;
 	}

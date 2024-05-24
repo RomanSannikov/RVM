@@ -2,6 +2,7 @@
 
 void STWGC::run(StackFrameManager& frames, std::shared_ptr<std::byte[]>& pool, stackType& poolPointer)
 {
+	Logger::print("Run STW GC");
 	size_t offset = 0;
 	for (auto& frame : frames) {
 		for (auto& variable : frame.variables) {

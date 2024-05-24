@@ -21,7 +21,7 @@ private:
 	std::shared_ptr<std::byte[]> pool = std::make_shared<std::byte[]>(c_POOL_SIZE);
 	stackType poolPointer = 0;
 
-	std::shared_ptr<BaseGC> gc = std::make_shared<STWGC>();
+	std::shared_ptr<BaseGC> gc;
 
 	std::vector<ObjectType> objectRepresentationTable = { ObjectType::INT, ObjectType::DOUBLE, ObjectType::REF };
 	Stack<stackType> stack;
@@ -49,7 +49,7 @@ private:
 	  std::bind(&VM::op_nand, this, std::placeholders::_1, std::placeholders::_2), std::bind(&VM::op_xor, this, std::placeholders::_1, std::placeholders::_2) };
 
 public:
-	VM() { stackFrame.pushFrame(); }
+	VM(std::shared_ptr<BaseGC> gc = std::make_shared<STWGC>()) : gc(gc) { stackFrame.pushFrame(); }
 
 public:
 	void run(const std::vector<instructionType>&);
