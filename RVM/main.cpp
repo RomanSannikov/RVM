@@ -1,12 +1,7 @@
 #include <iostream>
-#include <cassert>
-#include <bitset>
 #include <span>
 #include <ranges>
 #include <string_view>
-#include <filesystem>
-#include <utility>
-#include <optional>
 
 #include "startupUtils.hpp"
 
@@ -22,4 +17,4 @@ int main(int argc, char* argv[])
 		std::cerr << e.what() << std::endl;
 	}
 	return 0;
-}  
+}

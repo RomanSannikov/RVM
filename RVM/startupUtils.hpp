@@ -1,3 +1,7 @@
+#include <string_view>
+#include <filesystem>
+#include <optional>
+
 #include "parser.hpp"
 #include "VM.hpp"
 #include "EpsilonGC.hpp"
